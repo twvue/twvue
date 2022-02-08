@@ -27,8 +27,9 @@ const router = new VueRouter({
                 buildRoute("form", "documentation/Form"),
                 buildRoute("help-text", "documentation/HelpText"),
                 buildRoute("modal", "documentation/Modal"),
-                buildRoute("ProgressBar", "documentation/ProgressBar"),
+                buildRoute("progressBar", "documentation/ProgressBar"),
                 buildRoute("spinner", "documentation/Spinner"),
+                buildRoute("stepBar", "documentation/StepBar.vue"),
                 buildRoute("tab", "documentation/Tab"),
                 buildRoute("tag", "documentation/Tag"),
             ]
