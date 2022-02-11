@@ -7,28 +7,50 @@
         <div class="space-y-6">
             <div>
                 <h4 class="font-semibold text-gray-800 tracking-tight mb-2">
+                    Variant
+                </h4>
+
+                <div class="flex items-center space-x-4">
+                    <TWButton @click="activateVariant()">Primary</TWButton>
+                    <TWButton @click="activateVariant('secondary')">Secondary</TWButton>
+                </div>
+            </div>
+
+            <div>
+                <h4 class="font-semibold text-gray-800 tracking-tight mb-2">
+                    Options
+                </h4>
+
+                <div class="flex items-center space-x-4">
+                    <TWButton @click="activateOptions({ 'no-close-on-esc': true })">No close on ESC</TWButton>
+                    <TWButton @click="activateOptions({ 'no-close-on-backdrop': true })">No close on backdrop</TWButton>
+                    <TWButton @click="activateOptions({ 'no-animation': true })">No animation</TWButton>
+                    <TWButton @click="activateOptions({ 'hide-header': true, 'hide-footer': true })">Hide header / footer</TWButton>
+                    <TWButton @click="activateOptions({ 'hide-btn-ok': true, 'hide-btn-cancel': true })">Hide buttons</TWButton>
+                    <TWButton @click="activateOptions({ direction: 'left' })">Left</TWButton>
+                </div>
+            </div>
+
+            <div>
+                <h4 class="font-semibold text-gray-800 tracking-tight mb-2">
                     Sizes
                 </h4>
 
                 <div class="flex items-center space-x-4">
-                    <div>
-                        <TWButton @click="drawer.sm = true">Small</TWButton>
-                        <TWDrawer
-                            v-model="drawer.sm"
-                            title="Drawer"
-                            description="Lorem, ipsum dolor sit amet consectetur adipisicing elit aliquam ad hic recusandae soluta."
-                            size="sm"
-                            variant="secondary"
-                        >
-                            Drawer
-                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Atque debitis facilis nulla quas quia quibusdam reprehenderit sapiente suscipit! Ab ad alias deleniti ipsum iure iusto libero odio qui quibusdam similique!</p>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Atque debitis facilis nulla quas quia quibusdam reprehenderit sapiente suscipit! Ab ad alias deleniti ipsum iure iusto libero odio qui quibusdam similique!</p>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Atque debitis facilis nulla quas quia quibusdam reprehenderit sapiente suscipit! Ab ad alias deleniti ipsum iure iusto libero odio qui quibusdam similique!</p>
-                        </TWDrawer>
-                    </div>
+                    <TWButton @click="activateSize()">Small</TWButton>
+                    <TWButton @click="activateSize('md')">Medium</TWButton>
+                    <TWButton @click="activateSize('lg')">Large</TWButton>
+                    <TWButton @click="activateSize('full')">Full</TWButton>
                 </div>
             </div>
         </div>
+
+        <TWDrawer
+            v-model="isOpen"
+            v-bind="drawerAttributes"
+        >
+            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Atque debitis facilis nulla quas quia quibusdam reprehenderit sapiente suscipit! Ab ad alias deleniti ipsum iure iusto libero odio qui quibusdam similique!</p>
+        </TWDrawer>
     </div>
 </template>
 
@@ -38,16 +60,41 @@ import { gsap } from 'gsap';
 export default {
     data() {
         return {
-            drawer: {
-                sm: false,
-                md: false,
-                lg: false,
-                full: false,
-            },
+            isOpen: false,
+            drawerAttributes: null,
         };
     },
 
     methods: {
+        activateVariant(variant = 'primary') {
+            this.drawerAttributes = {
+                title: 'Drawer primary',
+                description: 'This is a description',
+                variant: variant
+            }
+
+            this.isOpen = true;
+        },
+        activateOptions(options = {}) {
+            this.drawerAttributes = {
+                title: 'Drawer',
+                description: 'This is a description',
+                variant: 'secondary',
+                ...options
+            }
+
+            this.isOpen = true;
+        },
+        activateSize(size = 'sm') {
+            this.drawerAttributes = {
+                size: size,
+                title: 'Drawer small',
+                description: 'This is a description',
+                variant: 'secondary'
+            }
+
+            this.isOpen = true;
+        },
         run() {
             const el = this.$refs.gsap;
             gsap.set(el, { opacity: 0 })
