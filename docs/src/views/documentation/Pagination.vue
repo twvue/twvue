@@ -15,7 +15,7 @@
                         :current-page="currentPage"
                         :total="total"
                         :per-page="perPage"
-                        size="lg"
+                        size="xl"
                         align="center"
                         pills
                         @change="onPageChange"
