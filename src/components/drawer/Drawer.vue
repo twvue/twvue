@@ -58,7 +58,7 @@ import { gsap } from 'gsap';
 import FixedMixin from '../../utils/FixedMixin';
 import VariantMixin from '../../utils/VariantMixin';
 import SizeMixin from '../../utils/SizeMixin';
-import TWDrawerHeader from './DrawerHEader';
+import TWDrawerHeader from './DrawerHeader';
 import TWDrawerFooter from './DrawerFooter';
 
 export default {
@@ -72,6 +72,10 @@ export default {
     props: {
         value: Boolean,
         title: String,
+        titleTag: {
+            type: String,
+            default: 'h5',
+        },
         description: String,
         direction: {
             type: String,

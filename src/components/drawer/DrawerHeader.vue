@@ -1,9 +1,12 @@
 <template>
     <div :class="TWDrawer.headerClass">
         <div class="flex items-center justify-between">
-            <h2 :class="TWDrawer.titleClass">
+            <Component
+                :is="TWDrawer.titleTag"
+                :class="TWDrawer.titleClass"
+            >
                 {{ TWDrawer.title }}
-            </h2>
+            </Component>
 
             <div class="ml-3 h-7 flex items-center">
                 <TWButtonClose
