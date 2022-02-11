@@ -136,6 +136,28 @@
                 </TWFormGroup>
             </div>
         </div>
+
+                <div>
+            <h3 class="text-lg font-bold mb-3">
+                Form checkbox
+            </h3>
+
+            <div>
+               <TWFormCheckbox 
+                    label="Basic"
+               />
+
+                <TWFormCheckbox 
+                    v-model="check"
+                    label="Yes"
+               />
+
+                <TWFormCheckbox 
+                    label="Disabled"
+                    disabled
+               />
+            </div>
+        </div>
     </div>
 </template>
 
@@ -144,6 +166,7 @@
 export default {
     data() {
         return {
+            check: true,
             multiple: [],
         }
     },

@@ -4,6 +4,7 @@ import Button from './button'
 import ButtonClose from './button-close';
 import Card from './card';
 import Drawer from './drawer';
+import FormCheckbox from './form-checkbox';
 import FormGroup from './form-group';
 import FormInput from './form-input';
 import FormLabel from './form-label';
@@ -27,6 +28,7 @@ export {
     ButtonClose,
     Card,
     Drawer,
+    FormCheckbox,
     FormGroup,
     FormInput,
     FormLabel,
