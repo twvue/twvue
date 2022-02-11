@@ -31,32 +31,7 @@
                                 v-if="!hideHeader"
                                 name="header"
                             >
-                                <div :class="headerClass">
-                                    <div class="flex items-center justify-between">
-                                        <h2 :class="titleClass">
-                                            {{ title }}
-                                        </h2>
-
-                                        <div class="ml-3 h-7 flex items-center">
-                                            <TWButtonClose
-                                                :class="btnCloseClass"
-                                                size="sm"
-                                                @click="close()"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div
-                                        v-if="description"
-                                        :class="descriptionWrapperClass"
-                                    >
-                                        <slot name="description">
-                                            <p :class="descriptionClass">
-                                                {{ description }}
-                                            </p>
-                                        </slot>
-                                    </div>
-                                </div>
+                                <TWDrawerHeader />
                             </slot>
 
                             <div :class="bodyClass">
@@ -67,23 +42,7 @@
                                 v-if="!hideFooter"
                                 name="footer"
                             >
-                                <div :class="footerClass">
-                                    <TWButton
-                                        v-if="!hideBtnCancel"
-                                        :variant="btnCancelVariant"
-                                        @click="onCancelClick()"
-                                    >
-                                        {{ btnCancelText }}
-                                    </TWButton>
-
-                                    <TWButton
-                                        v-if="!hideBtnOk"
-                                        :variant="btnOkVariant"
-                                        @click="onOkClick()"
-                                    >
-                                        {{ btnOkText }}
-                                    </TWButton>
-                                </div>
+                                <TWDrawerFooter />
                             </slot>
                         </div>
                     </div>
@@ -98,13 +57,18 @@ import { MountingPortal } from 'portal-vue';
 import { gsap } from 'gsap';
 import FixedMixin from '../../utils/FixedMixin';
 import VariantMixin from '../../utils/VariantMixin';
-import TWButtonClose from '../../components/button-close/ButtonClose';
-import TWButton from '../../components/button/Button'
 import SizeMixin from '../../utils/SizeMixin';
+import TWDrawerHeader from './DrawerHEader';
+import TWDrawerFooter from './DrawerFooter';
 
 export default {
     name: 'TWDrawer',
     mixins: [FixedMixin, VariantMixin, SizeMixin],
+    provide() {
+        return {
+            TWDrawer: this,
+        };
+    },
     props: {
         value: Boolean,
         title: String,
@@ -143,8 +107,8 @@ export default {
     },
     components: {
         MountingPortal,
-        TWButtonClose,
-        TWButton,
+        TWDrawerHeader,
+        TWDrawerFooter,
     },
     created() {
         window.addEventListener('keydown', this.onEsc);
@@ -276,6 +240,7 @@ export default {
                     return
 
                 }
+
                 this.close();
             }
         },
