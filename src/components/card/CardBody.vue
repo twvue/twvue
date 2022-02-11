@@ -7,16 +7,12 @@
 <script>
 export default {
     name: 'TWCardBody',
-    inject: {
-        'Card': {
-            default: undefined,
-        },
-    },
+    inject: ['TWCard'],
     computed: {
         bodyClass() {
             return [
-                this.Card.fixedClass.body,
-                this.Card.variantClass.body,
+                this.TWCard.fixedClass.body,
+                this.TWCard.variantClass.body,
             ];
         },
     },

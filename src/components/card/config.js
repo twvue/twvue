@@ -1,8 +1,11 @@
 export default {
     defaultVariant: 'secondary',
     fixed: {
-        root: 'w-full shadow-lg rounded-lg',
-        body: 'p-6',
+        root: 'w-full shadow rounded-lg overflow-hidden',
+        header: 'px-5 py-4 flex items-center justify-between',
+        headerTitle: 'text-base font-semibold leading-tight',
+        body: 'px-5 py-4',
+        footer: 'px-5 py-4',
     },
     variants: {
         primary: {
@@ -10,8 +13,10 @@ export default {
             body: '',
         },
         secondary: {
-            root: 'text-gray-700 bg-gray-50',
+            root: 'bg-white',
+            header: 'bg-gray-50',
             body: '',
+            footer: 'bg-gray-50',
         },
         success: {
             root: 'text-white bg-green-500',

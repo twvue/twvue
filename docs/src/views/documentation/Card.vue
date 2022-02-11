@@ -35,6 +35,22 @@
 
             <div>
                 <h4 class="font-semibold text-gray-800 tracking-tight mb-2">
+                    Header and footer
+                </h4>
+
+                <div class="space-y-4">
+                    <TWCard title="Header" variant="secondary">
+                        This is a <span class="font-semibold">secondary</span> card!
+
+                        <template #footer>
+                            Footer
+                        </template>
+                    </TWCard>
+                </div>
+            </div>
+
+            <div>
+                <h4 class="font-semibold text-gray-800 tracking-tight mb-2">
                     No body
                 </h4>
 

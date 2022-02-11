@@ -4,13 +4,13 @@ export default {
     fixed: {
         backdrop: 'bg-gray-700 bg-opacity-50',
         panel: 'w-screen flex flex-col bg-white shadow-xl',
-        header: 'p-6',
-        title: 'text-lg font-bold text-white',
+        header: 'px-5 py-4',
+        title: 'text-lg font-semibold text-white',
         description: 'text-sm',
         descriptionWrapper: 'mt-1',
         btnClose: '',
-        body: 'py-6 relative flex-1 px-4 sm:px-6 overflow-y-auto',
-        footer: 'p-6 flex items-center justify-end space-x-3',
+        body: 'p-4 relative flex-1 overflow-y-auto',
+        footer: 'px-5 py-4 flex items-center justify-end space-x-3',
     },
     variants: {
         primary: {
@@ -27,13 +27,13 @@ export default {
         secondary: {
             backdrop: '',
             panel: '',
-            header: 'bg-gray-50 border-b border-gray-200',
+            header: 'bg-gray-100 border-b border-gray-200',
             title: 'text-gray-700',
             description: 'text-gray-600',
             descriptionWrapper: '',
             btnClose: 'text-gray-700',
             body: '',
-            footer: 'bg-gray-50 border-t border-gray-200',
+            footer: 'bg-gray-100 border-t border-gray-200',
         },
     },
     sizes: {
