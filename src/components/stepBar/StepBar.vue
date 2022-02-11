@@ -43,7 +43,7 @@ export default {
         getWidthProgress() {
             const calc = 100 / (this.steps.length - 1);
             const progress = this.steps.findIndex(
-                step => step.completed == false
+                step => !step.completed
             );
             return progress < 0 ? 100 : calc * (progress - 1);
         },
