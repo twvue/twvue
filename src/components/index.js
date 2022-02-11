@@ -12,6 +12,9 @@ import FormSwitch from './form-switch';
 import FormTextarea from './form-textarea';
 import HelpText from './help-text';
 import Modal from './modal';
+import Pagination from './pagination';
+import PaginatorArrow from './pagination';
+import PaginatorPage from './pagination';
 import ProgressBar from './progressbar';
 import Spinner from './spinner';
 import Tabs from './tabs';
@@ -32,6 +35,9 @@ export {
     FormTextarea,
     HelpText,
     Modal,
+    Pagination,
+    PaginatorArrow,
+    PaginatorPage,
     ProgressBar,
     Spinner,
     Tabs,
