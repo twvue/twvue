@@ -52,11 +52,10 @@
 
     export default {
         name: 'TWDropdown',
-
         props: {
             variant: {
                 type: String,
-                default: 'default',
+                default: 'primary',
             },
             disabled: {
                 type: Boolean,
@@ -79,33 +78,28 @@
                 default: 'bottom-end',
             },
         },
-
         components: {
             TWButton,
         },
-
         provide() {
             return {
                 TWDropdown: this,
             };
         },
-
         data() {
             return {
-                TWOptions: {},
+                config: this.$TWVue.Dropdown,
                 isOpen: false,
                 popper: null,
                 id: this._uid,
             };
         },
-
         computed: {
             iconClassList() {
-                const sizes = this.TWOptions.icon.sizes;
+                const sizes = this.config.icon.sizes;
                 return sizes[this.size];
             },
         },
-
         watch: {
             isOpen(value) {
                 if (value) {
@@ -113,12 +107,10 @@
                 }
             },
         },
-
         created() {
             this.$root.$on('tw-dropdown-shown', this.rootCloseListener);
             this.TWOptions = this?.$TWVue?.TWDropdown || {};
         },
-
         mounted() {
             this.initPopper();
 
@@ -126,7 +118,6 @@
                 document.addEventListener('click', this.clickOutListener);
             }
         },
-
         beforeDestroy() {
             this.close();
 
@@ -134,11 +125,9 @@
                 document.removeEventListener('click', this.clickOutListener);
             }
         },
-
         destroyed() {
             this.popper.destroy();
         },
-
         methods: {
             rootCloseListener(vm) {
                 if (vm !== this) {
