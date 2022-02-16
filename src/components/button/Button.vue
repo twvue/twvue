@@ -33,10 +33,7 @@ export default {
         TWSpinner,
     },
     props: {
-        label: {
-            type: String,
-            default: '',
-        },
+        label: String,
         type: {
             type: String,
             default: 'button',
