@@ -2,7 +2,7 @@
     <Component
         :is="computedTag"
         v-bind="$attrs"
-        :value="value"
+        :value="localValue"
         :class="rootClass"
         v-on="inputListeners"
     />

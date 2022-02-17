@@ -5,7 +5,7 @@ export default {
         backdrop: 'bg-gray-700 bg-opacity-50',
         panel: 'w-screen flex flex-col bg-white shadow-xl',
         header: 'px-5 py-4',
-        title: 'text-lg font-semibold text-white',
+        title: 'text-lg font-semibold',
         description: 'text-sm',
         descriptionWrapper: 'mt-1',
         btnClose: '',
