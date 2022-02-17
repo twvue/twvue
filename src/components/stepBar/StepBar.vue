@@ -57,18 +57,17 @@ export default {
             return [this.fixedClass.bar, this.sizeClass.bar];
         },
         progressClass() {
-            return [this.fixedClass.progress, this.variantClass.root];
+            return [this.fixedClass.progress, this.variantClass.progress];
         },
         stepClass() {
             return [
                 this.fixedClass.step,
                 this.sizeClass.step,
-                this.variantClass.root
+                this.variantClass.step
             ];
         },
         noStepClass() {
             return [
-                this.fixedClass.noStep,
                 this.fixedClass.step,
                 this.sizeClass.step
             ];
