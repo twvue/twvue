@@ -69,6 +69,7 @@ export default {
         noStepClass() {
             return [
                 this.fixedClass.step,
+                this.fixedClass.noStep,
                 this.sizeClass.step
             ];
         },
