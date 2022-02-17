@@ -28,7 +28,7 @@
                     >
                         <div :class="panelClass">
                             <slot
-                                v-if="!hideHeader"
+                                v-if="!hideHeader && title"
                                 name="header"
                             >
                                 <TWDrawerHeader />

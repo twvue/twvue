@@ -1,15 +1,13 @@
-import Component from './FormGroup';
-
-const componentName = Component.name;
+import FormGroup from './FormGroup';
 
 const Plugin = {
     install(Vue) {
-        Vue.component(componentName, Component);
+        Vue.component('TWFormGroup', FormGroup);
     },
 };
 
 export default Plugin;
 
 export {
-    Component as componentName,
+    FormGroup as TWFormGroup,
 };
