@@ -221,7 +221,7 @@ export default {
                 return;
             }
 
-            gsap.fromTo(this.panel, { scale: 1 }, { repeat: 1, duration: 0.2, scale: 1.02, yoyo: true })
+            gsap.fromTo(this.panel, { scale: 1 }, { repeat: 1, duration: 0.1, scale: 1.02, yoyo: true })
         },
         onBackdropClick() {
             if (this.noCloseOnBackdrop) {
