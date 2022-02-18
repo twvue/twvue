@@ -11,21 +11,17 @@
             @after-leave="afterLeave"
         >
             <div
-                v-show="isOpen"
+                v-if="isOpen"
                 class="fixed inset-0 overflow-hidden"
             >
                 <div class="absolute inset-0 overflow-hidden">
                     <div
                         v-if="!noBackdrop"
-                        ref="backdrop"
                         :class="backdropClass"
                         @click="onBackdropClick"
                     />
 
-                    <div
-                        ref="panel"
-                        :class="panelWrapperClass"
-                    >
+                    <div :class="panelWrapperClass">
                         <div :class="panelClass">
                             <slot
                                 v-if="!hideHeader && title"
@@ -132,25 +128,20 @@ export default {
         value(vl) {
             this.isOpen = vl;
         },
-        isOpen(vl) {
-            const body = document.body;
-            if (vl) {
-                body.classList.add('overflow-hidden');
-            } else {
-                body.classList.remove('overflow-hidden');
-            }
+        isOpen() {
+            this.handleScroll();
         },
     },
     computed: {
         backdropClass() {
             return [
-                'absolute inset-0',
+                'backdrop absolute inset-0',
                 this.fixedClass.backdrop,
             ];
         },
         panelWrapperClass() {
             return [
-                'flex fixed inset-y-0',
+                'panel flex fixed inset-y-0',
                 this.getDirectionClass,
             ];
         },
@@ -214,6 +205,17 @@ export default {
         }
     },
     methods: {
+        handleScroll() {
+            if (typeof window === 'undefined') return
+
+            const body = document.body;
+            if (this.isOpen) {
+                body.classList.add('overflow-hidden');
+            } else {
+                body.classList.remove('overflow-hidden');
+            }
+        },
+
         noCloseEffect() {
             if (this.noAnimation) {
                 return;
@@ -252,9 +254,11 @@ export default {
             this.$emit('input', false);
             this.$emit('close');
         },
-        beforeEnter() {
-            this.backdrop = this.$refs.backdrop;
-            this.panel = this.$refs.panel;
+        beforeEnter(el) {
+            this.$emit('before-enter');
+
+            this.backdrop = el.querySelector('.backdrop');
+            this.panel = el.querySelector('.panel');
 
             if (this.noAnimation) {
                 return;
@@ -289,8 +293,7 @@ export default {
             gsap.to(this.panel, { opacity: 0, x: this.initialXPosition, ease: 'power3.inOut', duration: 1, onComplete: done, })
         },
         afterLeave() {
-            this.backdrop.removeAttribute( 'style');
-            this.panel.removeAttribute( 'style');
+            this.$emit('after-leave');
         },
     },
 };

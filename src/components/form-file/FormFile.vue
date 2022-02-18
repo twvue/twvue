@@ -1,79 +1,81 @@
 <template>
-    <label :class="baseCLass">
+    <label :class="rootClass">
         <input
             type="file"
             class="absolute opacity-0"
+            :multiple="multiple"
             @change="onChange"
         >
 
-        <span>{{ fileName || 'Choose a file...' }}</span>
+        <span :class="textClass">{{ fileName || placeholder }}</span>
 
-        <span class="flex bg-gray-200 border border-gray-300 -mr-5 -my-3 px-3 py-2">
-            Browse
+        <span :class="btnClass">
+            {{ btnText }}
         </span>
     </label>
 </template>
 
 <script>
-    export default {
-        name: 'TWFormFile',
-        props: {
-            value: undefined,
-            variant: {
-                type: String,
-                default: 'default',
-            },
-            size: {
-                type: String,
-                default: 'md',
-            },
+import FixedMixin from '../../utils/FixedMixin';
+import VariantMixin from '../../utils/VariantMixin';
+import SizeMixin from '../../utils/SizeMixin';
+
+export default {
+    name: 'TWFormFile',
+    mixins: [FixedMixin, VariantMixin, SizeMixin],
+    inheritAttrs: false,
+    props: {
+        multiple: Boolean,
+        placeholder: {
+            type: String,
+            default: 'Choose a file...'
         },
-
-        data() {
-            return {
-                fileName: null,
-                TWOptions: {},
-            };
+        btnText: {
+            type: String,
+            default: 'Browse',
         },
-
-        computed: {
-            baseCLass() {
-                return [
-                    'flex items-center justify-between relative overflow-hidden',
-                    this.TWOptions.base,
-                    this.getVariants,
-                    this.sizeClass,
-                ];
-            },
-
-            getVariants() {
-                if (this.disabled) {
-                    return this.TWOptions.disabled;
-                }
-
-                if (this.readonly) {
-                    return this.TWOptions.readonly;
-                }
-
-                const variants = this.TWOptions.variants;
-                return variants[this.variant];
-            },
-
-            sizeClass() {
-                const sizes = this.TWOptions.sizes;
-                return sizes[this.size];
-            },
+    },
+    data() {
+        return {
+            fileName: null,
+            config: this.$TWVue.FormFile,
+        };
+    },
+    computed: {
+        rootClass() {
+            return [
+                this.fixedClass.root,
+                this.variantClass.root,
+                this.sizeClass.root,
+            ];
         },
-
-        created() {
-            this.TWOptions = this?.$TWVue?.TWFormInput || {};
+        textClass() {
+            return [
+                this.fixedClass.text,
+                this.variantClass.text,
+                this.sizeClass.text,
+            ];
         },
-
-        methods: {
-            onChange($evt) {
-                this.fileName = $evt.target.files[0].name;
-                this.$emit('input', $evt.target.files[0]);
-            },
+        btnClass() {
+            return [
+                this.fixedClass.btn,
+                this.variantClass.btn,
+                this.sizeClass.btn,
+            ];
         },
-    };
+    },
+
+    methods: {
+        onChange($evt) {
+            const files = $evt.target.files;
+            if (files.length > 1) {
+                this.fileName = `${files.length} files`;
+            } else if (files.length === 1) {
+                this.fileName = files[0].name;
+            }
+
+            this.$emit('input', $evt.target.files);
+        },
+    },
+};
 </script>

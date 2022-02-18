@@ -136,6 +136,16 @@
                 </TWFormGroup>
             </div>
         </div>
+
+        <div>
+            <h3 class="text-lg font-bold mb-3">
+                Form file
+            </h3>
+
+            <div>
+                <TWFormFile multiple variant="primary" />
+            </div>
+        </div>
     </div>
 </template>
 
