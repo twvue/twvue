@@ -15,6 +15,7 @@ import HelpText from './help-text';
 import Modal from './modal';
 import ProgressBar from './progressbar';
 import Spinner from './spinner';
+import StepBar from './stepBar'
 import Tabs from './tabs';
 import Tag from './tag';
 
@@ -36,6 +37,7 @@ export {
     Modal,
     ProgressBar,
     Spinner,
+    StepBar,
     Tabs,
     Tag
 };
