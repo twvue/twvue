@@ -4,13 +4,13 @@ export default {
     fixed: {
         backdrop: 'bg-gray-700 bg-opacity-50',
         panel: 'w-screen flex flex-col bg-white shadow-xl',
-        header: 'px-5 py-4',
+        header: 'px-4 py-3',
         title: 'text-lg font-semibold',
         description: 'text-sm',
         descriptionWrapper: 'mt-1',
         btnClose: '',
         body: 'p-4 relative flex-1 overflow-y-auto',
-        footer: 'px-5 py-4 flex items-center justify-end space-x-3',
+        footer: 'px-4 py-3',
     },
     variants: {
         primary: {

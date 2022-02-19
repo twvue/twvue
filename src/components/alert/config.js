@@ -1,7 +1,7 @@
 export default {
     defaultVariant: 'primary',
     fixed: {
-        root: 'rounded-xl px-5 py-4 text-sm mb-4',
+        root: 'rounded-xl px-4 py-3 text-sm mb-4',
         btnClose: 'inline-flex rounded-md p-1.5 focus:outline-none focus:ring-2 focus:ring-offset-2',
     },
     variants: {

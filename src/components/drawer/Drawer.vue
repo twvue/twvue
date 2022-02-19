@@ -34,12 +34,12 @@
                                 <slot />
                             </div>
 
-                            <slot
-                                v-if="!hideFooter"
-                                name="footer"
+                            <div
+                                v-if="$slots.footer"
+                                :class="footerClass"
                             >
-                                <TWDrawerFooter />
-                            </slot>
+                                <slot name="footer" />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -55,7 +55,6 @@ import FixedMixin from '../../utils/FixedMixin';
 import VariantMixin from '../../utils/VariantMixin';
 import SizeMixin from '../../utils/SizeMixin';
 import TWDrawerHeader from './DrawerHeader';
-import TWDrawerFooter from './DrawerFooter';
 
 export default {
     name: 'TWDrawer',
@@ -108,7 +107,6 @@ export default {
     components: {
         MountingPortal,
         TWDrawerHeader,
-        TWDrawerFooter,
     },
     created() {
         window.addEventListener('keydown', this.onEsc);
@@ -116,10 +114,13 @@ export default {
     beforeDestroy() {
         window.removeEventListener('keydown', this.onEsc);
     },
+    mounted() {
+        this.isOpen = this.value
+    },
     data() {
         return {
             config: this.$TWVue.Drawer,
-            isOpen: this.value,
+            isOpen: false,
             backdrop: null,
             panel: null,
         }
@@ -215,7 +216,6 @@ export default {
                 body.classList.remove('overflow-hidden');
             }
         },
-
         noCloseEffect() {
             if (this.noAnimation) {
                 return;

@@ -2,10 +2,10 @@ export default {
     defaultVariant: 'secondary',
     fixed: {
         root: 'w-full shadow rounded-lg overflow-hidden',
-        header: 'px-5 py-4 flex items-center justify-between',
+        header: 'px-4 py-3 flex items-center justify-between',
         headerTitle: 'text-base font-semibold leading-tight',
-        body: 'px-5 py-4',
-        footer: 'px-5 py-4',
+        body: 'px-4 py-3',
+        footer: 'px-4 py-3',
     },
     variants: {
         primary: {
