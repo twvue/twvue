@@ -7,7 +7,7 @@ const Plugin = {
         if (!Vue.prototype.$TWVue) { Vue.prototype.$TWVue = {}; }
         Vue.prototype.$TWVue.Drawer = merge(config, options);
 
-        Vue.component(Drawer.name, Drawer);
+        Vue.component('TWDrawer', Drawer);
     },
 };
 

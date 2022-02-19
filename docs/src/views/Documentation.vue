@@ -33,6 +33,7 @@ export default {
                 { label: "Button close", to: "/documentation/button-close" },
                 { label: "Card", to: "/documentation/card" },
                 { label: "Drawer", to: "/documentation/drawer" },
+                { label: "Dropdown", to: "/documentation/dropdown" },
                 { label: "Form", to: "/documentation/form" },
                 { label: "Help text", to: "/documentation/help-text" },
                 { label: "Modal", to: "/documentation/modal" },

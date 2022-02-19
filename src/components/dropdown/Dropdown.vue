@@ -1,7 +1,7 @@
 <template>
     <div
         ref="component"
-        class="relative inline-block text-left"
+        :class="rootClass"
     >
         <TWButton
             ref="button"
@@ -19,7 +19,7 @@
                 name="button-icon"
             >
                 <svg
-                    :class="iconClassList"
+                    :class="iconClass"
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 20 20"
                     fill="currentColor"
@@ -34,168 +34,164 @@
             </slot>
         </TWButton>
 
-        <div
-            ref="dropdown"
-            :data-show="isOpen"
-            class="absolute dropdown w-56 rounded-md shadow-lg z-10"
+        <MountingPortal
+            mount-to="body"
+            append
         >
-            <div class="py-1 rounded-md bg-white shadow-xs">
-                <slot />
+            <div
+                ref="dropdown"
+                :data-show="isOpen"
+                class="twvue-dropdown absolute w-56 rounded-md shadow-lg z-10"
+            >
+                <div class="py-1 rounded-md bg-white shadow-xs">
+                    <slot />
+                </div>
             </div>
-        </div>
+        </MountingPortal>
     </div>
 </template>
 
 <script>
-    import TWButton from '../button/Button';
-    import { createPopper } from '@popperjs/core/lib/popper-lite.js';
+import { MountingPortal } from 'portal-vue';
+import TWButton from '../button/Button';
+import { createPopper } from '@popperjs/core';
+import FixedMixin from '../../utils/FixedMixin';
+import VariantMixin from '../../utils/VariantMixin';
+import SizeMixin from '../../utils/SizeMixin';
 
-    export default {
-        name: 'TWDropdown',
-
-        props: {
-            variant: {
-                type: String,
-                default: 'default',
-            },
-            disabled: {
-                type: Boolean,
-                default: false,
-            },
-            noCaret: {
-                type: Boolean,
-                default: false,
-            },
-            size: {
-                type: String,
-                default: 'md',
-            },
-            text: {
-                type: String,
-                default: undefined,
-            },
-            placement: {
-                type: String,
-                default: 'bottom-end',
-            },
+export default {
+    name: 'TWDropdown',
+    mixins: [FixedMixin, VariantMixin, SizeMixin],
+    props: {
+        disabled: {
+            type: Boolean,
+            default: false,
         },
-
-        components: {
-            TWButton,
+        noCaret: {
+            type: Boolean,
+            default: false,
         },
-
-        provide() {
-            return {
-                TWDropdown: this,
-            };
+        text: {
+            type: String,
+            default: undefined,
         },
-
-        data() {
-            return {
-                TWOptions: {},
-                isOpen: false,
-                popper: null,
-                id: this._uid,
-            };
+        placement: {
+            type: String,
+            default: 'bottom-end',
         },
-
-        computed: {
-            iconClassList() {
-                const sizes = this.TWOptions.icon.sizes;
-                return sizes[this.size];
-            },
+    },
+    components: {
+        MountingPortal,
+        TWButton,
+    },
+    provide() {
+        return {
+            TWDropdown: this,
+        };
+    },
+    data() {
+        return {
+            config: this.$TWVue.Dropdown,
+            isOpen: false,
+            popper: null,
+        };
+    },
+    computed: {
+        rootClass() {
+            return [
+                this.fixedClass.root,
+                this.sizeClass.root,
+            ];
         },
-
-        watch: {
-            isOpen(value) {
-                if (value) {
-                    this.$root.$emit('tw-dropdown-shown', this);
-                }
-            },
+        iconClass() {
+            return [
+                this.fixedClass.icon,
+                this.sizeClass.icon
+            ];
         },
-
-        created() {
-            this.$root.$on('tw-dropdown-shown', this.rootCloseListener);
-            this.TWOptions = this?.$TWVue?.TWDropdown || {};
+    },
+    watch: {
+        isOpen(value) {
+            if (value) {
+                this.$root.$emit('tw-dropdown-shown', this);
+            }
         },
-
-        mounted() {
+    },
+    created() {
+        this.$root.$on('tw-dropdown-shown', this.rootCloseListener);
+    },
+    mounted() {
+        this.$nextTick(() => {
             this.initPopper();
+        })
 
-            if (typeof document !== 'undefined') {
-                document.addEventListener('click', this.clickOutListener);
-            }
-        },
+        if (typeof document !== 'undefined') {
+            document.addEventListener('click', this.clickOutListener);
+        }
+    },
+    beforeDestroy() {
+        this.close();
 
-        beforeDestroy() {
-            this.close();
-
-            if (typeof document !== 'undefined') {
-                document.removeEventListener('click', this.clickOutListener);
-            }
-        },
-
-        destroyed() {
+        if (typeof document !== 'undefined') {
+            document.removeEventListener('click', this.clickOutListener);
+        }
+    },
+    destroyed() {
+        if (typeof this.popper.destroy === 'function') {
             this.popper.destroy();
-        },
-
-        methods: {
-            rootCloseListener(vm) {
-                if (vm !== this) {
-                    this.close();
-                }
-            },
-
-            clickOutListener(e) {
-                // TODO Refactor as it should close only the current scope
-                if (!this.$el.contains(e.target)) {
-                    this.close();
-                }
-            },
-
-            toggleDropdown() {
-                if (this.isOpen) {
-                    this.close();
-                } else {
-                    this.open();
-                }
-            },
-
-            open() {
-                this.isOpen = true;
-                this.$emit('open');
-            },
-
-            close() {
-                this.isOpen = false;
-                this.$emit('close');
-            },
-
-            select(opt) {
+        }
+    },
+    methods: {
+        rootCloseListener(vm) {
+            if (vm !== this) {
                 this.close();
-                this.$emit('select', opt);
-            },
-
-            initPopper() {
-                const button = this.$refs.component;
-                const dropdown = this.$refs.dropdown;
-
-                this.popper = createPopper(button, dropdown, {
-                    placement: this.placement,
-                });
-            },
+            }
         },
-    };
+        clickOutListener(e) {
+            // TODO Refactor as it should close only the current scope
+            if (!this.$el.contains(e.target)) {
+                this.close();
+            }
+        },
+        toggleDropdown() {
+            if (this.isOpen) {
+                this.close();
+            } else {
+                this.open();
+            }
+        },
+        open() {
+            this.isOpen = true;
+            this.$emit('open');
+        },
+        close() {
+            this.isOpen = false;
+            this.$emit('close');
+        },
+        select(opt) {
+            this.close();
+            this.$emit('select', opt);
+        },
+        initPopper() {
+            const button = this.$refs.component;
+            const dropdown = this.$refs.dropdown;
+
+            this.popper = createPopper(button, dropdown, {
+                placement: this.placement,
+            });
+        },
+    },
+};
 </script>
 
 <style>
-    .dropdown {
-        pointer-events: none;
-        visibility: hidden;
-    }
+.twvue-dropdown {
+    pointer-events: none;
+    visibility: hidden;
+}
 
-    .dropdown[data-show] {
-        pointer-events: auto;
-        visibility: visible;
-    }
+.twvue-dropdown[data-show] {
+    pointer-events: auto;
+    visibility: visible;
+}
 </style>

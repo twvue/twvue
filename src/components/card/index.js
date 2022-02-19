@@ -8,8 +8,8 @@ const Plugin = {
         if (!Vue.prototype.$TWVue) { Vue.prototype.$TWVue = {}; }
         Vue.prototype.$TWVue.Card = merge(config, options);
 
-        Vue.component(Card.name, Card);
-        Vue.component(CardBody.name, CardBody);
+        Vue.component('TWCard', Card);
+        Vue.component('TWCardBody', CardBody);
     },
 };
 

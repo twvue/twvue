@@ -25,6 +25,7 @@ const router = new VueRouter({
                 buildRoute("button-close", "documentation/ButtonClose"),
                 buildRoute("card", "documentation/Card"),
                 buildRoute("drawer", "documentation/Drawer"),
+                buildRoute("dropdown", "documentation/Dropdown"),
                 buildRoute("form", "documentation/Form"),
                 buildRoute("help-text", "documentation/HelpText"),
                 buildRoute("modal", "documentation/Modal"),

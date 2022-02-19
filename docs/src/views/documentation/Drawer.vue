@@ -61,8 +61,6 @@
 </template>
 
 <script>
-import { gsap } from 'gsap';
-
 export default {
     data() {
         return {
@@ -100,11 +98,6 @@ export default {
             }
 
             this.isOpen = true;
-        },
-        run() {
-            const el = this.$refs.gsap;
-            gsap.set(el, { opacity: 0 })
-            gsap.to(el, { opacity: 1, x: '100px', ease: 'expo.inOut' })
         },
     },
 };

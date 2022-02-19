@@ -4,6 +4,7 @@ import Button from './button'
 import ButtonClose from './button-close';
 import Card from './card';
 import Drawer from './drawer';
+import Dropdown from './dropdown';
 import FormFile from './form-file';
 import FormGroup from './form-group';
 import FormInput from './form-input';
@@ -25,6 +26,7 @@ export {
     ButtonClose,
     Card,
     Drawer,
+    Dropdown,
     FormFile,
     FormGroup,
     FormInput,
