@@ -5,6 +5,8 @@ export default {
         root: '',
         rootItem: 'group flex items-center block w-full px-4 py-2 text-sm leading-5 text-gray-700 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-900',
         rootDivider: 'border-t my-1 border-gray-100',
+        dropdown: 'absolute w-56 bg-white rounded-lg shadow-lg',
+        dropdownContainer: 'py-1',
     },
     sizes: {
         xs: {

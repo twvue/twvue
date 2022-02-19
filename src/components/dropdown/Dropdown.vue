@@ -41,9 +41,9 @@
             <div
                 ref="dropdown"
                 :data-show="isOpen"
-                class="twvue-dropdown absolute w-56 rounded-md shadow-lg z-10"
+                :class="dropdownClass"
             >
-                <div class="py-1 rounded-md bg-white shadow-xs">
+                <div :class="dropdownContainerClass">
                     <slot />
                 </div>
             </div>
@@ -108,6 +108,19 @@ export default {
                 this.fixedClass.icon,
                 this.sizeClass.icon
             ];
+        },
+        dropdownClass() {
+            return [
+                'twvue-dropdown',
+                this.fixedClass.dropdown,
+                this.sizeClass.dropdown,
+            ]
+        },
+        dropdownContainerClass() {
+            return [
+                this.fixedClass.dropdownContainer,
+                this.sizeClass.dropdownContainer,
+            ]
         },
     },
     watch: {
