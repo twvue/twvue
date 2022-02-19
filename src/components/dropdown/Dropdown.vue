@@ -113,6 +113,7 @@ export default {
             return [
                 'twvue-dropdown',
                 this.fixedClass.dropdown,
+                this.variantClass.dropdown,
                 this.sizeClass.dropdown,
             ]
         },
