@@ -25,8 +25,7 @@
                     <TWButton @click="activateOptions({ 'no-close-on-esc': true })">No close on ESC</TWButton>
                     <TWButton @click="activateOptions({ 'no-close-on-backdrop': true })">No close on backdrop</TWButton>
                     <TWButton @click="activateOptions({ 'no-animation': true })">No animation</TWButton>
-                    <TWButton @click="activateOptions({ 'hide-header': true, 'hide-footer': true })">Hide header / footer</TWButton>
-                    <TWButton @click="activateOptions({ 'hide-btn-ok': true, 'hide-btn-cancel': true })">Hide buttons</TWButton>
+                    <TWButton @click="activateOptions({ 'hide-header': true })">Hide header</TWButton>
                     <TWButton @click="activateOptions({ direction: 'left' })">Left</TWButton>
                 </div>
             </div>

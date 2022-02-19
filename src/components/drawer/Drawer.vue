@@ -81,28 +81,9 @@ export default {
         },
         noAnimation: Boolean,
         hideHeader: Boolean,
-        hideFooter: Boolean,
         noCloseOnBackdrop: Boolean,
         noCloseOnEsc: Boolean,
         noBackdrop: Boolean,
-        btnCancelVariant: {
-            type: String,
-            default: 'secondary',
-        },
-        hideBtnCancel: Boolean,
-        btnCancelText: {
-            type: String,
-            default: 'Cancel',
-        },
-        btnOkVariant: {
-            type: String,
-            default: 'primary',
-        },
-        hideBtnOk: Boolean,
-        btnOkText: {
-            type: String,
-            default: 'OK',
-        },
     },
     components: {
         MountingPortal,
