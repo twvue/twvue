@@ -8,69 +8,63 @@
             v-show="isOpen"
             :class="rootClass"
         >
-            <div class="flex items-center justify-center min-h-screen p-4 sm:p-0 text-center">
+            <div
+                v-if="!hideBackdrop"
+                :class="backdropClass"
+                @click="onBackdropClick()"
+            />
+
+            <div :class="wrapClass">
                 <div
-                    v-if="!hideBackdrop"
-                    class="fixed inset-0 transition-opacity"
-                    @click="onBackdropClick()"
+                    v-if="!hideHeader"
+                    :class="headerClass"
                 >
-                    <div :class="backdropClass" />
+                    <slot name="header">
+                        <slot name="header-title">
+                            <Component
+                                :is="titleTag"
+                                :class="titleClass"
+                            >
+                                {{ title }}
+                            </Component>
+                        </slot>
+
+                        <div
+                            v-if="!hideHeaderClose"
+                            class="-mr-2"
+                        >
+                            <TWButtonClose
+                                size="sm"
+                                :class="buttonCloseClass"
+                                @click="close()"
+                            />
+                        </div>
+                    </slot>
                 </div>
 
-                <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+                <div :class="bodyClass">
+                    <slot />
+                </div>
 
-                <div :class="wrapClass">
-                    <div
-                        v-if="!hideHeader"
-                        :class="headerClass"
+                <div
+                    v-if="!hideFooter"
+                    :class="footerClass"
+                >
+                    <TWButton
+                        v-if="!hideBtnCancel"
+                        :variant="btnCancelVariant"
+                        @click="onCancelClick()"
                     >
-                        <slot name="header">
-                            <slot name="header-title">
-                                <Component
-                                    :is="titleTag"
-                                    :class="titleClass"
-                                >
-                                    {{ title }}
-                                </Component>
-                            </slot>
+                        {{ btnCancelText }}
+                    </TWButton>
 
-                            <div
-                                v-if="!hideHeaderClose"
-                                class="-mr-2"
-                            >
-                                <TWButtonClose
-                                    size="sm"
-                                    :class="buttonCloseClass"
-                                    @click="close()"
-                                />
-                            </div>
-                        </slot>
-                    </div>
-
-                    <div :class="bodyClass">
-                        <slot />
-                    </div>
-
-                    <div
-                        v-if="!hideFooter"
-                        :class="footerClass"
+                    <TWButton
+                        v-if="!hideBtnOk"
+                        :variant="btnOkVariant"
+                        @click="onOkClick()"
                     >
-                        <TWButton
-                            v-if="!hideBtnCancel"
-                            :variant="btnCancelVariant"
-                            @click="onCancelClick()"
-                        >
-                            {{ btnCancelText }}
-                        </TWButton>
-
-                        <TWButton
-                            v-if="!hideBtnOk"
-                            :variant="btnOkVariant"
-                            @click="onOkClick()"
-                        >
-                            {{ btnOkText }}
-                        </TWButton>
-                    </div>
+                        {{ btnOkText }}
+                    </TWButton>
                 </div>
             </div>
         </div>
@@ -143,13 +137,14 @@ export default {
         },
         backdropClass() {
             return [
+                'fixed inset-0 transition-opacity',
                 this.fixedClass.backdrop,
             ];
         },
         wrapClass() {
             return [
                 this.fixedClass.wrap,
-                this.sizeClass
+                this.sizeClass.wrap,
             ];
         },
         titleClass() {
