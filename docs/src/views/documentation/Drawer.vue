@@ -92,7 +92,7 @@ export default {
         activateSize(size = 'sm') {
             this.drawerAttributes = {
                 size: size,
-                title: 'Drawer small',
+                title: 'Drawer',
                 description: 'This is a description',
                 variant: 'secondary'
             }

@@ -268,10 +268,10 @@ export default {
                 return;
             }
 
+            gsap.to(this.panel, { opacity: 0, x: this.initialXPosition, ease: 'power3.inOut', duration: 1, onComplete: done, })
             if (!this.noBackdrop) {
                 gsap.to(this.backdrop, { opacity: 0, ease: 'power3.inOut' })
             }
-            gsap.to(this.panel, { opacity: 0, x: this.initialXPosition, ease: 'power3.inOut', duration: 1, onComplete: done, })
         },
         afterLeave() {
             this.$emit('after-leave');
