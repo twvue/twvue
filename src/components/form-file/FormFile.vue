@@ -4,6 +4,7 @@
             type="file"
             class="absolute opacity-0"
             :multiple="multiple"
+            :accept="accept"
             @change="onChange"
         >
 
@@ -26,6 +27,7 @@ export default {
     inheritAttrs: false,
     props: {
         multiple: Boolean,
+        accept: String,
         placeholder: {
             type: String,
             default: 'Choose a file...'
