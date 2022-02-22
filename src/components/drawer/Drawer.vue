@@ -34,12 +34,12 @@
                                 <slot />
                             </div>
 
-                            <div
-                                v-if="$slots.footer"
-                                :class="footerClass"
+                            <slot
+                                v-if="!hideFooter"
+                                name="footer"
                             >
-                                <slot name="footer" />
-                            </div>
+                                <TWDrawerFooter />
+                            </slot>
                         </div>
                     </div>
                 </div>
@@ -55,6 +55,7 @@ import FixedMixin from '../../utils/FixedMixin';
 import VariantMixin from '../../utils/VariantMixin';
 import SizeMixin from '../../utils/SizeMixin';
 import TWDrawerHeader from './DrawerHeader';
+import TWDrawerFooter from './DrawerFooter';
 
 export default {
     name: 'TWDrawer',
@@ -81,11 +82,31 @@ export default {
         },
         noAnimation: Boolean,
         hideHeader: Boolean,
+        hideFooter: Boolean,
         noCloseOnBackdrop: Boolean,
         noCloseOnEsc: Boolean,
         noBackdrop: Boolean,
+        btnCancelVariant: {
+            type: String,
+            default: 'secondary',
+        },
+        hideBtnCancel: Boolean,
+        btnCancelText: {
+            type: String,
+            default: 'Cancel',
+        },
+        btnOkVariant: {
+            type: String,
+            default: 'primary',
+        },
+        hideBtnOk: Boolean,
+        btnOkText: {
+            type: String,
+            default: 'OK',
+        },
     },
     components: {
+        TWDrawerFooter,
         MountingPortal,
         TWDrawerHeader,
     },

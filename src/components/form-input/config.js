@@ -20,7 +20,7 @@ export default {
     },
     sizes: {
         sm: 'text-sm px-3 py-2 leading-4',
-        md: 'text-sm px-4 py-2',
+        md: 'text-sm px-4 py-2.5',
         lg: 'text-base px-4 py-3',
     },
 };

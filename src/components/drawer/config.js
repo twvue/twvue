@@ -10,7 +10,7 @@ export default {
         descriptionWrapper: 'mt-1',
         btnClose: '',
         body: 'p-4 relative flex-1 overflow-y-auto',
-        footer: 'px-4 py-3',
+        footer: 'px-4 py-3 flex items-center justify-end space-x-3',
     },
     variants: {
         primary: {

@@ -26,6 +26,7 @@
                     <TWButton @click="activateOptions({ 'no-close-on-backdrop': true })">No close on backdrop</TWButton>
                     <TWButton @click="activateOptions({ 'no-animation': true })">No animation</TWButton>
                     <TWButton @click="activateOptions({ 'hide-header': true })">Hide header</TWButton>
+                    <TWButton @click="activateOptions({ 'hide-footer': true })">Hide footer</TWButton>
                     <TWButton @click="activateOptions({ direction: 'left' })">Left</TWButton>
                 </div>
             </div>
@@ -49,13 +50,6 @@
             v-bind="drawerAttributes"
         >
             <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Atque debitis facilis nulla quas quia quibusdam reprehenderit sapiente suscipit! Ab ad alias deleniti ipsum iure iusto libero odio qui quibusdam similique!</p>
-
-            <template #footer>
-                <div class="flex items-center justify-end space-x-2">
-                    <TWButton @click="isOpen = false" variant="secondary">Cancel</TWButton>
-                    <TWButton @click="isOpen = false">Save</TWButton>
-                </div>
-            </template>
         </TWDrawer>
     </div>
 </template>

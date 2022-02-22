@@ -94,10 +94,7 @@ export default {
     props: {
         value: Boolean,
         size: String,
-        title: {
-            type: String,
-            default: 'Modal title',
-        },
+        title: String,
         titleTag: {
             type: String,
             default: 'h5',
