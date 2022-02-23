@@ -1,26 +1,26 @@
 <template>
-    <div :class="rootClass">
+    <label :class="rootClass">
          <div :class="handlerClass">
-           <input type="checkbox" class="opacity-0 absolute" :disabled="disabled" @click="onClick">
-           <svg 
+           <input 
+              type="checkbox" 
+              class="opacity-0 absolute" 
+              v-model="localValue" 
+              :disabled="disabled" 
+              @click="onClick"
+           >
+
+           <svg
               :class="rootSvgClass" 
               viewBox="0 0 20 20">
               <path d="M0 11l2-2 5 5L18 3l2 2L7 18z"/>
            </svg>
          </div>
 
-         <TWFormLabel   
-            v-if="label"
-            :for="labelFor"
-            :label="label"
-        />
-
-        {{isEnabled}}
-    </div>
+        <div v-if="label" class="select-none">{{ label }}</div>
+    </label>
 </template>
 
 <script>
-import TWFormLabel from '../form-label/FormLabel';
 import FixedMixin from '../../utils/FixedMixin';
 import VariantMixin from '../../utils/VariantMixin';
 import SizeMixin from '../../utils/SizeMixin';
@@ -33,10 +33,6 @@ export default {
         labelFor: String,
         value: [Boolean, Number],
         disabled: [Boolean],
-    },
-
-    components: {
-        TWFormLabel,
     },
 
     data() {
@@ -63,11 +59,12 @@ export default {
         handlerClass() {
             return [
                 this.fixedClass.handler,
+                this.isChecked ? this.variantClass.handler.enabled : this.variantClass.handler.disabled,
                 this.sizeClass.handler,
             ];
         },
 
-        isEnabled() {
+        isChecked() {
             return !!this.localValue;
         },
     },
@@ -77,7 +74,7 @@ export default {
             this.localValue = newValue;
         },
     },
-    
+
     methods: {
         onClick() {
             this.localValue = !this.localValue;

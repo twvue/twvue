@@ -3,8 +3,8 @@ export default {
     defaultSize: 'sm',
     fixed: {
         root: 'flex justify-start items-start',
-        handler: 'bg-white border-2 rounded border-gray-300 flex flex-shrink-0 justify-center items-center mr-2 focus-within:border-blue-500',
-        svgRoot: 'fill-current hidden text-green-500 pointer-events-none',
+        handler: 'border-2 rounded border-gray-300 flex flex-shrink-0 justify-center items-center mr-2 focus-within:border-blue-500',
+        svgRoot: 'fill-current hidden text-white pointer-events-none',
     },
     sizes: {
         sm: {
@@ -21,56 +21,36 @@ export default {
         },
     },
 
-       /*variants: {
+    variants: {
         primary: {
-            root: {
-                enabled: 'bg-blue-600',
-                disabled: 'bg-gray-200',
-            },
             handler: {
-                enabled: 'bg-white',
+                enabled: 'bg-blue-600',
                 disabled: 'bg-white',
             },
         },
         secondary: {
-            root: {
-                enabled: 'bg-gray-400',
-                disabled: 'bg-gray-200',
-            },
             handler: {
-                enabled: 'bg-white',
+                enabled: 'bg-gray-400',
                 disabled: 'bg-white',
             },
         },
         success: {
-            root: {
-                enabled: 'bg-green-500',
-                disabled: 'bg-gray-200',
-            },
             handler: {
-                enabled: 'bg-white',
+                enabled: 'bg-green-500',
                 disabled: 'bg-white',
             },
         },
         danger: {
-            root: {
-                enabled: 'bg-red-500',
-                disabled: 'bg-gray-200',
-            },
             handler: {
-                enabled: 'bg-white',
+                enabled: 'bg-red-500',
                 disabled: 'bg-white',
             },
         },
         warning: {
-            root: {
-                enabled: 'bg-yellow-500',
-                disabled: 'bg-gray-200',
-            },
             handler: {
-                enabled: 'bg-white',
+                enabled: 'bg-yellow-500',
                 disabled: 'bg-white',
             },
         },
-    },*/
+    },
 };
