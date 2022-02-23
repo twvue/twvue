@@ -147,11 +147,11 @@
             </h4>
 
             <div class="flex items-center space-x-4">
-                <TWFormCheckbox variant="primary"  v-model="check"/>
-                <TWFormCheckbox variant="secondary" v-model="check" />
-                <TWFormCheckbox variant="success" v-model="check"/>
-                <TWFormCheckbox variant="danger" v-model="check"/>
-                <TWFormCheckbox variant="warning" v-model="check"/>
+                <TWFormCheckbox variant="primary" />
+                <TWFormCheckbox variant="secondary" />
+                <TWFormCheckbox variant="success" />
+                <TWFormCheckbox variant="danger" />
+                <TWFormCheckbox variant="warning" />
             </div>
 
             <h4 class="font-semibold text-gray-800 tracking-tight mb-2 mt-4">
@@ -164,7 +164,7 @@
                />
 
                 <TWFormCheckbox 
-                    v-model="checkTypes"
+                    v-model="check"
                     label="Yes"
                />
 
@@ -183,7 +183,6 @@ export default {
     data() {
         return {
             check: true,
-            checkTypes: true,
             multiple: [],
         }
     },
