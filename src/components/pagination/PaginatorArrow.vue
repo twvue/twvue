@@ -7,7 +7,7 @@
     >
         <slot>
             <svg
-                class="h-5 w-5"
+                :class="sizeClass"
                 fill="currentColor"
                 viewBox="0 0 20 20"
             >
@@ -22,8 +22,12 @@
 </template>
 
 <script>
+ import FixedMixin from '../../utils/FixedMixin';
+ import SizeMixin from '../../utils/SizeMixin';
     export default {
         name: 'TWPaginatorArrow',
+
+        mixins: [FixedMixin, SizeMixin],
 
         props: {
             next: {
@@ -39,13 +43,14 @@
 
         data() {
             return {
+                config: this.$TWVue.PaginatorArrow,
             };
         },
 
         computed: {
             classList() {
                 return [
-                    'relative inline-flex items-center px-2 py-2 bg-white border text-sm leading-5 font-medium focus:z-10 hover:z-10 focus:outline-none transition ease-in-out duration-150',
+                    this.fixedClass.buttonArrowRoot,
                     this.getTextColorClass,
                     this.getBorderColorClass,
                     this.getBorderRoundClass,

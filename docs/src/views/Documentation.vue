@@ -37,6 +37,7 @@ export default {
                 { label: "Form", to: "/documentation/form" },
                 { label: "Help text", to: "/documentation/help-text" },
                 { label: "Modal", to: "/documentation/modal" },
+                { label: "Pagination", to: "/documentation/Pagination" },
                 { label: "Progress Bar", to: "/documentation/ProgressBar" },
                 { label: "Spinner", to: "/documentation/spinner" },
                 { label: "Tab", to: "/documentation/tab" },
