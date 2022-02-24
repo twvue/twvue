@@ -1,56 +1,88 @@
 export default {
     defaultVariant: 'primary',
-    defaultSize: 'sm',
+    defaultSize: 'md',
     fixed: {
-        root: 'flex justify-start items-start',
-        handler: 'border-2 rounded border-gray-300 flex flex-shrink-0 justify-center items-center mr-2 focus-within:border-blue-500',
-        svgRoot: 'fill-current hidden text-white pointer-events-none',
+        root: 'inline-flex justify-start items-center',
+        handler: 'border-2 rounded lex flex-shrink-0 justify-center items-center cursor-pointer',
+        label: 'text-sm ml-2',
     },
-    sizes: {
-        sm: {
-            handler: 'h-5 w-5',
-            svg: 'h-3 w-3',
-        },
-        md: {
-            handler: 'w-6 h-6',
-            svg: 'w-4 h-4',
-        },
-        lg: {
-            handler: 'h-8 w-8',
-            svg: 'h-6 w-6',
-        },
-    },
-
     variants: {
         primary: {
             handler: {
-                enabled: 'bg-blue-600',
-                disabled: 'bg-white',
+                checked: 'text-white bg-blue-600 border-blue-600',
+                unchecked: 'bg-white border-gray-300',
+                disabled: 'bg-gray-50 border-gray-200',
+            },
+            label: {
+                checked: 'text-gray-800',
+                unchecked: 'text-gray-800',
+                disabled: 'text-gray-500',
             },
         },
         secondary: {
             handler: {
-                enabled: 'bg-gray-400',
-                disabled: 'bg-white',
+                checked: 'text-white bg-gray-400 border-gray-400',
+                unchecked: 'bg-white border-gray-300',
+                disabled: 'bg-gray-50 border-gray-200',
+            },
+            label: {
+                checked: 'text-gray-800',
+                unchecked: 'text-gray-800',
+                disabled: 'text-gray-500',
             },
         },
         success: {
             handler: {
-                enabled: 'bg-green-500',
-                disabled: 'bg-white',
+                checked: 'text-white bg-green-500 border-green-500',
+                unchecked: 'bg-white border-gray-300',
+                disabled: 'bg-gray-50 border-gray-200',
+            },
+            label: {
+                checked: '',
+                unchecked: 'text-gray-700',
+                disabled: 'text-gray-500',
             },
         },
         danger: {
             handler: {
-                enabled: 'bg-red-500',
-                disabled: 'bg-white',
+                checked: 'text-white bg-red-500 border-red-500',
+                unchecked: 'bg-white border-gray-300',
+                disabled: 'bg-gray-50 border-gray-200',
+            },
+            label: {
+                checked: 'text-gray-800',
+                unchecked: 'text-gray-800',
+                disabled: 'text-gray-500',
             },
         },
         warning: {
             handler: {
-                enabled: 'bg-yellow-500',
-                disabled: 'bg-white',
+                checked: 'text-white bg-yellow-500 border-yellow-500',
+                unchecked: 'bg-white border-gray-300',
+                disabled: 'bg-gray-50 border-gray-200',
             },
+            label: {
+                checked: 'text-gray-800',
+                unchecked: 'text-gray-800',
+                disabled: 'text-gray-500',
+            },
+        },
+    },
+    sizes: {
+        sm: {
+            root: '',
+            handler: 'p-0.5 h-5 w-5',
+            label: '',
+        },
+        md: {
+            root: '',
+            handler: 'p-1 w-6 h-6',
+            label: '',
+        },
+        lg: {
+            root: '',
+            handler: 'p-1 h-8 w-8',
+            label: '',
         },
     },
 };

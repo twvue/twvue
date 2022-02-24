@@ -119,6 +119,66 @@
 
         <div>
             <h3 class="text-lg font-bold mb-3">
+                Checkbox
+            </h3>
+
+            <div class="space-y-6">
+                <div>
+                    <h4 class="font-semibold text-gray-800 tracking-tight mb-2">
+                        Variants
+                    </h4>
+
+                    <div class="flex items-center space-x-4">
+                        <TWFormCheckbox
+                            v-model="check"
+                            variant="primary"
+                        />
+                        <TWFormCheckbox
+                            v-model="check"
+                            variant="secondary"
+                        />
+                        <TWFormCheckbox
+                            v-model="check"
+                            variant="success"
+                        />
+                        <TWFormCheckbox
+                            v-model="check"
+                            variant="danger"
+                        />
+                        <TWFormCheckbox
+                            v-model="check"
+                            variant="warning"
+                        />
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold text-gray-800 tracking-tight mb-2 mt-4">
+                        Sizes
+                    </h4>
+
+                    <div class="flex items-center space-x-4">
+                        <TWFormCheckbox size="sm" />
+                        <TWFormCheckbox size="md" />
+                        <TWFormCheckbox size="lg" />
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold text-gray-800 tracking-tight mb-2 mt-4">
+                        With label
+                    </h4>
+
+                    <div class="flex items-center space-x-4">
+                        <TWFormCheckbox label="Yes" />
+                        <TWFormCheckbox label="Do you agree with our Terms and Conditions?" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <h3 class="text-lg font-bold mb-3">
                 Form group
             </h3>
 
@@ -134,44 +194,6 @@
                         variant="danger"
                     />
                 </TWFormGroup>
-            </div>
-        </div>
-
-                <div>
-            <h3 class="text-lg font-bold mb-3">
-                Form checkbox
-            </h3>
-
-            <h4 class="font-semibold text-gray-800 tracking-tight mb-2">
-                Variants
-            </h4>
-
-            <div class="flex items-center space-x-4">
-                <TWFormCheckbox variant="primary" />
-                <TWFormCheckbox variant="secondary" />
-                <TWFormCheckbox variant="success" />
-                <TWFormCheckbox variant="danger" />
-                <TWFormCheckbox variant="warning" />
-            </div>
-
-            <h4 class="font-semibold text-gray-800 tracking-tight mb-2 mt-4">
-                Tipos
-            </h4>
-
-            <div>
-               <TWFormCheckbox 
-                    label="Basic"
-               />
-
-                <TWFormCheckbox 
-                    v-model="check"
-                    label="Yes"
-               />
-
-                <TWFormCheckbox 
-                    label="Disabled"
-                    disabled
-               />
             </div>
         </div>
     </div>

@@ -1,22 +1,29 @@
 <template>
     <label :class="rootClass">
-         <div :class="handlerClass">
-           <input 
-              type="checkbox" 
-              class="opacity-0 absolute" 
-              v-model="localValue" 
-              :disabled="disabled" 
-              @click="onClick"
-           >
-
+         <span :class="handlerClass">
            <svg
-              :class="rootSvgClass" 
-              viewBox="0 0 20 20">
+               v-if="localValue"
+               viewBox="0 0 20 20"
+               fill="currentColor"
+           >
               <path d="M0 11l2-2 5 5L18 3l2 2L7 18z"/>
            </svg>
-         </div>
+         </span>
 
-        <div v-if="label" class="select-none">{{ label }}</div>
+        <span
+            v-if="label"
+            :class="labelClass"
+        >
+            {{ label }}
+        </span>
+
+        <input
+            type="checkbox"
+            class="absolute opacity-0"
+            :checked="localValue"
+            :disabled="disabled"
+            @click="onClick"
+        >
     </label>
 </template>
 
@@ -27,12 +34,11 @@ import SizeMixin from '../../utils/SizeMixin';
 export default {
     name: 'TWFormCheckbox',
     mixins: [FixedMixin, VariantMixin, SizeMixin],
-
+    inheritAttrs: false,
     props: {
-        label: String,
-        labelFor: String,
         value: [Boolean, Number],
         disabled: [Boolean],
+        label: String,
     },
 
     data() {
@@ -45,36 +51,56 @@ export default {
     computed: {
         rootClass() {
             return [
+                'relative',
                 this.fixedClass.root,
             ];
         },
-
-        rootSvgClass() {
-            return [
-                this.fixedClass.svgRoot,
-                this.sizeClass.svg,
-            ];
-        },
-
         handlerClass() {
             return [
+                'z-10',
                 this.fixedClass.handler,
-                this.isChecked ? this.variantClass.handler.enabled : this.variantClass.handler.disabled,
+                this.getHandlerVariantClass,
                 this.sizeClass.handler,
             ];
         },
+        getHandlerVariantClass() {
+            if (this.disabled) {
+                return this.variantClass.handler.disabled;
+            }
 
+            if (this.isChecked) {
+                return this.variantClass.handler.checked
+            }
+
+            return this.variantClass.handler.unchecked;
+        },
+        labelClass() {
+            return [
+                this.fixedClass.label,
+                this.getLabelVariantClass,
+                this.sizeClass.label,
+            ]
+        },
+        getLabelVariantClass() {
+            if (this.disabled) {
+                return this.variantClass.label.disabled;
+            }
+
+            if (this.isChecked) {
+                return this.variantClass.label.checked
+            }
+
+            return this.variantClass.label.unchecked;
+        },
         isChecked() {
             return !!this.localValue;
         },
     },
-
     watch: {
         value(newValue) {
             this.localValue = newValue;
         },
     },
-
     methods: {
         onClick() {
             this.localValue = !this.localValue;
@@ -83,8 +109,3 @@ export default {
     },
 };
 </script>
-<style>
-  input:checked + svg {
-    display: block;
-  }
-</style>
