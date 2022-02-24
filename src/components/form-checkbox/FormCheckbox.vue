@@ -1,5 +1,8 @@
 <template>
-    <label :class="rootClass">
+    <label
+        v-bind="$attrs"
+        :class="rootClass"
+    >
          <span :class="handlerClass">
            <svg
                v-if="localValue"

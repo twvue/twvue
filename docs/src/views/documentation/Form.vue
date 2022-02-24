@@ -166,6 +166,16 @@
 
                 <div>
                     <h4 class="font-semibold text-gray-800 tracking-tight mb-2 mt-4">
+                        Disable
+                    </h4>
+
+                    <div class="flex items-center space-x-4">
+                        <TWFormCheckbox disabled />
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold text-gray-800 tracking-tight mb-2 mt-4">
                         With label
                     </h4>
 
