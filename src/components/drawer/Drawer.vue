@@ -279,9 +279,9 @@ export default {
             }
 
             if (!this.noBackdrop) {
-                gsap.to(this.backdrop, { opacity: 1, ease: 'power3.inOut' })
+                gsap.to(this.backdrop, { opacity: 1, ease: 'power3.inOut', duration: .6 })
             }
-            gsap.to(this.panel, { opacity: 1, x: '0px', ease: 'power3.inOut', duration: 1, onComplete: done, })
+            gsap.to(this.panel, { opacity: 1, x: '0px', ease: 'power3.inOut', duration: .6, onComplete: done, })
         },
         leave(el, done) {
             if (this.noAnimation) {
@@ -289,9 +289,9 @@ export default {
                 return;
             }
 
-            gsap.to(this.panel, { opacity: 0, x: this.initialXPosition, ease: 'power3.inOut', duration: 1, onComplete: done, })
+            gsap.to(this.panel, { opacity: 0, x: this.initialXPosition, ease: 'power3.inOut', duration: .6, onComplete: done, })
             if (!this.noBackdrop) {
-                gsap.to(this.backdrop, { opacity: 0, ease: 'power3.inOut' })
+                gsap.to(this.backdrop, { opacity: 0, ease: 'power3.inOut', duration: .6 })
             }
         },
         afterLeave() {

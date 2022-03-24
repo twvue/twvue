@@ -2,15 +2,15 @@ export default {
     defaultVariant: 'primary',
     defaultSize: 'sm',
     fixed: {
-        backdrop: 'bg-gray-700 bg-opacity-50',
+        backdrop: 'bg-gray-900 bg-opacity-40',
         panel: 'w-screen flex flex-col bg-white shadow-xl',
-        header: 'px-4 py-3',
-        title: 'text-lg font-semibold',
+        header: 'px-6 py-5',
+        title: 'text-base font-semibold',
         description: 'text-sm',
         descriptionWrapper: 'mt-1',
         btnClose: '',
-        body: 'p-4 relative flex-1 overflow-y-auto',
-        footer: 'px-4 py-3 flex items-center justify-end space-x-3',
+        body: 'p-6 relative flex-1 overflow-y-auto',
+        footer: 'px-6 py-5 flex items-center justify-end space-x-3',
     },
     variants: {
         primary: {
@@ -41,7 +41,7 @@ export default {
             panel: 'max-w-md',
         },
         md: {
-            panel: 'max-w-xl',
+            panel: 'max-w-lg',
         },
         lg: {
             panel: 'max-w-3xl',

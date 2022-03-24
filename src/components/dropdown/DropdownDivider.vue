@@ -5,11 +5,7 @@
 <script>
     export default {
         name: 'TWDropdownDivider',
-        inject: {
-            'TWDropdown': {
-                default: undefined,
-            },
-        },
+        inject: ['TWDropdown'],
         computed: {
             rootClass() {
                 return [

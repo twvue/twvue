@@ -13,11 +13,7 @@
 export default {
     name: 'TWDropdownItem',
     inheritAttrs: false,
-    inject: {
-        'TWDropdown': {
-            default: undefined,
-        },
-    },
+    inject: ['TWDropdown'],
     props: {
         tag: {
             type: String,

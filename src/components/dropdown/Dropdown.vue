@@ -63,18 +63,9 @@ export default {
     name: 'TWDropdown',
     mixins: [FixedMixin, VariantMixin, SizeMixin],
     props: {
-        disabled: {
-            type: Boolean,
-            default: false,
-        },
-        noCaret: {
-            type: Boolean,
-            default: false,
-        },
-        text: {
-            type: String,
-            default: undefined,
-        },
+        disabled: Boolean,
+        noCaret: Boolean,
+        text: String,
         placement: {
             type: String,
             default: 'bottom-end',
