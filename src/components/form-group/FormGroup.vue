@@ -1,10 +1,12 @@
 <template>
     <div>
-        <TWFormLabel
-            v-if="label"
-            :for="labelFor"
-            :label="label"
-        />
+        <slot name="label">
+            <TWFormLabel
+                v-if="label"
+                :for="labelFor"
+                :label="label"
+            />
+        </slot>
         <slot />
         <TWHelpText
             v-if="helpText"

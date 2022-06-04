@@ -64,7 +64,7 @@ export default {
         },
         btnCloseClass() {
             return [
-                'absolute right-4 top-4 ml-auto -mx-1.5 -my-1.5',
+                'absolute right-4 top-1.5 ml-auto -mx-1.5',
                 this.fixedClass.btnClose,
                 this.variantClass.btnClose,
             ];

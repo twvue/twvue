@@ -21,8 +21,8 @@
 <script>
 import FixedMixin from '../../utils/FixedMixin';
 import VariantMixin from '../../utils/VariantMixin';
-import TWCardHeader from '../card/CardHeader';
-import TWCardBody from '../card/CardBody';
+import TWCardHeader from './CardHeader';
+import TWCardBody from './CardBody';
 import TWCardFooter from './CardFooter';
 
 export default {
