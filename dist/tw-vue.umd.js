@@ -280,51 +280,6 @@ module.exports = function (it) {
 
 /***/ }),
 
-/***/ "1c7e":
-/***/ (function(module, exports, __webpack_require__) {
-
-var wellKnownSymbol = __webpack_require__("b622");
-
-var ITERATOR = wellKnownSymbol('iterator');
-var SAFE_CLOSING = false;
-
-try {
-  var called = 0;
-  var iteratorWithReturn = {
-    next: function () {
-      return { done: !!called++ };
-    },
-    'return': function () {
-      SAFE_CLOSING = true;
-    }
-  };
-  iteratorWithReturn[ITERATOR] = function () {
-    return this;
-  };
-  // eslint-disable-next-line no-throw-literal
-  Array.from(iteratorWithReturn, function () { throw 2; });
-} catch (error) { /* empty */ }
-
-module.exports = function (exec, SKIP_CLOSING) {
-  if (!SKIP_CLOSING && !SAFE_CLOSING) return false;
-  var ITERATION_SUPPORT = false;
-  try {
-    var object = {};
-    object[ITERATOR] = function () {
-      return {
-        next: function () {
-          return { done: ITERATION_SUPPORT = true };
-        }
-      };
-    };
-    exec(object);
-  } catch (error) { /* empty */ }
-  return ITERATION_SUPPORT;
-};
-
-
-/***/ }),
-
 /***/ "1d80":
 /***/ (function(module, exports) {
 
@@ -456,21 +411,6 @@ var hiddenKeys = enumBugKeys.concat('length', 'prototype');
 // https://tc39.github.io/ecma262/#sec-object.getownpropertynames
 exports.f = Object.getOwnPropertyNames || function getOwnPropertyNames(O) {
   return internalObjectKeys(O, hiddenKeys);
-};
-
-
-/***/ }),
-
-/***/ "2a62":
-/***/ (function(module, exports, __webpack_require__) {
-
-var anObject = __webpack_require__("825a");
-
-module.exports = function (iterator) {
-  var returnMethod = iterator['return'];
-  if (returnMethod !== undefined) {
-    return anObject(returnMethod.call(iterator)).value;
-  }
 };
 
 
@@ -18298,24 +18238,6 @@ module.exports = getBuiltIn('navigator', 'userAgent') || '';
 
 /***/ }),
 
-/***/ "35a1":
-/***/ (function(module, exports, __webpack_require__) {
-
-var classof = __webpack_require__("f5df");
-var Iterators = __webpack_require__("3f8c");
-var wellKnownSymbol = __webpack_require__("b622");
-
-var ITERATOR = wellKnownSymbol('iterator');
-
-module.exports = function (it) {
-  if (it != undefined) return it[ITERATOR]
-    || it['@@iterator']
-    || Iterators[classof(it)];
-};
-
-
-/***/ }),
-
 /***/ "37e8":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -18472,17 +18394,6 @@ module.exports = function (key) {
 
 /***/ }),
 
-/***/ "4557":
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var _node_modules_mini_css_extract_plugin_dist_loader_js_ref_8_oneOf_1_0_node_modules_css_loader_dist_cjs_js_ref_8_oneOf_1_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_8_oneOf_1_2_node_modules_sass_loader_dist_cjs_js_ref_8_oneOf_1_3_node_modules_cache_loader_dist_cjs_js_ref_0_0_node_modules_vue_loader_lib_index_js_vue_loader_options_TWPagination_vue_vue_type_style_index_0_id_3754a0e6_lang_scss_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("7751");
-/* harmony import */ var _node_modules_mini_css_extract_plugin_dist_loader_js_ref_8_oneOf_1_0_node_modules_css_loader_dist_cjs_js_ref_8_oneOf_1_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_8_oneOf_1_2_node_modules_sass_loader_dist_cjs_js_ref_8_oneOf_1_3_node_modules_cache_loader_dist_cjs_js_ref_0_0_node_modules_vue_loader_lib_index_js_vue_loader_options_TWPagination_vue_vue_type_style_index_0_id_3754a0e6_lang_scss_scoped_true___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_mini_css_extract_plugin_dist_loader_js_ref_8_oneOf_1_0_node_modules_css_loader_dist_cjs_js_ref_8_oneOf_1_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_8_oneOf_1_2_node_modules_sass_loader_dist_cjs_js_ref_8_oneOf_1_3_node_modules_cache_loader_dist_cjs_js_ref_0_0_node_modules_vue_loader_lib_index_js_vue_loader_options_TWPagination_vue_vue_type_style_index_0_id_3754a0e6_lang_scss_scoped_true___WEBPACK_IMPORTED_MODULE_0__);
-/* unused harmony reexport * */
-
-
-/***/ }),
-
 /***/ "4930":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -18558,55 +18469,6 @@ $({ target: 'Array', proto: true, forced: !HAS_SPECIES_SUPPORT || !USES_TO_LENGT
     return $filter(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
   }
 });
-
-
-/***/ }),
-
-/***/ "4df4":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var bind = __webpack_require__("0366");
-var toObject = __webpack_require__("7b0b");
-var callWithSafeIterationClosing = __webpack_require__("9bdd");
-var isArrayIteratorMethod = __webpack_require__("e95a");
-var toLength = __webpack_require__("50c4");
-var createProperty = __webpack_require__("8418");
-var getIteratorMethod = __webpack_require__("35a1");
-
-// `Array.from` method implementation
-// https://tc39.github.io/ecma262/#sec-array.from
-module.exports = function from(arrayLike /* , mapfn = undefined, thisArg = undefined */) {
-  var O = toObject(arrayLike);
-  var C = typeof this == 'function' ? this : Array;
-  var argumentsLength = arguments.length;
-  var mapfn = argumentsLength > 1 ? arguments[1] : undefined;
-  var mapping = mapfn !== undefined;
-  var iteratorMethod = getIteratorMethod(O);
-  var index = 0;
-  var length, result, step, iterator, next, value;
-  if (mapping) mapfn = bind(mapfn, argumentsLength > 2 ? arguments[2] : undefined, 2);
-  // if the target is not iterable or it's an array with the default iterator - use a simple case
-  if (iteratorMethod != undefined && !(C == Array && isArrayIteratorMethod(iteratorMethod))) {
-    iterator = iteratorMethod.call(O);
-    next = iterator.next;
-    result = new C();
-    for (;!(step = next.call(iterator)).done; index++) {
-      value = mapping ? callWithSafeIterationClosing(iterator, mapfn, [step.value, index], true) : step.value;
-      createProperty(result, index, value);
-    }
-  } else {
-    length = toLength(O.length);
-    result = new C(length);
-    for (;length > index; index++) {
-      value = mapping ? mapfn(O[index], index) : O[index];
-      createProperty(result, index, value);
-    }
-  }
-  result.length = index;
-  return result;
-};
 
 
 /***/ }),
@@ -18992,13 +18854,6 @@ module.exports = function (NAME) {
 
 /***/ }),
 
-/***/ "7751":
-/***/ (function(module, exports, __webpack_require__) {
-
-// extracted by mini-css-extract-plugin
-
-/***/ }),
-
 /***/ "7839":
 /***/ (function(module, exports) {
 
@@ -19303,6 +19158,25 @@ module.exports = function (object, key, value) {
 
 /***/ }),
 
+/***/ "857a":
+/***/ (function(module, exports, __webpack_require__) {
+
+var requireObjectCoercible = __webpack_require__("1d80");
+
+var quot = /"/g;
+
+// B.2.3.2.1 CreateHTML(string, tag, attribute, value)
+// https://tc39.github.io/ecma262/#sec-createhtml
+module.exports = function (string, tag, attribute, value) {
+  var S = String(requireObjectCoercible(string));
+  var p1 = '<' + tag;
+  if (attribute !== '') p1 += ' ' + attribute + '="' + String(value).replace(quot, '&quot;') + '"';
+  return p1 + '>' + S + '</' + tag + '>';
+};
+
+
+/***/ }),
+
 /***/ "861d":
 /***/ (function(module, exports) {
 
@@ -19482,22 +19356,90 @@ module.exports = isForced;
 
 /***/ }),
 
-/***/ "9bdd":
+/***/ "9911":
 /***/ (function(module, exports, __webpack_require__) {
 
-var anObject = __webpack_require__("825a");
-var iteratorClose = __webpack_require__("2a62");
+"use strict";
 
-// call something on iterator step with safe closing on error
-module.exports = function (iterator, fn, value, ENTRIES) {
-  try {
-    return ENTRIES ? fn(anObject(value)[0], value[1]) : fn(value);
-  // 7.4.6 IteratorClose(iterator, completion)
-  } catch (error) {
-    iteratorClose(iterator);
-    throw error;
+var $ = __webpack_require__("23e7");
+var createHTML = __webpack_require__("857a");
+var forcedStringHTMLMethod = __webpack_require__("af03");
+
+// `String.prototype.link` method
+// https://tc39.github.io/ecma262/#sec-string.prototype.link
+$({ target: 'String', proto: true, forced: forcedStringHTMLMethod('link') }, {
+  link: function link(url) {
+    return createHTML(this, 'a', 'href', url);
   }
+});
+
+
+/***/ }),
+
+/***/ "99af":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var $ = __webpack_require__("23e7");
+var fails = __webpack_require__("d039");
+var isArray = __webpack_require__("e8b5");
+var isObject = __webpack_require__("861d");
+var toObject = __webpack_require__("7b0b");
+var toLength = __webpack_require__("50c4");
+var createProperty = __webpack_require__("8418");
+var arraySpeciesCreate = __webpack_require__("65f0");
+var arrayMethodHasSpeciesSupport = __webpack_require__("1dde");
+var wellKnownSymbol = __webpack_require__("b622");
+var V8_VERSION = __webpack_require__("2d00");
+
+var IS_CONCAT_SPREADABLE = wellKnownSymbol('isConcatSpreadable');
+var MAX_SAFE_INTEGER = 0x1FFFFFFFFFFFFF;
+var MAXIMUM_ALLOWED_INDEX_EXCEEDED = 'Maximum allowed index exceeded';
+
+// We can't use this feature detection in V8 since it causes
+// deoptimization and serious performance degradation
+// https://github.com/zloirock/core-js/issues/679
+var IS_CONCAT_SPREADABLE_SUPPORT = V8_VERSION >= 51 || !fails(function () {
+  var array = [];
+  array[IS_CONCAT_SPREADABLE] = false;
+  return array.concat()[0] !== array;
+});
+
+var SPECIES_SUPPORT = arrayMethodHasSpeciesSupport('concat');
+
+var isConcatSpreadable = function (O) {
+  if (!isObject(O)) return false;
+  var spreadable = O[IS_CONCAT_SPREADABLE];
+  return spreadable !== undefined ? !!spreadable : isArray(O);
 };
+
+var FORCED = !IS_CONCAT_SPREADABLE_SUPPORT || !SPECIES_SUPPORT;
+
+// `Array.prototype.concat` method
+// https://tc39.github.io/ecma262/#sec-array.prototype.concat
+// with adding support of @@isConcatSpreadable and @@species
+$({ target: 'Array', proto: true, forced: FORCED }, {
+  concat: function concat(arg) { // eslint-disable-line no-unused-vars
+    var O = toObject(this);
+    var A = arraySpeciesCreate(O, 0);
+    var n = 0;
+    var i, k, length, len, E;
+    for (i = -1, length = arguments.length; i < length; i++) {
+      E = i === -1 ? O : arguments[i];
+      if (isConcatSpreadable(E)) {
+        len = toLength(E.length);
+        if (n + len > MAX_SAFE_INTEGER) throw TypeError(MAXIMUM_ALLOWED_INDEX_EXCEEDED);
+        for (k = 0; k < len; k++, n++) if (k in E) createProperty(A, n, E[k]);
+      } else {
+        if (n >= MAX_SAFE_INTEGER) throw TypeError(MAXIMUM_ALLOWED_INDEX_EXCEEDED);
+        createProperty(A, n++, E);
+      }
+    }
+    A.length = n;
+    return A;
+  }
+});
 
 
 /***/ }),
@@ -19529,17 +19471,6 @@ exports.f = DESCRIPTORS ? nativeDefineProperty : function defineProperty(O, P, A
 
 /***/ }),
 
-/***/ "9c7c":
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var _node_modules_mini_css_extract_plugin_dist_loader_js_ref_6_oneOf_1_0_node_modules_css_loader_dist_cjs_js_ref_6_oneOf_1_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_oneOf_1_2_node_modules_cache_loader_dist_cjs_js_ref_0_0_node_modules_vue_loader_lib_index_js_vue_loader_options_TWDropdown_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("ea6c");
-/* harmony import */ var _node_modules_mini_css_extract_plugin_dist_loader_js_ref_6_oneOf_1_0_node_modules_css_loader_dist_cjs_js_ref_6_oneOf_1_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_oneOf_1_2_node_modules_cache_loader_dist_cjs_js_ref_0_0_node_modules_vue_loader_lib_index_js_vue_loader_options_TWDropdown_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_mini_css_extract_plugin_dist_loader_js_ref_6_oneOf_1_0_node_modules_css_loader_dist_cjs_js_ref_6_oneOf_1_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_oneOf_1_2_node_modules_cache_loader_dist_cjs_js_ref_0_0_node_modules_vue_loader_lib_index_js_vue_loader_options_TWDropdown_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_0__);
-/* unused harmony reexport * */
-
-
-/***/ }),
-
 /***/ "9ed3":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -19560,32 +19491,6 @@ module.exports = function (IteratorConstructor, NAME, next) {
   Iterators[TO_STRING_TAG] = returnThis;
   return IteratorConstructor;
 };
-
-
-/***/ }),
-
-/***/ "a15b":
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var $ = __webpack_require__("23e7");
-var IndexedObject = __webpack_require__("44ad");
-var toIndexedObject = __webpack_require__("fc6a");
-var arrayMethodIsStrict = __webpack_require__("a640");
-
-var nativeJoin = [].join;
-
-var ES3_STRINGS = IndexedObject != Object;
-var STRICT_METHOD = arrayMethodIsStrict('join', ',');
-
-// `Array.prototype.join` method
-// https://tc39.github.io/ecma262/#sec-array.prototype.join
-$({ target: 'Array', proto: true, forced: ES3_STRINGS || !STRICT_METHOD }, {
-  join: function join(separator) {
-    return nativeJoin.call(toIndexedObject(this), separator === undefined ? ',' : separator);
-  }
-});
 
 
 /***/ }),
@@ -19909,26 +19814,6 @@ hiddenKeys[HIDDEN] = true;
 
 /***/ }),
 
-/***/ "a630":
-/***/ (function(module, exports, __webpack_require__) {
-
-var $ = __webpack_require__("23e7");
-var from = __webpack_require__("4df4");
-var checkCorrectnessOfIteration = __webpack_require__("1c7e");
-
-var INCORRECT_ITERATION = !checkCorrectnessOfIteration(function (iterable) {
-  Array.from(iterable);
-});
-
-// `Array.from` method
-// https://tc39.github.io/ecma262/#sec-array.from
-$({ target: 'Array', stat: true, forced: INCORRECT_ITERATION }, {
-  from: from
-});
-
-
-/***/ }),
-
 /***/ "a640":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -20127,6 +20012,23 @@ module.exports = {
 
 /***/ }),
 
+/***/ "af03":
+/***/ (function(module, exports, __webpack_require__) {
+
+var fails = __webpack_require__("d039");
+
+// check the existence of a method, lowercase
+// of a tag and escaping quotes in arguments
+module.exports = function (METHOD_NAME) {
+  return fails(function () {
+    var test = ''[METHOD_NAME]('"');
+    return test !== test.toLowerCase() || test.split('"').length > 3;
+  });
+};
+
+
+/***/ }),
+
 /***/ "b041":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -20290,6 +20192,24 @@ module.exports = {
 
 /***/ }),
 
+/***/ "bd81":
+/***/ (function(module, exports, __webpack_require__) {
+
+// extracted by mini-css-extract-plugin
+
+/***/ }),
+
+/***/ "bded":
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var _node_modules_mini_css_extract_plugin_dist_loader_js_ref_6_oneOf_1_0_node_modules_css_loader_dist_cjs_js_ref_6_oneOf_1_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_oneOf_1_2_node_modules_cache_loader_dist_cjs_js_ref_0_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Dropdown_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("bd81");
+/* harmony import */ var _node_modules_mini_css_extract_plugin_dist_loader_js_ref_6_oneOf_1_0_node_modules_css_loader_dist_cjs_js_ref_6_oneOf_1_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_oneOf_1_2_node_modules_cache_loader_dist_cjs_js_ref_0_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Dropdown_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_mini_css_extract_plugin_dist_loader_js_ref_6_oneOf_1_0_node_modules_css_loader_dist_cjs_js_ref_6_oneOf_1_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_oneOf_1_2_node_modules_cache_loader_dist_cjs_js_ref_0_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Dropdown_vue_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_0__);
+/* unused harmony reexport * */
+
+
+/***/ }),
+
 /***/ "c04e":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -20345,6 +20265,26 @@ module.exports = store;
 
 /***/ }),
 
+/***/ "c7cd":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var $ = __webpack_require__("23e7");
+var createHTML = __webpack_require__("857a");
+var forcedStringHTMLMethod = __webpack_require__("af03");
+
+// `String.prototype.fixed` method
+// https://tc39.github.io/ecma262/#sec-string.prototype.fixed
+$({ target: 'String', proto: true, forced: forcedStringHTMLMethod('fixed') }, {
+  fixed: function fixed() {
+    return createHTML(this, 'tt', '', '');
+  }
+});
+
+
+/***/ }),
+
 /***/ "c8ba":
 /***/ (function(module, exports) {
 
@@ -20368,6 +20308,36 @@ try {
 // easier to handle this case. if(!global) { ...}
 
 module.exports = g;
+
+
+/***/ }),
+
+/***/ "c975":
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var $ = __webpack_require__("23e7");
+var $indexOf = __webpack_require__("4d64").indexOf;
+var arrayMethodIsStrict = __webpack_require__("a640");
+var arrayMethodUsesToLength = __webpack_require__("ae40");
+
+var nativeIndexOf = [].indexOf;
+
+var NEGATIVE_ZERO = !!nativeIndexOf && 1 / [1].indexOf(1, -0) < 0;
+var STRICT_METHOD = arrayMethodIsStrict('indexOf');
+var USES_TO_LENGTH = arrayMethodUsesToLength('indexOf', { ACCESSORS: true, 1: 0 });
+
+// `Array.prototype.indexOf` method
+// https://tc39.github.io/ecma262/#sec-array.prototype.indexof
+$({ target: 'Array', proto: true, forced: NEGATIVE_ZERO || !STRICT_METHOD || !USES_TO_LENGTH }, {
+  indexOf: function indexOf(searchElement /* , fromIndex = 0 */) {
+    return NEGATIVE_ZERO
+      // convert -0 to +0
+      ? nativeIndexOf.apply(this, arguments) || 0
+      : $indexOf(this, searchElement, arguments.length > 1 ? arguments[1] : undefined);
+  }
+});
 
 
 /***/ }),
@@ -20952,30 +20922,6 @@ module.exports = Array.isArray || function isArray(arg) {
 
 /***/ }),
 
-/***/ "e95a":
-/***/ (function(module, exports, __webpack_require__) {
-
-var wellKnownSymbol = __webpack_require__("b622");
-var Iterators = __webpack_require__("3f8c");
-
-var ITERATOR = wellKnownSymbol('iterator');
-var ArrayPrototype = Array.prototype;
-
-// check on default Array iterator
-module.exports = function (it) {
-  return it !== undefined && (Iterators.Array === it || ArrayPrototype[ITERATOR] === it);
-};
-
-
-/***/ }),
-
-/***/ "ea6c":
-/***/ (function(module, exports, __webpack_require__) {
-
-// extracted by mini-css-extract-plugin
-
-/***/ }),
-
 /***/ "f5df":
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -21031,6 +20977,31 @@ module.exports = function (key) {
 // ESM COMPAT FLAG
 __webpack_require__.r(__webpack_exports__);
 
+// NAMESPACE OBJECT: ./src/components/index.js
+var components_namespaceObject = {};
+__webpack_require__.r(components_namespaceObject);
+__webpack_require__.d(components_namespaceObject, "Alert", function() { return components_alert; });
+__webpack_require__.d(components_namespaceObject, "Avatar", function() { return avatar; });
+__webpack_require__.d(components_namespaceObject, "Button", function() { return components_button; });
+__webpack_require__.d(components_namespaceObject, "ButtonClose", function() { return button_close; });
+__webpack_require__.d(components_namespaceObject, "Card", function() { return card; });
+__webpack_require__.d(components_namespaceObject, "Drawer", function() { return drawer; });
+__webpack_require__.d(components_namespaceObject, "Dropdown", function() { return components_dropdown; });
+__webpack_require__.d(components_namespaceObject, "FormCheckbox", function() { return form_checkbox; });
+__webpack_require__.d(components_namespaceObject, "FormFile", function() { return form_file; });
+__webpack_require__.d(components_namespaceObject, "FormGroup", function() { return form_group; });
+__webpack_require__.d(components_namespaceObject, "FormInput", function() { return form_input; });
+__webpack_require__.d(components_namespaceObject, "FormLabel", function() { return form_label; });
+__webpack_require__.d(components_namespaceObject, "FormSelect", function() { return form_select; });
+__webpack_require__.d(components_namespaceObject, "FormSwitch", function() { return form_switch; });
+__webpack_require__.d(components_namespaceObject, "FormTextarea", function() { return form_textarea; });
+__webpack_require__.d(components_namespaceObject, "HelpText", function() { return help_text; });
+__webpack_require__.d(components_namespaceObject, "Modal", function() { return modal; });
+__webpack_require__.d(components_namespaceObject, "ProgressBar", function() { return progressbar; });
+__webpack_require__.d(components_namespaceObject, "Spinner", function() { return spinner; });
+__webpack_require__.d(components_namespaceObject, "Tabs", function() { return tabs; });
+__webpack_require__.d(components_namespaceObject, "Tag", function() { return tag; });
+
 // CONCATENATED MODULE: ./node_modules/@vue/cli-service/lib/commands/build/setPublicPath.js
 // This file is imported into lib/wc client bundles.
 
@@ -21055,6 +21026,25 @@ if (typeof window !== 'undefined') {
 // Indicate to webpack that this file can be concatenated
 /* harmony default export */ var setPublicPath = (null);
 
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"3483aeeb-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/alert/Alert.vue?vue&type=template&id=1bf92915&
+var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{class:_vm.rootClass},[_vm._t("content",[_c('div',{staticClass:"flex"},[(_vm.$slots['icon'])?_c('div',{staticClass:"flex-shrink-0 mr-3"},[_vm._t("icon")],2):_vm._e(),_c('div',{class:_vm.dismissible ? 'mr-10 ' : null},[_vm._t("default")],2)])]),(_vm.dismissible)?_c('button',{class:_vm.btnCloseClass,on:{"click":function($event){$event.stopPropagation();$event.preventDefault();return _vm.onClose()}}},[_c('svg',{staticClass:"h-5 w-5",attrs:{"xmlns":"http://www.w3.org/2000/svg","viewBox":"0 0 20 20","fill":"currentColor","aria-hidden":"true"}},[_c('path',{attrs:{"fill-rule":"evenodd","d":"M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z","clip-rule":"evenodd"}})])]):_vm._e()],2)}
+var staticRenderFns = []
+
+
+// CONCATENATED MODULE: ./src/components/alert/Alert.vue?vue&type=template&id=1bf92915&
+
+// EXTERNAL MODULE: ./node_modules/core-js/modules/es.string.fixed.js
+var es_string_fixed = __webpack_require__("c7cd");
+
+// CONCATENATED MODULE: ./src/utils/FixedMixin.js
+
+/* harmony default export */ var FixedMixin = ({
+  computed: {
+    fixedClass: function fixedClass() {
+      return this.config.fixed;
+    }
+  }
+});
 // EXTERNAL MODULE: ./node_modules/core-js/modules/es.symbol.js
 var es_symbol = __webpack_require__("a4d3");
 
@@ -21134,88 +21124,99 @@ function _objectSpread2(target) {
 
   return target;
 }
-// EXTERNAL MODULE: ./node_modules/lodash/lodash.js
-var lodash = __webpack_require__("2ef0");
+// CONCATENATED MODULE: ./src/utils/variants.js
 
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"4df010df-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/alert/TWAlert.vue?vue&type=template&id=499efdb6&
-var TWAlertvue_type_template_id_499efdb6_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{class:_vm.baseClass},[_c('div',{staticClass:"flex"},[(_vm.$slots['icon'])?_c('div',{staticClass:"flex-shrink-0 mr-3"},[_vm._t("icon")],2):_vm._e(),_c('div',[_vm._t("default")],2),(_vm.dismissible)?_c('div',{staticClass:"ml-auto pl-3"},[_c('div',{staticClass:"-mx-1.5 -my-1.5"},[_c('button',{class:_vm.baseButtonCloseClass,on:{"click":function($event){$event.stopPropagation();$event.preventDefault();return _vm.onClose()}}},[_c('span',{staticClass:"sr-only"},[_vm._v("Dismiss")]),_c('svg',{staticClass:"h-5 w-5",attrs:{"xmlns":"http://www.w3.org/2000/svg","viewBox":"0 0 20 20","fill":"currentColor","aria-hidden":"true"}},[_c('path',{attrs:{"fill-rule":"evenodd","d":"M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z","clip-rule":"evenodd"}})])])])]):_vm._e()])])}
-var staticRenderFns = []
+var getDefaultVariant = function getDefaultVariant(config) {
+  if (!(config !== null && config !== void 0 && config.variants)) {
+    throw new Error('You have to declare variants property');
+  }
+
+  if (!!(config !== null && config !== void 0 && config.defaultVariant) && !!config.variants[config.defaultVariant]) {
+    return config === null || config === void 0 ? void 0 : config.defaultVariant;
+  }
+
+  return Object.keys(config.variants)[0];
+};
+// CONCATENATED MODULE: ./src/utils/VariantMixin.js
 
 
-// CONCATENATED MODULE: ./src/components/alert/TWAlert.vue?vue&type=template&id=499efdb6&
-
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/alert/TWAlert.vue?vue&type=script&lang=js&
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-/* harmony default export */ var TWAlertvue_type_script_lang_js_ = ({
-  name: 'TWAlert',
+/* harmony default export */ var VariantMixin = ({
   props: {
-    variant: {
-      type: String,
-      default: 'default'
-    },
-    dismissible: {
-      type: Boolean,
-      default: undefined
-    }
+    variants: Object,
+    variant: String
   },
   computed: {
-    config: function config() {
-      var _this$$TWVue;
+    localVariant: function localVariant() {
+      return this.variant || getDefaultVariant(this.config);
+    },
+    variantClass: function variantClass() {
+      var variants = _objectSpread2(_objectSpread2({}, this.config.variants), this.variants);
 
-      return (this === null || this === void 0 ? void 0 : (_this$$TWVue = this.$TWVue) === null || _this$$TWVue === void 0 ? void 0 : _this$$TWVue.TWAlert) || {};
+      return variants[this.localVariant];
+    }
+  }
+});
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/alert/Alert.vue?vue&type=script&lang=js&
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+/* harmony default export */ var Alertvue_type_script_lang_js_ = ({
+  name: 'TWAlert',
+  mixins: [FixedMixin, VariantMixin],
+  props: {
+    variants: Object,
+    variant: String,
+    dismissible: Boolean
+  },
+  data: function data() {
+    return {
+      config: this.$TWVue.Alert
+    };
+  },
+  computed: {
+    rootClass: function rootClass() {
+      return ['relative', this.fixedClass.root, this.variantClass.root];
     },
-    baseClass: function baseClass() {
-      return [this.config.base, this.getVariant.base, this.getVariant.text];
-    },
-    baseButtonCloseClass: function baseButtonCloseClass() {
-      return [this.config.baseButtonClose, this.getVariant.buttonClose];
-    },
-    getVariant: function getVariant() {
-      var variants = this.config.variants;
-      return variants[this.variant];
+    btnCloseClass: function btnCloseClass() {
+      return ['absolute right-4 top-1.5 ml-auto -mx-1.5', this.fixedClass.btnClose, this.variantClass.btnClose];
     }
   },
   methods: {
@@ -21226,8 +21227,8 @@ var staticRenderFns = []
     }
   }
 });
-// CONCATENATED MODULE: ./src/components/alert/TWAlert.vue?vue&type=script&lang=js&
- /* harmony default export */ var alert_TWAlertvue_type_script_lang_js_ = (TWAlertvue_type_script_lang_js_); 
+// CONCATENATED MODULE: ./src/components/alert/Alert.vue?vue&type=script&lang=js&
+ /* harmony default export */ var alert_Alertvue_type_script_lang_js_ = (Alertvue_type_script_lang_js_); 
 // CONCATENATED MODULE: ./node_modules/vue-loader/lib/runtime/componentNormalizer.js
 /* globals __VUE_SSR_CONTEXT__ */
 
@@ -21328,7 +21329,7 @@ function normalizeComponent (
   }
 }
 
-// CONCATENATED MODULE: ./src/components/alert/TWAlert.vue
+// CONCATENATED MODULE: ./src/components/alert/Alert.vue
 
 
 
@@ -21337,8 +21338,8 @@ function normalizeComponent (
 /* normalize component */
 
 var component = normalizeComponent(
-  alert_TWAlertvue_type_script_lang_js_,
-  TWAlertvue_type_template_id_499efdb6_render,
+  alert_Alertvue_type_script_lang_js_,
+  render,
   staticRenderFns,
   false,
   null,
@@ -21347,463 +21348,137 @@ var component = normalizeComponent(
   
 )
 
-/* harmony default export */ var TWAlert = (component.exports);
-// EXTERNAL MODULE: ./node_modules/core-js/modules/es.array.includes.js
-var es_array_includes = __webpack_require__("caad");
+/* harmony default export */ var Alert = (component.exports);
+// EXTERNAL MODULE: ./node_modules/lodash/lodash.js
+var lodash = __webpack_require__("2ef0");
 
-// EXTERNAL MODULE: ./node_modules/core-js/modules/es.array.join.js
-var es_array_join = __webpack_require__("a15b");
-
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"4df010df-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/spinner/TWSpinner.vue?vue&type=template&id=1f184671&
-var TWSpinnervue_type_template_id_1f184671_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{class:_vm.baseClass},[_c('svg',{staticClass:"animate-spin",attrs:{"xmlns":"http://www.w3.org/2000/svg","fill":"none","viewBox":"0 0 24 24"}},[_c('circle',{staticClass:"opacity-25",attrs:{"cx":"12","cy":"12","r":"10","stroke":"currentColor","stroke-width":"4"}}),_c('path',{staticClass:"opacity-75",attrs:{"fill":"currentColor","d":"M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"}})])])}
-var TWSpinnervue_type_template_id_1f184671_staticRenderFns = []
-
-
-// CONCATENATED MODULE: ./src/components/spinner/TWSpinner.vue?vue&type=template&id=1f184671&
-
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/spinner/TWSpinner.vue?vue&type=script&lang=js&
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-/* harmony default export */ var TWSpinnervue_type_script_lang_js_ = ({
-  name: 'TWSpinner',
-  props: {
-    variant: {
-      type: String,
-      default: undefined
-    },
-    size: {
-      type: String,
-      default: 'md'
-    }
+// CONCATENATED MODULE: ./src/components/alert/config.js
+/* harmony default export */ var config = ({
+  defaultVariant: 'primary',
+  fixed: {
+    root: 'rounded-xl px-4 py-3 text-sm mb-4',
+    btnClose: 'inline-flex rounded-md p-1.5 focus:outline-none focus:ring-2 focus:ring-offset-2'
   },
-  computed: {
-    config: function config() {
-      var _this$$TWVue;
-
-      return (this === null || this === void 0 ? void 0 : (_this$$TWVue = this.$TWVue) === null || _this$$TWVue === void 0 ? void 0 : _this$$TWVue.TWSpinner) || {};
+  variants: {
+    primary: {
+      root: 'text-blue-700 text-blue-700 bg-blue-100',
+      btnClose: 'bg-blue-100 text-blue-500 rounded-lg focus:ring-2 focus:ring-blue-400 p-1.5 hover:bg-blue-200'
     },
-    baseClass: function baseClass() {
-      return [this.config.base, this.getSize, this.getVariant];
+    secondary: {
+      root: 'text-gray-700 text-gray-700 bg-gray-100',
+      btnClose: 'bg-gray-100 text-gray-500 rounded-lg focus:ring-2 focus:ring-gray-400 p-1.5 hover:bg-gray-200'
     },
-    getVariant: function getVariant() {
-      return this.variant ? this.config.variants[this.variant] : '';
+    success: {
+      root: 'text-green-700 text-green-700 bg-green-100',
+      btnClose: 'bg-green-100 text-green-500 rounded-lg focus:ring-2 focus:ring-green-400 p-1.5 hover:bg-green-200'
     },
-    getSize: function getSize() {
-      return this.config.sizes[this.size];
+    danger: {
+      root: 'text-red-700 text-red-700 bg-red-100',
+      btnClose: 'bg-red-100 text-red-500 rounded-lg focus:ring-2 focus:ring-red-400 p-1.5 hover:bg-red-200'
+    },
+    warning: {
+      root: 'text-yellow-700 text-yellow-700 bg-yellow-100',
+      btnClose: 'bg-yellow-100 text-yellow-600 rounded-lg focus:ring-2 focus:ring-yellow-400 p-1.5 hover:bg-yellow-200'
     }
   }
 });
-// CONCATENATED MODULE: ./src/components/spinner/TWSpinner.vue?vue&type=script&lang=js&
- /* harmony default export */ var spinner_TWSpinnervue_type_script_lang_js_ = (TWSpinnervue_type_script_lang_js_); 
-// CONCATENATED MODULE: ./src/components/spinner/TWSpinner.vue
+// CONCATENATED MODULE: ./src/components/alert/index.js
 
 
 
+var Plugin = {
+  install: function install(Vue) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-
-/* normalize component */
-
-var TWSpinner_component = normalizeComponent(
-  spinner_TWSpinnervue_type_script_lang_js_,
-  TWSpinnervue_type_template_id_1f184671_render,
-  TWSpinnervue_type_template_id_1f184671_staticRenderFns,
-  false,
-  null,
-  null,
-  null
-  
-)
-
-/* harmony default export */ var TWSpinner = (TWSpinner_component.exports);
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/button/TWButton.vue?vue&type=script&lang=js&
-
-
-
-
-/* harmony default export */ var TWButtonvue_type_script_lang_js_ = ({
-  name: 'TWButton',
-  props: {
-    type: {
-      type: String,
-      default: 'button'
-    },
-    variant: {
-      type: String,
-      default: 'default'
-    },
-    size: {
-      type: String,
-      default: 'md'
-    },
-    rounded: {
-      type: [String, Boolean],
-      default: 'default'
-    },
-    circle: {
-      type: Boolean,
-      default: false
-    },
-    block: {
-      type: Boolean,
-      default: false
-    },
-    busy: {
-      type: Boolean,
-      default: false
-    },
-    disabled: {
-      type: Boolean,
-      default: false
-    },
-    href: {
-      type: String,
-      default: undefined
-    },
-    to: {
-      type: [String, Object],
-      default: undefined
-    },
-    tagName: {
-      type: String,
-      default: 'button',
-      validator: function validator(value) {
-        return ['button', 'a'].includes(value);
-      }
+    if (!Vue.prototype.$TWVue) {
+      Vue.prototype.$TWVue = {};
     }
+
+    Vue.prototype.$TWVue.Alert = Object(lodash["merge"])(config, options);
+    Vue.component('TWAlert', Alert);
+  }
+};
+/* harmony default export */ var components_alert = (Plugin);
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"3483aeeb-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/avatar/Avatar.vue?vue&type=template&id=15b9c260&
+var Avatarvue_type_template_id_15b9c260_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{class:_vm.rootClass,on:{"click":function($event){$event.stopPropagation();$event.preventDefault();return _vm.onClick()}}},[_vm._t("default",[(_vm.src)?_c('img',{attrs:{"src":_vm.src,"alt":_vm.alt}}):_vm._e()]),(_vm.text && (!_vm.src || _vm.$slots['default']))?_c('span',[_vm._v(" "+_vm._s(_vm.text)+" ")]):_vm._e()],2)}
+var Avatarvue_type_template_id_15b9c260_staticRenderFns = []
+
+
+// CONCATENATED MODULE: ./src/components/avatar/Avatar.vue?vue&type=template&id=15b9c260&
+
+// CONCATENATED MODULE: ./src/utils/size.js
+
+var getDefaultSize = function getDefaultSize(config) {
+  if (!(config !== null && config !== void 0 && config.sizes)) {
+    throw new Error('You have to declare sizes property');
+  }
+
+  if (!!(config !== null && config !== void 0 && config.defaultSize) && !!config.sizes[config.defaultSize]) {
+    return config === null || config === void 0 ? void 0 : config.defaultSize;
+  }
+
+  return Object.keys(config.sizes)[0];
+};
+// CONCATENATED MODULE: ./src/utils/SizeMixin.js
+
+
+/* harmony default export */ var SizeMixin = ({
+  props: {
+    sizes: Object,
+    size: String
   },
   computed: {
-    config: function config() {
-      var _this$$TWVue;
-
-      return (this === null || this === void 0 ? void 0 : (_this$$TWVue = this.$TWVue) === null || _this$$TWVue === void 0 ? void 0 : _this$$TWVue.TWButton) || {};
+    localSize: function localSize() {
+      return this.size || getDefaultSize(this.config);
     },
-    baseClass: function baseClass() {
-      var base = [this.config.base];
+    sizeClass: function sizeClass() {
+      var sizes = _objectSpread2(_objectSpread2({}, this.config.sizes), this.sizes);
 
-      if (this.block) {
-        base.push('w-full justify-center');
-      }
-
-      if (this.busy) {
-        base.push('opacity-75');
-      }
-
-      return [base.join(' '), this.getVariant, this.getSize, this.getRoundBorder];
-    },
-    getVariant: function getVariant() {
-      var variants = this.config.variants;
-      return variants[this.variant];
-    },
-    getSize: function getSize() {
-      if (this.circle) {
-        return;
-      }
-
-      var sizes = this.config.sizes;
-      return sizes[this.size];
-    },
-    getRoundBorder: function getRoundBorder() {
-      if (this.circle) {
-        return 'rounded-full';
-      }
-
-      if (!this.rounded) {
-        return '';
-      }
-
-      var rounded = this.config.rounded;
-      return rounded[this.rounded];
-    },
-    isRouterLinkComponentAvailable: function isRouterLinkComponentAvailable() {
-      return !!(this.$options.components && (this.$options.components.RouterLink || this.$options.components.NuxtLink));
-    },
-    isARouterLink: function isARouterLink() {
-      return this.to !== undefined && this.isRouterLinkComponentAvailable;
-    },
-    toRender: function toRender() {
-      if (this.isARouterLink && this.$options.components) {
-        return this.$options.components.NuxtLink || this.$options.components.RouterLink;
-      }
-
-      if (this.href) {
-        return 'a';
-      }
-
-      return this.tagName;
+      return sizes[this.localSize];
     }
-  },
-  methods: {
-    routerLinkAttributes: function routerLinkAttributes() {
-      return {
-        to: this.to,
-        tag: this.tagName,
-        disabled: this.busy
-      };
-    },
-    getAttributes: function getAttributes() {
-      if (this.isARouterLink) {
-        return this.routerLinkAttributes();
-      }
-
-      return {
-        type: this.type,
-        disabled: this.busy
-      };
-    },
-    onClick: function onClick(evt) {
-      if (this.busy) {
-        evt.stopPropagation();
-        evt.preventDefault();
-        return;
-      }
-
-      this.$emit('click', evt);
-    }
-  },
-  render: function render(createElement) {
-    var _this$config, _this$config2;
-
-    var options;
-
-    if (this.busy) {
-      options = createElement(TWSpinner, {
-        props: {
-          size: 'xxs'
-        },
-        class: {
-          '-ml-1 mr-3 h-full w-5': !!this.$slots.default
-        }
-      });
-    }
-
-    return createElement(this.toRender, {
-      class: this.baseClass,
-      style: {
-        width: this.circle && (_this$config = this.config) !== null && _this$config !== void 0 && _this$config.circle[this.size] ? "".concat(this.config.circle[this.size], "px") : undefined,
-        height: this.circle && (_this$config2 = this.config) !== null && _this$config2 !== void 0 && _this$config2.circle[this.size] ? "".concat(this.config.circle[this.size], "px") : undefined
-      },
-      attrs: this.getAttributes(),
-      on: _objectSpread2(_objectSpread2({}, this.$listeners), {}, {
-        click: this.onClick
-      })
-    }, [options, this.$slots.default]);
   }
 });
-// CONCATENATED MODULE: ./src/components/button/TWButton.vue?vue&type=script&lang=js&
- /* harmony default export */ var button_TWButtonvue_type_script_lang_js_ = (TWButtonvue_type_script_lang_js_); 
-// CONCATENATED MODULE: ./src/components/button/TWButton.vue
-var TWButton_render, TWButton_staticRenderFns
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/avatar/Avatar.vue?vue&type=script&lang=js&
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
-
-/* normalize component */
-
-var TWButton_component = normalizeComponent(
-  button_TWButtonvue_type_script_lang_js_,
-  TWButton_render,
-  TWButton_staticRenderFns,
-  false,
-  null,
-  null,
-  null
-  
-)
-
-/* harmony default export */ var TWButton = (TWButton_component.exports);
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/button-close/TWButtonClose.vue?vue&type=script&lang=js&
-/* harmony default export */ var TWButtonClosevue_type_script_lang_js_ = ({
-  name: 'TWButtonClose',
+/* harmony default export */ var Avatarvue_type_script_lang_js_ = ({
+  name: 'TWAvatar',
+  mixins: [FixedMixin, VariantMixin, SizeMixin],
   props: {
-    variant: {
-      type: String,
-      default: 'default'
-    },
-    size: {
-      type: String,
-      default: 'md'
-    }
+    src: String,
+    alt: String,
+    text: String
   },
   data: function data() {
     return {
-      TWOptions: {}
+      config: this.$TWVue.Avatar
     };
   },
   computed: {
-    baseClass: function baseClass() {
-      return [this.TWOptions.base, this.getVariant, this.getSize];
-    },
-    iconClass: function iconClass() {
-      return [];
-    },
-    getVariant: function getVariant() {
-      var variants = this.TWOptions.variants;
-      return variants[this.variant];
-    },
-    getSize: function getSize() {
-      var sizes = this.TWOptions.sizes;
-      return sizes[this.size];
+    rootClass: function rootClass() {
+      return [this.fixedClass.root, this.variantClass.root, this.sizeClass];
     }
-  },
-  created: function created() {
-    var _this$$TWVue;
-
-    this.TWOptions = (this === null || this === void 0 ? void 0 : (_this$$TWVue = this.$TWVue) === null || _this$$TWVue === void 0 ? void 0 : _this$$TWVue.TWButtonClose) || {};
-  },
-  render: function render(createElement) {
-    var child = this.$slots.default;
-
-    if (!child) {
-      child = createElement('svg', {
-        attrs: {
-          // class: this.iconClass,
-          style: 'width: 100%; height: 100%;',
-          xmlns: 'http://www.w3.org/2000/svg',
-          viewBox: '0 0 20 20',
-          fill: 'currentColor',
-          'aria-hidden': 'true' // preserveAspectRatio: 'none',
-
-        },
-        slot: 'default'
-      }, [createElement('path', {
-        attrs: {
-          'fill-rule': 'evenodd',
-          d: 'M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z',
-          'clip-rule': 'evenodd'
-        }
-      })]);
-    }
-
-    return createElement('button', {
-      class: this.baseClass,
-      attrs: {
-        type: 'button'
-      },
-      on: this.$listeners
-    }, [child]);
-  }
-});
-// CONCATENATED MODULE: ./src/components/button-close/TWButtonClose.vue?vue&type=script&lang=js&
- /* harmony default export */ var button_close_TWButtonClosevue_type_script_lang_js_ = (TWButtonClosevue_type_script_lang_js_); 
-// CONCATENATED MODULE: ./src/components/button-close/TWButtonClose.vue
-var TWButtonClose_render, TWButtonClose_staticRenderFns
-
-
-
-
-/* normalize component */
-
-var TWButtonClose_component = normalizeComponent(
-  button_close_TWButtonClosevue_type_script_lang_js_,
-  TWButtonClose_render,
-  TWButtonClose_staticRenderFns,
-  false,
-  null,
-  null,
-  null
-  
-)
-
-/* harmony default export */ var TWButtonClose = (TWButtonClose_component.exports);
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"4df010df-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/avatar/TWAvatar.vue?vue&type=template&id=b5fd8bda&
-var TWAvatarvue_type_template_id_b5fd8bda_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{class:_vm.classList,on:{"click":function($event){$event.stopPropagation();$event.preventDefault();return _vm.onClick()}}},[(_vm.src)?_c('img',{attrs:{"src":_vm.src,"alt":_vm.alt}}):(_vm.text)?_c('span',{class:_vm.textClassList},[_vm._v(" "+_vm._s(_vm.text)+" ")]):_vm._e()])}
-var TWAvatarvue_type_template_id_b5fd8bda_staticRenderFns = []
-
-
-// CONCATENATED MODULE: ./src/components/avatar/TWAvatar.vue?vue&type=template&id=b5fd8bda&
-
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/avatar/TWAvatar.vue?vue&type=script&lang=js&
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-/* harmony default export */ var TWAvatarvue_type_script_lang_js_ = ({
-  name: 'TWAvatar',
-  props: {
-    src: {
-      type: String,
-      default: undefined
-    },
-    alt: {
-      type: String,
-      default: undefined
-    },
-    size: {
-      type: String,
-      default: 'md'
-    },
-    text: {
-      type: String,
-      default: undefined
-    }
-  },
-  data: function data() {
-    return {};
-  },
-  computed: {
-    classList: function classList() {
-      return ['inline-flex items-center justify-center bg-gray-500 rounded-full overflow-hidden', this.getSize];
-    },
-    getSize: function getSize() {
-      return this.TWOptions.sizes[this.size];
-    },
-    textClassList: function textClassList() {
-      return ['text-xs leading-none text-white', this.getTextSize];
-    },
-    getTextSize: function getTextSize() {
-      var sizes = {
-        xs: 'text-xs',
-        sm: 'text-sm',
-        md: 'text-base',
-        lg: 'text-lg',
-        xl: 'text-xl'
-      };
-      return sizes[this.size];
-    }
-  },
-  created: function created() {
-    var _this$$TWVue;
-
-    this.TWOptions = (this === null || this === void 0 ? void 0 : (_this$$TWVue = this.$TWVue) === null || _this$$TWVue === void 0 ? void 0 : _this$$TWVue.TWAvatar) || {};
   },
   methods: {
     onClick: function onClick() {
@@ -21811,9 +21486,9 @@ var TWAvatarvue_type_template_id_b5fd8bda_staticRenderFns = []
     }
   }
 });
-// CONCATENATED MODULE: ./src/components/avatar/TWAvatar.vue?vue&type=script&lang=js&
- /* harmony default export */ var avatar_TWAvatarvue_type_script_lang_js_ = (TWAvatarvue_type_script_lang_js_); 
-// CONCATENATED MODULE: ./src/components/avatar/TWAvatar.vue
+// CONCATENATED MODULE: ./src/components/avatar/Avatar.vue?vue&type=script&lang=js&
+ /* harmony default export */ var avatar_Avatarvue_type_script_lang_js_ = (Avatarvue_type_script_lang_js_); 
+// CONCATENATED MODULE: ./src/components/avatar/Avatar.vue
 
 
 
@@ -21821,10 +21496,10 @@ var TWAvatarvue_type_template_id_b5fd8bda_staticRenderFns = []
 
 /* normalize component */
 
-var TWAvatar_component = normalizeComponent(
-  avatar_TWAvatarvue_type_script_lang_js_,
-  TWAvatarvue_type_template_id_b5fd8bda_render,
-  TWAvatarvue_type_template_id_b5fd8bda_staticRenderFns,
+var Avatar_component = normalizeComponent(
+  avatar_Avatarvue_type_script_lang_js_,
+  Avatarvue_type_template_id_15b9c260_render,
+  Avatarvue_type_template_id_15b9c260_staticRenderFns,
   false,
   null,
   null,
@@ -21832,235 +21507,119 @@ var TWAvatar_component = normalizeComponent(
   
 )
 
-/* harmony default export */ var TWAvatar = (TWAvatar_component.exports);
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"4df010df-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/card/TWCard.vue?vue&type=template&id=70c15e5b&
-var TWCardvue_type_template_id_70c15e5b_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{class:_vm.classList},[_c(_vm.noBody ? 'div' : 'TWCardBody',{tag:"Component"},[_vm._t("default")],2)],1)}
-var TWCardvue_type_template_id_70c15e5b_staticRenderFns = []
-
-
-// CONCATENATED MODULE: ./src/components/card/TWCard.vue?vue&type=template&id=70c15e5b&
-
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"4df010df-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/card/TWCardBody.vue?vue&type=template&id=5fc9635a&
-var TWCardBodyvue_type_template_id_5fc9635a_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{class:_vm.TWOptions.body},[_vm._t("default")],2)}
-var TWCardBodyvue_type_template_id_5fc9635a_staticRenderFns = []
-
-
-// CONCATENATED MODULE: ./src/components/card/TWCardBody.vue?vue&type=template&id=5fc9635a&
-
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/card/TWCardBody.vue?vue&type=script&lang=js&
-//
-//
-//
-//
-//
-//
-/* harmony default export */ var TWCardBodyvue_type_script_lang_js_ = ({
-  name: 'TWCardBody',
-  data: function data() {
-    return {
-      TWOptions: {}
-    };
+/* harmony default export */ var Avatar = (Avatar_component.exports);
+// CONCATENATED MODULE: ./src/components/avatar/config.js
+/* harmony default export */ var avatar_config = ({
+  defaultVariant: 'primary',
+  defaultSize: 'md',
+  fixed: {
+    root: 'inline-flex items-center justify-center rounded-full overflow-hidden'
   },
-  created: function created() {
-    var _this$$TWVue;
-
-    this.TWOptions = (this === null || this === void 0 ? void 0 : (_this$$TWVue = this.$TWVue) === null || _this$$TWVue === void 0 ? void 0 : _this$$TWVue.TWCard) || {};
-  }
-});
-// CONCATENATED MODULE: ./src/components/card/TWCardBody.vue?vue&type=script&lang=js&
- /* harmony default export */ var card_TWCardBodyvue_type_script_lang_js_ = (TWCardBodyvue_type_script_lang_js_); 
-// CONCATENATED MODULE: ./src/components/card/TWCardBody.vue
-
-
-
-
-
-/* normalize component */
-
-var TWCardBody_component = normalizeComponent(
-  card_TWCardBodyvue_type_script_lang_js_,
-  TWCardBodyvue_type_template_id_5fc9635a_render,
-  TWCardBodyvue_type_template_id_5fc9635a_staticRenderFns,
-  false,
-  null,
-  null,
-  null
-  
-)
-
-/* harmony default export */ var TWCardBody = (TWCardBody_component.exports);
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/card/TWCard.vue?vue&type=script&lang=js&
-//
-//
-//
-//
-//
-//
-//
-//
-
-/* harmony default export */ var TWCardvue_type_script_lang_js_ = ({
-  name: 'TWCard',
-  props: {
-    variant: {
-      type: String,
-      default: 'default'
+  variants: {
+    primary: {
+      root: 'text-blue-700 text-blue-700 bg-blue-100'
     },
-    noBody: {
-      type: Boolean,
-      default: false
-    }
-  },
-  components: {
-    TWCardBody: TWCardBody
-  },
-  data: function data() {
-    return {
-      TWOptions: {}
-    };
-  },
-  computed: {
-    classList: function classList() {
-      return [this.TWOptions.base, this.getVariant];
+    secondary: {
+      root: 'text-gray-700 text-gray-700 bg-gray-100'
     },
-    getVariant: function getVariant() {
-      var variants = this.TWOptions.variants;
-      return variants[this.variant];
+    success: {
+      root: 'text-green-700 text-green-700 bg-green-100'
+    },
+    danger: {
+      root: 'text-red-700 text-red-700 bg-red-100'
+    },
+    warning: {
+      root: 'text-yellow-700 text-yellow-700 bg-yellow-100'
     }
   },
-  created: function created() {
-    var _this$$TWVue;
-
-    this.TWOptions = (this === null || this === void 0 ? void 0 : (_this$$TWVue = this.$TWVue) === null || _this$$TWVue === void 0 ? void 0 : _this$$TWVue.TWCard) || {};
+  sizes: {
+    xs: 'h-6 w-6 text-xs',
+    sm: 'h-8 w-8 text-sm',
+    md: 'h-10 w-10 text-root',
+    lg: 'h-12 w-12 text-lg',
+    xl: 'h-14 w-14 text-xl'
   }
 });
-// CONCATENATED MODULE: ./src/components/card/TWCard.vue?vue&type=script&lang=js&
- /* harmony default export */ var card_TWCardvue_type_script_lang_js_ = (TWCardvue_type_script_lang_js_); 
-// CONCATENATED MODULE: ./src/components/card/TWCard.vue
+// CONCATENATED MODULE: ./src/components/avatar/index.js
 
 
 
+var avatar_Plugin = {
+  install: function install(Vue) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-
-/* normalize component */
-
-var TWCard_component = normalizeComponent(
-  card_TWCardvue_type_script_lang_js_,
-  TWCardvue_type_template_id_70c15e5b_render,
-  TWCardvue_type_template_id_70c15e5b_staticRenderFns,
-  false,
-  null,
-  null,
-  null
-  
-)
-
-/* harmony default export */ var TWCard = (TWCard_component.exports);
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"4df010df-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/form-group/TWFormGroup.vue?vue&type=template&id=639d3c0a&
-var TWFormGroupvue_type_template_id_639d3c0a_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',[(_vm.label)?_c('TWFormLabel',{attrs:{"label-for":_vm.labelFor}},[_vm._v(" "+_vm._s(_vm.label)+" ")]):_vm._e(),_vm._t("default"),(_vm.invalidFeedback)?_c('TWHelpText',{attrs:{"variant":"danger"}},[_vm._v(" "+_vm._s(_vm.invalidFeedback)+" ")]):_vm._e()],2)}
-var TWFormGroupvue_type_template_id_639d3c0a_staticRenderFns = []
-
-
-// CONCATENATED MODULE: ./src/components/form-group/TWFormGroup.vue?vue&type=template&id=639d3c0a&
-
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"4df010df-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/form-label/TWFormLabel.vue?vue&type=template&id=e1d5cd74&
-var TWFormLabelvue_type_template_id_e1d5cd74_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('label',{class:_vm.options.base,attrs:{"for":_vm.labelFor}},[_vm._t("default")],2)}
-var TWFormLabelvue_type_template_id_e1d5cd74_staticRenderFns = []
-
-
-// CONCATENATED MODULE: ./src/components/form-label/TWFormLabel.vue?vue&type=template&id=e1d5cd74&
-
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/form-label/TWFormLabel.vue?vue&type=script&lang=js&
-//
-//
-//
-//
-//
-//
-//
-//
-//
-/* harmony default export */ var TWFormLabelvue_type_script_lang_js_ = ({
-  name: 'TWFormLabel',
-  props: {
-    labelFor: {
-      type: String,
-      default: undefined
+    if (!Vue.prototype.$TWVue) {
+      Vue.prototype.$TWVue = {};
     }
-  },
-  created: function created() {
-    var _this$$TWVue;
 
-    this.options = (this === null || this === void 0 ? void 0 : (_this$$TWVue = this.$TWVue) === null || _this$$TWVue === void 0 ? void 0 : _this$$TWVue.TWFormLabel) || {};
+    Vue.prototype.$TWVue.Avatar = Object(lodash["merge"])(avatar_config, options);
+    Vue.component('TWAvatar', Avatar);
   }
-});
-// CONCATENATED MODULE: ./src/components/form-label/TWFormLabel.vue?vue&type=script&lang=js&
- /* harmony default export */ var form_label_TWFormLabelvue_type_script_lang_js_ = (TWFormLabelvue_type_script_lang_js_); 
-// CONCATENATED MODULE: ./src/components/form-label/TWFormLabel.vue
+};
+/* harmony default export */ var avatar = (avatar_Plugin);
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"3483aeeb-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/button/Button.vue?vue&type=template&id=9626191e&
+var Buttonvue_type_template_id_9626191e_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c(_vm.computedTag,_vm._g(_vm._b({tag:"Component",class:_vm.rootClass,attrs:{"type":_vm.type,"disabled":_vm.$attrs.disabled || _vm.busy}},'Component',_vm.$attrs,false),_vm.$listeners),[(_vm.busy)?_c('TWSpinner',{class:_vm.$slots.default || _vm.label ? '-ml-0.5 mr-2' : '',attrs:{"size":"xxs"}}):_vm._e(),(_vm.label)?[_vm._v(_vm._s(_vm.label))]:(_vm.$slots.default)?[_vm._t("default")]:_vm._e()],2)}
+var Buttonvue_type_template_id_9626191e_staticRenderFns = []
 
 
+// CONCATENATED MODULE: ./src/components/button/Button.vue?vue&type=template&id=9626191e&
+
+// EXTERNAL MODULE: ./node_modules/core-js/modules/es.array.includes.js
+var es_array_includes = __webpack_require__("caad");
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"3483aeeb-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/spinner/Spinner.vue?vue&type=template&id=21d78ec3&
+var Spinnervue_type_template_id_21d78ec3_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{class:_vm.rootClass},[_c('svg',{staticClass:"animate-spin",attrs:{"xmlns":"http://www.w3.org/2000/svg","fill":"none","viewBox":"0 0 24 24"}},[_c('circle',{staticClass:"opacity-25",attrs:{"cx":"12","cy":"12","r":"10","stroke":"currentColor","stroke-width":"4"}}),_c('path',{staticClass:"opacity-75",attrs:{"fill":"currentColor","d":"M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"}})])])}
+var Spinnervue_type_template_id_21d78ec3_staticRenderFns = []
 
 
+// CONCATENATED MODULE: ./src/components/spinner/Spinner.vue?vue&type=template&id=21d78ec3&
 
-/* normalize component */
-
-var TWFormLabel_component = normalizeComponent(
-  form_label_TWFormLabelvue_type_script_lang_js_,
-  TWFormLabelvue_type_template_id_e1d5cd74_render,
-  TWFormLabelvue_type_template_id_e1d5cd74_staticRenderFns,
-  false,
-  null,
-  null,
-  null
-  
-)
-
-/* harmony default export */ var TWFormLabel = (TWFormLabel_component.exports);
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"4df010df-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/help-text/TWHelpText.vue?vue&type=template&id=0bbbaa6f&
-var TWHelpTextvue_type_template_id_0bbbaa6f_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('small',{class:_vm.classList},[_vm._t("default")],2)}
-var TWHelpTextvue_type_template_id_0bbbaa6f_staticRenderFns = []
-
-
-// CONCATENATED MODULE: ./src/components/help-text/TWHelpText.vue?vue&type=template&id=0bbbaa6f&
-
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/help-text/TWHelpText.vue?vue&type=script&lang=js&
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/spinner/Spinner.vue?vue&type=script&lang=js&
 //
 //
 //
 //
 //
 //
-/* harmony default export */ var TWHelpTextvue_type_script_lang_js_ = ({
-  name: 'TWHelpText',
-  props: {
-    variant: {
-      type: String,
-      default: 'default'
-    }
-  },
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+/* harmony default export */ var Spinnervue_type_script_lang_js_ = ({
+  name: 'TWSpinner',
+  mixins: [FixedMixin, SizeMixin],
   data: function data() {
     return {
-      options: {}
+      config: this.$TWVue.Spinner
     };
   },
   computed: {
-    classList: function classList() {
-      return [this.options.base, this.getVariant];
-    },
-    getVariant: function getVariant() {
-      var variants = this.options.variants;
-      return variants[this.variant];
+    rootClass: function rootClass() {
+      return [this.fixedClass.root, this.sizeClass];
     }
-  },
-  created: function created() {
-    var _this$$TWVue;
-
-    this.options = (this === null || this === void 0 ? void 0 : (_this$$TWVue = this.$TWVue) === null || _this$$TWVue === void 0 ? void 0 : _this$$TWVue.TWHelpText) || {};
   }
 });
-// CONCATENATED MODULE: ./src/components/help-text/TWHelpText.vue?vue&type=script&lang=js&
- /* harmony default export */ var help_text_TWHelpTextvue_type_script_lang_js_ = (TWHelpTextvue_type_script_lang_js_); 
-// CONCATENATED MODULE: ./src/components/help-text/TWHelpText.vue
+// CONCATENATED MODULE: ./src/components/spinner/Spinner.vue?vue&type=script&lang=js&
+ /* harmony default export */ var spinner_Spinnervue_type_script_lang_js_ = (Spinnervue_type_script_lang_js_); 
+// CONCATENATED MODULE: ./src/components/spinner/Spinner.vue
 
 
 
@@ -22068,10 +21627,10 @@ var TWHelpTextvue_type_template_id_0bbbaa6f_staticRenderFns = []
 
 /* normalize component */
 
-var TWHelpText_component = normalizeComponent(
-  help_text_TWHelpTextvue_type_script_lang_js_,
-  TWHelpTextvue_type_template_id_0bbbaa6f_render,
-  TWHelpTextvue_type_template_id_0bbbaa6f_staticRenderFns,
+var Spinner_component = normalizeComponent(
+  spinner_Spinnervue_type_script_lang_js_,
+  Spinnervue_type_template_id_21d78ec3_render,
+  Spinnervue_type_template_id_21d78ec3_staticRenderFns,
   false,
   null,
   null,
@@ -22079,8 +21638,10 @@ var TWHelpText_component = normalizeComponent(
   
 )
 
-/* harmony default export */ var TWHelpText = (TWHelpText_component.exports);
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/form-group/TWFormGroup.vue?vue&type=script&lang=js&
+/* harmony default export */ var Spinner = (Spinner_component.exports);
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/button/Button.vue?vue&type=script&lang=js&
+
+//
 //
 //
 //
@@ -22103,215 +21664,59 @@ var TWHelpText_component = normalizeComponent(
 //
 
 
-/* harmony default export */ var TWFormGroupvue_type_script_lang_js_ = ({
-  name: 'TWFormGroup',
-  props: {
-    label: {
-      type: String,
-      default: undefined
-    },
-    labelFor: {
-      type: String,
-      default: undefined
-    },
-    invalidFeedback: {
-      type: String,
-      default: undefined
-    }
-  },
+
+
+/* harmony default export */ var Buttonvue_type_script_lang_js_ = ({
+  name: 'TWButton',
+  mixins: [FixedMixin, VariantMixin, SizeMixin],
+  inheritAttrs: false,
   components: {
-    TWFormLabel: TWFormLabel,
-    TWHelpText: TWHelpText
+    TWSpinner: Spinner
   },
-  data: function data() {
-    return {};
-  },
-  methods: {}
-});
-// CONCATENATED MODULE: ./src/components/form-group/TWFormGroup.vue?vue&type=script&lang=js&
- /* harmony default export */ var form_group_TWFormGroupvue_type_script_lang_js_ = (TWFormGroupvue_type_script_lang_js_); 
-// CONCATENATED MODULE: ./src/components/form-group/TWFormGroup.vue
-
-
-
-
-
-/* normalize component */
-
-var TWFormGroup_component = normalizeComponent(
-  form_group_TWFormGroupvue_type_script_lang_js_,
-  TWFormGroupvue_type_template_id_639d3c0a_render,
-  TWFormGroupvue_type_template_id_639d3c0a_staticRenderFns,
-  false,
-  null,
-  null,
-  null
-  
-)
-
-/* harmony default export */ var TWFormGroup = (TWFormGroup_component.exports);
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"4df010df-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/form-input/TWFormInput.vue?vue&type=template&id=11bde503&
-var TWFormInputvue_type_template_id_11bde503_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('input',_vm._g({class:_vm.classList,attrs:{"autocomplete":_vm.autocomplete,"autofocus":_vm.autofocus,"disabled":_vm.disabled,"id":_vm.id,"max":_vm.max,"maxlength":_vm.maxlength,"min":_vm.min,"minlength":_vm.minlength,"name":_vm.name,"pattern":_vm.pattern,"placeholder":_vm.placeholder,"readonly":_vm.readonly,"required":_vm.required,"type":_vm.type},domProps:{"value":_vm.value}},_vm.inputListeners))}
-var TWFormInputvue_type_template_id_11bde503_staticRenderFns = []
-
-
-// CONCATENATED MODULE: ./src/components/form-input/TWFormInput.vue?vue&type=template&id=11bde503&
-
-// EXTERNAL MODULE: ./node_modules/core-js/modules/es.number.constructor.js
-var es_number_constructor = __webpack_require__("a9e3");
-
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/form-input/TWFormInput.vue?vue&type=script&lang=js&
-
-
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-/* harmony default export */ var TWFormInputvue_type_script_lang_js_ = ({
-  name: 'TWFormInput',
   props: {
-    value: {
-      type: [String, Number],
-      default: undefined
-    },
-    variant: {
-      type: String,
-      default: 'default'
-    },
-    id: {
-      type: String,
-      default: undefined
-    },
+    label: String,
     type: {
       type: String,
-      default: 'text'
+      default: 'button',
+      validator: function validator(value) {
+        return ['button', 'submit', 'reset'].includes(value);
+      }
     },
-    autocomplete: {
+    block: Boolean,
+    busy: Boolean,
+    hideLabelWhenBusy: Boolean,
+    tag: {
       type: String,
-      default: undefined
-    },
-    placeholder: {
-      type: String,
-      default: undefined
-    },
-    name: {
-      type: String,
-      default: undefined
-    },
-    max: {
-      type: [String, Number],
-      default: undefined
-    },
-    maxlength: {
-      type: [String, Number],
-      default: undefined
-    },
-    min: {
-      type: [String, Number],
-      default: undefined
-    },
-    minlength: {
-      type: [String, Number],
-      default: undefined
-    },
-    disabled: {
-      type: Boolean,
-      default: false
-    },
-    readonly: {
-      type: Boolean,
-      default: false
-    },
-    required: {
-      type: Boolean,
-      default: false
-    },
-    pattern: {
-      type: Boolean,
-      default: undefined
-    },
-    autofocus: {
-      type: Boolean,
-      default: false
-    },
-    size: {
-      type: String,
-      default: 'md'
+      default: 'button'
     }
   },
   data: function data() {
     return {
-      localValue: this.value,
-      TWOptions: {}
+      config: this.$TWVue.Button
     };
   },
-  watch: {
-    value: function value(_value) {
-      this.localValue = _value;
-    }
-  },
   computed: {
-    classList: function classList() {
-      return [this.TWOptions.base, this.getVariants, this.getSize];
-    },
-    getVariants: function getVariants() {
-      if (this.disabled) {
-        return this.TWOptions.disabled;
+    computedTag: function computedTag() {
+      if (this.$attrs.disabled !== undefined && this.$attrs.disabled !== false) {
+        return 'button';
       }
 
-      if (this.readonly) {
-        return this.TWOptions.readonly;
-      }
-
-      var variants = this.TWOptions.variants;
-      return variants[this.variant];
+      return this.tag;
     },
-    getSize: function getSize() {
-      var sizes = this.TWOptions.sizes;
-      return sizes[this.size];
+    rootClass: function rootClass() {
+      return [this.fixedClass.root, this.variantClass.root, this.sizeClass, this.getOpacity, this.getBlock];
     },
-    inputListeners: function inputListeners() {
-      var vm = this;
-      return _objectSpread2(_objectSpread2({}, this.$listeners), {}, {
-        input: function input(event) {
-          vm.$emit('input', event.target.value);
-        },
-        change: function change(event) {
-          vm.$emit('change', event.target.value);
-        },
-        blur: function blur(event) {
-          vm.$emit('blur', event);
-        }
-      });
+    getOpacity: function getOpacity() {
+      return this.busy || this.$attrs.disabled ? 'opacity-75' : '';
+    },
+    getBlock: function getBlock() {
+      return this.block ? 'w-full justify-center' : '';
     }
-  },
-  created: function created() {
-    var _this$$TWVue;
-
-    this.TWOptions = (this === null || this === void 0 ? void 0 : (_this$$TWVue = this.$TWVue) === null || _this$$TWVue === void 0 ? void 0 : _this$$TWVue.TWFormInput) || {};
   }
 });
-// CONCATENATED MODULE: ./src/components/form-input/TWFormInput.vue?vue&type=script&lang=js&
- /* harmony default export */ var form_input_TWFormInputvue_type_script_lang_js_ = (TWFormInputvue_type_script_lang_js_); 
-// CONCATENATED MODULE: ./src/components/form-input/TWFormInput.vue
+// CONCATENATED MODULE: ./src/components/button/Button.vue?vue&type=script&lang=js&
+ /* harmony default export */ var button_Buttonvue_type_script_lang_js_ = (Buttonvue_type_script_lang_js_); 
+// CONCATENATED MODULE: ./src/components/button/Button.vue
 
 
 
@@ -22319,10 +21724,10 @@ var es_number_constructor = __webpack_require__("a9e3");
 
 /* normalize component */
 
-var TWFormInput_component = normalizeComponent(
-  form_input_TWFormInputvue_type_script_lang_js_,
-  TWFormInputvue_type_template_id_11bde503_render,
-  TWFormInputvue_type_template_id_11bde503_staticRenderFns,
+var Button_component = normalizeComponent(
+  button_Buttonvue_type_script_lang_js_,
+  Buttonvue_type_template_id_9626191e_render,
+  Buttonvue_type_template_id_9626191e_staticRenderFns,
   false,
   null,
   null,
@@ -22330,19 +21735,83 @@ var TWFormInput_component = normalizeComponent(
   
 )
 
-/* harmony default export */ var TWFormInput = (TWFormInput_component.exports);
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"4df010df-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/form-file/TWFormFile.vue?vue&type=template&id=768e23bc&
-var TWFormFilevue_type_template_id_768e23bc_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('label',{class:_vm.baseCLass},[_c('input',{staticClass:"absolute opacity-0",attrs:{"type":"file"},on:{"change":_vm.onChange}}),_c('span',[_vm._v(_vm._s(_vm.fileName || 'Choose a file...'))]),_c('span',{staticClass:"flex bg-gray-200 border border-gray-300 -mr-5 -my-3 px-3 py-2"},[_vm._v(" Browse ")])])}
-var TWFormFilevue_type_template_id_768e23bc_staticRenderFns = []
+/* harmony default export */ var Button = (Button_component.exports);
+// CONCATENATED MODULE: ./src/components/button/config.js
+/* harmony default export */ var button_config = ({
+  defaultVariant: 'primary',
+  defaultSize: 'md',
+  fixed: {
+    root: 'inline-flex items-center justify-center border focus:outline-none transition ease-in-out font-medium rounded-md duration-150'
+  },
+  variants: {
+    ghost: {
+      root: 'text-gray-700 bg-white hover:bg-white border-white hover:border-white'
+    },
+    primary: {
+      root: 'text-white bg-blue-500 hover:bg-blue-600 border-blue-500 hover:border-blue-600'
+    },
+    primaryOutline: {
+      root: 'text-blue-500 hover:text-blue-600 border-blue-500 hover:border-blue-600'
+    },
+    secondary: {
+      root: 'text-gray-700 bg-white hover:bg-gray-50 border-gray-300 hover:border-gray-400'
+    },
+    secondaryOutline: {
+      root: 'text-gray-500 hover:text-gray-600 border-gray-500 hover:border-gray-600'
+    },
+    success: {
+      root: 'text-white bg-green-500 hover:bg-green-600 border-green-500 hover:border-green-600'
+    },
+    successOutline: {
+      root: 'text-green-500 hover:text-green-600 border-green-500 hover:border-green-600'
+    },
+    danger: {
+      root: 'text-white bg-red-500 hover:bg-red-600 border-red-500 hover:border-red-600'
+    },
+    dangerOutline: {
+      root: 'text-red-500 hover:text-red-600 border-red-500 hover:border-red-600'
+    },
+    warning: {
+      root: 'text-yellow-900 bg-yellow-400 hover:bg-yellow-500 border-yellow-400 hover:border-yellow-500'
+    },
+    warningOutline: {
+      root: 'text-yellow-500 hover:text-yellow-600 border-yellow-500 hover:border-yellow-600'
+    }
+  },
+  sizes: {
+    xs: 'text-xs px-2.5 py-1.5',
+    sm: 'text-sm px-3 py-2 leading-4',
+    md: 'text-sm px-4 py-2.5',
+    lg: 'text-base px-5 py-3',
+    xl: 'text-base px-6 py-4'
+  }
+});
+// CONCATENATED MODULE: ./src/components/button/index.js
 
 
-// CONCATENATED MODULE: ./src/components/form-file/TWFormFile.vue?vue&type=template&id=768e23bc&
 
-// EXTERNAL MODULE: ./node_modules/core-js/modules/es.function.name.js
-var es_function_name = __webpack_require__("b0c0");
+var button_Plugin = {
+  install: function install(Vue) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/form-file/TWFormFile.vue?vue&type=script&lang=js&
+    if (!Vue.prototype.$TWVue) {
+      Vue.prototype.$TWVue = {};
+    }
 
+    Vue.prototype.$TWVue.Button = Object(lodash["merge"])(button_config, options);
+    Vue.component('TWButton', Button);
+  }
+};
+/* harmony default export */ var components_button = (button_Plugin);
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"3483aeeb-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/button-close/ButtonClose.vue?vue&type=template&id=c3b08908&
+var ButtonClosevue_type_template_id_c3b08908_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('button',_vm._g({class:_vm.rootClass,attrs:{"type":"button"}},_vm.$listeners),[_c('svg',{staticStyle:{"height":"100%","width":"100%"},attrs:{"fill":"none","stroke":"currentColor","viewBox":"0 0 24 24","xmlns":"http://www.w3.org/2000/svg"}},[_c('path',{attrs:{"stroke-linecap":"round","stroke-linejoin":"round","stroke-width":"2","d":"M6 18L18 6M6 6l12 12"}})])])}
+var ButtonClosevue_type_template_id_c3b08908_staticRenderFns = []
+
+
+// CONCATENATED MODULE: ./src/components/button-close/ButtonClose.vue?vue&type=template&id=c3b08908&
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/button-close/ButtonClose.vue?vue&type=script&lang=js&
 //
 //
 //
@@ -22359,61 +21828,314 @@ var es_function_name = __webpack_require__("b0c0");
 //
 //
 //
-/* harmony default export */ var TWFormFilevue_type_script_lang_js_ = ({
-  name: 'TWFormFile',
+//
+//
+//
+//
+//
+//
+
+
+/* harmony default export */ var ButtonClosevue_type_script_lang_js_ = ({
+  name: 'TWButtonClose',
+  mixins: [FixedMixin, SizeMixin],
+  data: function data() {
+    return {
+      config: this.$TWVue.ButtonClose
+    };
+  },
+  computed: {
+    rootClass: function rootClass() {
+      return [this.fixedClass.root, this.sizeClass];
+    }
+  }
+});
+// CONCATENATED MODULE: ./src/components/button-close/ButtonClose.vue?vue&type=script&lang=js&
+ /* harmony default export */ var button_close_ButtonClosevue_type_script_lang_js_ = (ButtonClosevue_type_script_lang_js_); 
+// CONCATENATED MODULE: ./src/components/button-close/ButtonClose.vue
+
+
+
+
+
+/* normalize component */
+
+var ButtonClose_component = normalizeComponent(
+  button_close_ButtonClosevue_type_script_lang_js_,
+  ButtonClosevue_type_template_id_c3b08908_render,
+  ButtonClosevue_type_template_id_c3b08908_staticRenderFns,
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* harmony default export */ var ButtonClose = (ButtonClose_component.exports);
+// CONCATENATED MODULE: ./src/components/button-close/config.js
+/* harmony default export */ var button_close_config = ({
+  defaultVariant: 'primary',
+  defaultSize: 'md',
+  fixed: {
+    root: 'inline-flex items-center justify-center p-1 rounded-lg focus:outline-none focus:outline-none focus:ring-2 focus:ring-offset-2'
+  },
+  variants: {
+    primary: {
+      root: 'text-blue-500 hover:text-blue-600'
+    },
+    secondary: {
+      root: 'text-gray-400 hover:text-gray-500'
+    },
+    danger: {
+      root: 'text-red-400 hover:text-red-500'
+    },
+    success: {
+      root: 'text-green-400 hover:text-green-500'
+    },
+    warning: {
+      root: 'text-yellow-400 hover:text-yellow-500'
+    }
+  },
+  sizes: {
+    sm: 'w-8 h-8',
+    md: 'w-10 h-10',
+    lg: 'w-12 h-12'
+  }
+});
+// CONCATENATED MODULE: ./src/components/button-close/index.js
+
+
+
+var button_close_Plugin = {
+  install: function install(Vue) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    if (!Vue.prototype.$TWVue) {
+      Vue.prototype.$TWVue = {};
+    }
+
+    Vue.prototype.$TWVue.ButtonClose = Object(lodash["merge"])(button_close_config, options);
+    Vue.component('TWButtonClose', ButtonClose);
+  }
+};
+/* harmony default export */ var button_close = (button_close_Plugin);
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"3483aeeb-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/card/Card.vue?vue&type=template&id=7781d1fd&
+var Cardvue_type_template_id_7781d1fd_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{class:_vm.rootClass},[(_vm.title || _vm.$slots.header)?_c('TWCardHeader',{scopedSlots:_vm._u([{key:"action",fn:function(){return [_vm._t("header-action")]},proxy:true}],null,true)},[_vm._t("header")],2):_vm._e(),_c(_vm.computedBodyTag,{tag:"Component"},[_vm._t("default")],2),(_vm.$slots.footer)?_c('TWCardFooter',[_vm._t("footer")],2):_vm._e()],1)}
+var Cardvue_type_template_id_7781d1fd_staticRenderFns = []
+
+
+// CONCATENATED MODULE: ./src/components/card/Card.vue?vue&type=template&id=7781d1fd&
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"3483aeeb-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/card/CardHeader.vue?vue&type=template&id=939387da&
+var CardHeadervue_type_template_id_939387da_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{class:_vm.TWCard.headerClass},[_vm._t("default",[_c(_vm.TWCard.titleTag,{tag:"Component",class:_vm.TWCard.headerTitleClass},[_vm._v(" "+_vm._s(_vm.TWCard.title)+" ")]),_c('div',[_vm._t("action")],2)])],2)}
+var CardHeadervue_type_template_id_939387da_staticRenderFns = []
+
+
+// CONCATENATED MODULE: ./src/components/card/CardHeader.vue?vue&type=template&id=939387da&
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/card/CardHeader.vue?vue&type=script&lang=js&
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ var CardHeadervue_type_script_lang_js_ = ({
+  name: 'TWCardHeader',
+  inject: ['TWCard']
+});
+// CONCATENATED MODULE: ./src/components/card/CardHeader.vue?vue&type=script&lang=js&
+ /* harmony default export */ var card_CardHeadervue_type_script_lang_js_ = (CardHeadervue_type_script_lang_js_); 
+// CONCATENATED MODULE: ./src/components/card/CardHeader.vue
+
+
+
+
+
+/* normalize component */
+
+var CardHeader_component = normalizeComponent(
+  card_CardHeadervue_type_script_lang_js_,
+  CardHeadervue_type_template_id_939387da_render,
+  CardHeadervue_type_template_id_939387da_staticRenderFns,
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* harmony default export */ var CardHeader = (CardHeader_component.exports);
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"3483aeeb-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/card/CardBody.vue?vue&type=template&id=645b5bd4&
+var CardBodyvue_type_template_id_645b5bd4_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{class:_vm.bodyClass},[_vm._t("default")],2)}
+var CardBodyvue_type_template_id_645b5bd4_staticRenderFns = []
+
+
+// CONCATENATED MODULE: ./src/components/card/CardBody.vue?vue&type=template&id=645b5bd4&
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/card/CardBody.vue?vue&type=script&lang=js&
+//
+//
+//
+//
+//
+//
+/* harmony default export */ var CardBodyvue_type_script_lang_js_ = ({
+  name: 'TWCardBody',
+  inject: ['TWCard'],
+  computed: {
+    bodyClass: function bodyClass() {
+      return [this.TWCard.fixedClass.body, this.TWCard.variantClass.body];
+    }
+  }
+});
+// CONCATENATED MODULE: ./src/components/card/CardBody.vue?vue&type=script&lang=js&
+ /* harmony default export */ var card_CardBodyvue_type_script_lang_js_ = (CardBodyvue_type_script_lang_js_); 
+// CONCATENATED MODULE: ./src/components/card/CardBody.vue
+
+
+
+
+
+/* normalize component */
+
+var CardBody_component = normalizeComponent(
+  card_CardBodyvue_type_script_lang_js_,
+  CardBodyvue_type_template_id_645b5bd4_render,
+  CardBodyvue_type_template_id_645b5bd4_staticRenderFns,
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* harmony default export */ var CardBody = (CardBody_component.exports);
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"3483aeeb-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/card/CardFooter.vue?vue&type=template&id=0219e4f0&
+var CardFootervue_type_template_id_0219e4f0_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{class:_vm.TWCard.footerClass},[_vm._t("default")],2)}
+var CardFootervue_type_template_id_0219e4f0_staticRenderFns = []
+
+
+// CONCATENATED MODULE: ./src/components/card/CardFooter.vue?vue&type=template&id=0219e4f0&
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/card/CardFooter.vue?vue&type=script&lang=js&
+//
+//
+//
+//
+//
+//
+/* harmony default export */ var CardFootervue_type_script_lang_js_ = ({
+  name: 'TWCardFooter',
+  inject: ['TWCard']
+});
+// CONCATENATED MODULE: ./src/components/card/CardFooter.vue?vue&type=script&lang=js&
+ /* harmony default export */ var card_CardFootervue_type_script_lang_js_ = (CardFootervue_type_script_lang_js_); 
+// CONCATENATED MODULE: ./src/components/card/CardFooter.vue
+
+
+
+
+
+/* normalize component */
+
+var CardFooter_component = normalizeComponent(
+  card_CardFootervue_type_script_lang_js_,
+  CardFootervue_type_template_id_0219e4f0_render,
+  CardFootervue_type_template_id_0219e4f0_staticRenderFns,
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* harmony default export */ var CardFooter = (CardFooter_component.exports);
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/card/Card.vue?vue&type=script&lang=js&
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+
+
+/* harmony default export */ var Cardvue_type_script_lang_js_ = ({
+  name: 'TWCard',
+  mixins: [FixedMixin, VariantMixin],
   props: {
-    value: undefined,
-    variant: {
+    title: String,
+    titleTag: {
       type: String,
-      default: 'default'
+      default: 'h3'
     },
-    size: {
-      type: String,
-      default: 'md'
-    }
+    noBody: Boolean
+  },
+  provide: function provide() {
+    return {
+      TWCard: this
+    };
+  },
+  components: {
+    TWCardHeader: CardHeader,
+    TWCardBody: CardBody,
+    TWCardFooter: CardFooter
   },
   data: function data() {
     return {
-      fileName: null,
-      TWOptions: {}
+      config: this.$TWVue.Card
     };
   },
   computed: {
-    baseCLass: function baseCLass() {
-      return ['flex items-center justify-between relative overflow-hidden', this.TWOptions.base, this.getVariants, this.getSize];
+    rootClass: function rootClass() {
+      return [this.fixedClass.root, this.variantClass.root];
     },
-    getVariants: function getVariants() {
-      if (this.disabled) {
-        return this.TWOptions.disabled;
-      }
-
-      if (this.readonly) {
-        return this.TWOptions.readonly;
-      }
-
-      var variants = this.TWOptions.variants;
-      return variants[this.variant];
+    headerClass: function headerClass() {
+      return [this.fixedClass.header, this.variantClass.header];
     },
-    getSize: function getSize() {
-      var sizes = this.TWOptions.sizes;
-      return sizes[this.size];
-    }
-  },
-  created: function created() {
-    var _this$$TWVue;
-
-    this.TWOptions = (this === null || this === void 0 ? void 0 : (_this$$TWVue = this.$TWVue) === null || _this$$TWVue === void 0 ? void 0 : _this$$TWVue.TWFormInput) || {};
-  },
-  methods: {
-    onChange: function onChange($evt) {
-      this.fileName = $evt.target.files[0].name;
-      this.$emit('input', $evt.target.files[0]);
+    headerTitleClass: function headerTitleClass() {
+      return [this.fixedClass.headerTitle, this.variantClass.headerTitle];
+    },
+    footerClass: function footerClass() {
+      return [this.fixedClass.footer, this.variantClass.footer];
+    },
+    computedBodyTag: function computedBodyTag() {
+      return this.noBody ? 'div' : 'TWCardBody';
     }
   }
 });
-// CONCATENATED MODULE: ./src/components/form-file/TWFormFile.vue?vue&type=script&lang=js&
- /* harmony default export */ var form_file_TWFormFilevue_type_script_lang_js_ = (TWFormFilevue_type_script_lang_js_); 
-// CONCATENATED MODULE: ./src/components/form-file/TWFormFile.vue
+// CONCATENATED MODULE: ./src/components/card/Card.vue?vue&type=script&lang=js&
+ /* harmony default export */ var card_Cardvue_type_script_lang_js_ = (Cardvue_type_script_lang_js_); 
+// CONCATENATED MODULE: ./src/components/card/Card.vue
 
 
 
@@ -22421,10 +22143,10 @@ var es_function_name = __webpack_require__("b0c0");
 
 /* normalize component */
 
-var TWFormFile_component = normalizeComponent(
-  form_file_TWFormFilevue_type_script_lang_js_,
-  TWFormFilevue_type_template_id_768e23bc_render,
-  TWFormFilevue_type_template_id_768e23bc_staticRenderFns,
+var Card_component = normalizeComponent(
+  card_Cardvue_type_script_lang_js_,
+  Cardvue_type_template_id_7781d1fd_render,
+  Cardvue_type_template_id_7781d1fd_staticRenderFns,
   false,
   null,
   null,
@@ -22432,310 +22154,5539 @@ var TWFormFile_component = normalizeComponent(
   
 )
 
-/* harmony default export */ var TWFormFile = (TWFormFile_component.exports);
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"4df010df-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/form-textarea/TWFormTextarea.vue?vue&type=template&id=80096314&
-var TWFormTextareavue_type_template_id_80096314_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('textarea',_vm._g({class:_vm.classList,attrs:{"autofocus":_vm.autofocus,"disabled":_vm.disabled,"id":_vm.id,"name":_vm.name,"placeholder":_vm.placeholder,"readonly":_vm.readonly,"required":_vm.required,"rows":_vm.rows,"maxlength":_vm.maxLength,"cols":_vm.cols,"wrap":_vm.wrap},domProps:{"value":_vm.value}},_vm.inputListeners))}
-var TWFormTextareavue_type_template_id_80096314_staticRenderFns = []
-
-
-// CONCATENATED MODULE: ./src/components/form-textarea/TWFormTextarea.vue?vue&type=template&id=80096314&
-
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/form-textarea/TWFormTextarea.vue?vue&type=script&lang=js&
-
-
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-/* harmony default export */ var TWFormTextareavue_type_script_lang_js_ = ({
-  name: 'TWFormTextarea',
-  props: {
-    value: {
-      type: [String, Number],
-      default: undefined
+/* harmony default export */ var Card = (Card_component.exports);
+// CONCATENATED MODULE: ./src/components/card/config.js
+/* harmony default export */ var card_config = ({
+  defaultVariant: 'secondary',
+  fixed: {
+    root: 'w-full shadow rounded-lg overflow-hidden',
+    header: 'px-4 py-3 flex items-center justify-between',
+    headerTitle: 'text-base font-semibold leading-tight',
+    body: 'px-4 py-3',
+    footer: 'px-4 py-3'
+  },
+  variants: {
+    primary: {
+      root: 'text-white bg-blue-500',
+      body: ''
     },
-    variant: {
-      type: String,
-      default: 'default'
+    secondary: {
+      root: 'bg-white',
+      header: 'bg-gray-50',
+      body: '',
+      footer: 'bg-gray-50'
     },
-    id: {
-      type: String,
-      default: undefined
+    success: {
+      root: 'text-white bg-green-500',
+      body: ''
     },
-    placeholder: {
-      type: String,
-      default: undefined
+    danger: {
+      root: 'text-white bg-red-500',
+      body: ''
     },
-    name: {
-      type: String,
-      default: undefined
-    },
-    disabled: {
-      type: Boolean,
-      default: false
-    },
-    readonly: {
-      type: Boolean,
-      default: false
-    },
-    required: {
-      type: Boolean,
-      default: false
-    },
-    autofocus: {
-      type: Boolean,
-      default: false
-    },
-    size: {
-      type: String,
-      default: 'md'
-    },
-    cols: {
-      type: [Number, String],
-      default: undefined
-    },
-    rows: {
-      type: [Number, String],
-      default: 2
-    },
-    maxLength: {
-      type: [Number, String],
-      default: undefined
-    },
-    wrap: {
-      type: String,
-      default: 'soft'
+    warning: {
+      root: 'text-yellow-900 bg-yellow-400',
+      body: ''
     }
-  },
-  data: function data() {
-    return {
-      localValue: this.value,
-      TWOptions: {}
-    };
-  },
-  watch: {
-    value: function value(_value) {
-      this.localValue = _value;
-    }
-  },
-  computed: {
-    classList: function classList() {
-      return [this.TWOptions.base, this.getVariants, this.getSize];
-    },
-    getVariants: function getVariants() {
-      if (this.disabled) {
-        return this.TWOptions.disabled;
-      }
-
-      if (this.readonly) {
-        return this.TWOptions.readonly;
-      }
-
-      var variants = this.TWOptions.variants;
-      return variants[this.variant];
-    },
-    getSize: function getSize() {
-      var sizes = this.TWOptions.sizes;
-      return sizes[this.size];
-    },
-    inputListeners: function inputListeners() {
-      var vm = this;
-      return _objectSpread2(_objectSpread2({}, this.$listeners), {}, {
-        input: function input(event) {
-          vm.$emit('input', event.target.value);
-        },
-        change: function change(event) {
-          vm.$emit('change', event.target.value);
-        },
-        blur: function blur(event) {
-          vm.$emit('blur', event);
-        }
-      });
-    }
-  },
-  created: function created() {
-    var _this$$TWVue;
-
-    this.TWOptions = (this === null || this === void 0 ? void 0 : (_this$$TWVue = this.$TWVue) === null || _this$$TWVue === void 0 ? void 0 : _this$$TWVue.TWFormInput) || {};
   }
 });
-// CONCATENATED MODULE: ./src/components/form-textarea/TWFormTextarea.vue?vue&type=script&lang=js&
- /* harmony default export */ var form_textarea_TWFormTextareavue_type_script_lang_js_ = (TWFormTextareavue_type_script_lang_js_); 
-// CONCATENATED MODULE: ./src/components/form-textarea/TWFormTextarea.vue
+// CONCATENATED MODULE: ./src/components/card/index.js
 
 
 
 
+var card_Plugin = {
+  install: function install(Vue) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-/* normalize component */
+    if (!Vue.prototype.$TWVue) {
+      Vue.prototype.$TWVue = {};
+    }
 
-var TWFormTextarea_component = normalizeComponent(
-  form_textarea_TWFormTextareavue_type_script_lang_js_,
-  TWFormTextareavue_type_template_id_80096314_render,
-  TWFormTextareavue_type_template_id_80096314_staticRenderFns,
-  false,
-  null,
-  null,
-  null
-  
-)
+    Vue.prototype.$TWVue.Card = Object(lodash["merge"])(card_config, options);
+    Vue.component('TWCard', Card);
+    Vue.component('TWCardBody', CardBody);
+  }
+};
+/* harmony default export */ var card = (card_Plugin);
 
-/* harmony default export */ var TWFormTextarea = (TWFormTextarea_component.exports);
-// EXTERNAL MODULE: ./node_modules/core-js/modules/es.array.from.js
-var es_array_from = __webpack_require__("a630");
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"3483aeeb-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/drawer/Drawer.vue?vue&type=template&id=092d9682&
+var Drawervue_type_template_id_092d9682_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('MountingPortal',{attrs:{"mount-to":"body","append":""}},[_c('Transition',{attrs:{"css":false},on:{"before-enter":_vm.beforeEnter,"enter":_vm.enter,"leave":_vm.leave,"after-leave":_vm.afterLeave}},[(_vm.isOpen)?_c('div',{staticClass:"fixed inset-0 overflow-hidden"},[_c('div',{staticClass:"absolute inset-0 overflow-hidden"},[(!_vm.noBackdrop)?_c('div',{class:_vm.backdropClass,on:{"click":_vm.onBackdropClick}}):_vm._e(),_c('div',{class:_vm.panelWrapperClass},[_c('div',{class:_vm.panelClass},[(!_vm.hideHeader && _vm.title)?_vm._t("header",[_c('TWDrawerHeader')]):_vm._e(),_c('div',{class:_vm.bodyClass},[_vm._t("default")],2),(!_vm.hideFooter)?_vm._t("footer",[_c('TWDrawerFooter')]):_vm._e()],2)])])]):_vm._e()])],1)}
+var Drawervue_type_template_id_092d9682_staticRenderFns = []
 
-// EXTERNAL MODULE: ./node_modules/core-js/modules/es.array.map.js
-var es_array_map = __webpack_require__("d81d");
 
-// EXTERNAL MODULE: ./node_modules/core-js/modules/es.string.iterator.js
-var es_string_iterator = __webpack_require__("3ca3");
+// CONCATENATED MODULE: ./src/components/drawer/Drawer.vue?vue&type=template&id=092d9682&
 
 // EXTERNAL MODULE: ./node_modules/core-js/modules/es.symbol.description.js
 var es_symbol_description = __webpack_require__("e01a");
 
-// EXTERNAL MODULE: ./node_modules/core-js/modules/es.symbol.iterator.js
-var es_symbol_iterator = __webpack_require__("d28b");
+// EXTERNAL MODULE: ./node_modules/portal-vue/dist/portal-vue.common.js
+var portal_vue_common = __webpack_require__("2b88");
 
-// EXTERNAL MODULE: ./node_modules/core-js/modules/es.array.iterator.js
-var es_array_iterator = __webpack_require__("e260");
+// CONCATENATED MODULE: ./node_modules/gsap/gsap-core.js
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
 
-// EXTERNAL MODULE: ./node_modules/core-js/modules/es.object.to-string.js
-var es_object_to_string = __webpack_require__("d3b7");
+function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
 
-// EXTERNAL MODULE: ./node_modules/core-js/modules/web.dom-collections.iterator.js
-var web_dom_collections_iterator = __webpack_require__("ddb0");
+/*!
+ * GSAP 3.9.1
+ * https://greensock.com
+ *
+ * @license Copyright 2008-2021, GreenSock. All rights reserved.
+ * Subject to the terms at https://greensock.com/standard-license or for
+ * Club GreenSock members, the agreement issued with that membership.
+ * @author: Jack Doyle, jack@greensock.com
+*/
 
-// CONCATENATED MODULE: ./node_modules/@babel/runtime/helpers/esm/typeof.js
+/* eslint-disable */
+var _config = {
+  autoSleep: 120,
+  force3D: "auto",
+  nullTargetWarn: 1,
+  units: {
+    lineHeight: ""
+  }
+},
+    _defaults = {
+  duration: .5,
+  overwrite: false,
+  delay: 0
+},
+    _suppressOverwrites,
+    _bigNum = 1e8,
+    _tinyNum = 1 / _bigNum,
+    _2PI = Math.PI * 2,
+    _HALF_PI = _2PI / 4,
+    _gsID = 0,
+    _sqrt = Math.sqrt,
+    _cos = Math.cos,
+    _sin = Math.sin,
+    _isString = function _isString(value) {
+  return typeof value === "string";
+},
+    _isFunction = function _isFunction(value) {
+  return typeof value === "function";
+},
+    _isNumber = function _isNumber(value) {
+  return typeof value === "number";
+},
+    _isUndefined = function _isUndefined(value) {
+  return typeof value === "undefined";
+},
+    _isObject = function _isObject(value) {
+  return typeof value === "object";
+},
+    _isNotFalse = function _isNotFalse(value) {
+  return value !== false;
+},
+    _windowExists = function _windowExists() {
+  return typeof window !== "undefined";
+},
+    _isFuncOrString = function _isFuncOrString(value) {
+  return _isFunction(value) || _isString(value);
+},
+    _isTypedArray = typeof ArrayBuffer === "function" && ArrayBuffer.isView || function () {},
+    // note: IE10 has ArrayBuffer, but NOT ArrayBuffer.isView().
+_isArray = Array.isArray,
+    _strictNumExp = /(?:-?\.?\d|\.)+/gi,
+    //only numbers (including negatives and decimals) but NOT relative values.
+_numExp = /[-+=.]*\d+[.e\-+]*\d*[e\-+]*\d*/g,
+    //finds any numbers, including ones that start with += or -=, negative numbers, and ones in scientific notation like 1e-8.
+_numWithUnitExp = /[-+=.]*\d+[.e-]*\d*[a-z%]*/g,
+    _complexStringNumExp = /[-+=.]*\d+\.?\d*(?:e-|e\+)?\d*/gi,
+    //duplicate so that while we're looping through matches from exec(), it doesn't contaminate the lastIndex of _numExp which we use to search for colors too.
+_relExp = /[+-]=-?[.\d]+/,
+    _delimitedValueExp = /[^,'"\[\]\s]+/gi,
+    // previously /[#\-+.]*\b[a-z\d\-=+%.]+/gi but didn't catch special characters.
+_unitExp = /[\d.+\-=]+(?:e[-+]\d*)*/i,
+    _globalTimeline,
+    _win,
+    _coreInitted,
+    _doc,
+    _globals = {},
+    _installScope = {},
+    _coreReady,
+    _install = function _install(scope) {
+  return (_installScope = _merge(scope, _globals)) && gsap;
+},
+    _missingPlugin = function _missingPlugin(property, value) {
+  return console.warn("Invalid property", property, "set to", value, "Missing plugin? gsap.registerPlugin()");
+},
+    _warn = function _warn(message, suppress) {
+  return !suppress && console.warn(message);
+},
+    _addGlobal = function _addGlobal(name, obj) {
+  return name && (_globals[name] = obj) && _installScope && (_installScope[name] = obj) || _globals;
+},
+    _emptyFunc = function _emptyFunc() {
+  return 0;
+},
+    _reservedProps = {},
+    _lazyTweens = [],
+    _lazyLookup = {},
+    _lastRenderedFrame,
+    _plugins = {},
+    _effects = {},
+    _nextGCFrame = 30,
+    _harnessPlugins = [],
+    _callbackNames = "",
+    _harness = function _harness(targets) {
+  var target = targets[0],
+      harnessPlugin,
+      i;
+  _isObject(target) || _isFunction(target) || (targets = [targets]);
 
+  if (!(harnessPlugin = (target._gsap || {}).harness)) {
+    // find the first target with a harness. We assume targets passed into an animation will be of similar type, meaning the same kind of harness can be used for them all (performance optimization)
+    i = _harnessPlugins.length;
 
+    while (i-- && !_harnessPlugins[i].targetTest(target)) {}
 
+    harnessPlugin = _harnessPlugins[i];
+  }
 
+  i = targets.length;
 
+  while (i--) {
+    targets[i] && (targets[i]._gsap || (targets[i]._gsap = new GSCache(targets[i], harnessPlugin))) || targets.splice(i, 1);
+  }
 
+  return targets;
+},
+    _getCache = function _getCache(target) {
+  return target._gsap || _harness(toArray(target))[0]._gsap;
+},
+    _getProperty = function _getProperty(target, property, v) {
+  return (v = target[property]) && _isFunction(v) ? target[property]() : _isUndefined(v) && target.getAttribute && target.getAttribute(property) || v;
+},
+    _forEachName = function _forEachName(names, func) {
+  return (names = names.split(",")).forEach(func) || names;
+},
+    //split a comma-delimited list of names into an array, then run a forEach() function and return the split array (this is just a way to consolidate/shorten some code).
+_round = function _round(value) {
+  return Math.round(value * 100000) / 100000 || 0;
+},
+    _roundPrecise = function _roundPrecise(value) {
+  return Math.round(value * 10000000) / 10000000 || 0;
+},
+    // increased precision mostly for timing values.
+_arrayContainsAny = function _arrayContainsAny(toSearch, toFind) {
+  //searches one array to find matches for any of the items in the toFind array. As soon as one is found, it returns true. It does NOT return all the matches; it's simply a boolean search.
+  var l = toFind.length,
+      i = 0;
 
-function _typeof(obj) {
-  "@babel/helpers - typeof";
+  for (; toSearch.indexOf(toFind[i]) < 0 && ++i < l;) {}
 
-  if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
-    _typeof = function _typeof(obj) {
-      return typeof obj;
-    };
+  return i < l;
+},
+    _lazyRender = function _lazyRender() {
+  var l = _lazyTweens.length,
+      a = _lazyTweens.slice(0),
+      i,
+      tween;
+
+  _lazyLookup = {};
+  _lazyTweens.length = 0;
+
+  for (i = 0; i < l; i++) {
+    tween = a[i];
+    tween && tween._lazy && (tween.render(tween._lazy[0], tween._lazy[1], true)._lazy = 0);
+  }
+},
+    _lazySafeRender = function _lazySafeRender(animation, time, suppressEvents, force) {
+  _lazyTweens.length && _lazyRender();
+  animation.render(time, suppressEvents, force);
+  _lazyTweens.length && _lazyRender(); //in case rendering caused any tweens to lazy-init, we should render them because typically when someone calls seek() or time() or progress(), they expect an immediate render.
+},
+    _numericIfPossible = function _numericIfPossible(value) {
+  var n = parseFloat(value);
+  return (n || n === 0) && (value + "").match(_delimitedValueExp).length < 2 ? n : _isString(value) ? value.trim() : value;
+},
+    _passThrough = function _passThrough(p) {
+  return p;
+},
+    _setDefaults = function _setDefaults(obj, defaults) {
+  for (var p in defaults) {
+    p in obj || (obj[p] = defaults[p]);
+  }
+
+  return obj;
+},
+    _setKeyframeDefaults = function _setKeyframeDefaults(excludeDuration) {
+  return function (obj, defaults) {
+    for (var p in defaults) {
+      p in obj || p === "duration" && excludeDuration || p === "ease" || (obj[p] = defaults[p]);
+    }
+  };
+},
+    _merge = function _merge(base, toMerge) {
+  for (var p in toMerge) {
+    base[p] = toMerge[p];
+  }
+
+  return base;
+},
+    _mergeDeep = function _mergeDeep(base, toMerge) {
+  for (var p in toMerge) {
+    p !== "__proto__" && p !== "constructor" && p !== "prototype" && (base[p] = _isObject(toMerge[p]) ? _mergeDeep(base[p] || (base[p] = {}), toMerge[p]) : toMerge[p]);
+  }
+
+  return base;
+},
+    _copyExcluding = function _copyExcluding(obj, excluding) {
+  var copy = {},
+      p;
+
+  for (p in obj) {
+    p in excluding || (copy[p] = obj[p]);
+  }
+
+  return copy;
+},
+    _inheritDefaults = function _inheritDefaults(vars) {
+  var parent = vars.parent || _globalTimeline,
+      func = vars.keyframes ? _setKeyframeDefaults(_isArray(vars.keyframes)) : _setDefaults;
+
+  if (_isNotFalse(vars.inherit)) {
+    while (parent) {
+      func(vars, parent.vars.defaults);
+      parent = parent.parent || parent._dp;
+    }
+  }
+
+  return vars;
+},
+    _arraysMatch = function _arraysMatch(a1, a2) {
+  var i = a1.length,
+      match = i === a2.length;
+
+  while (match && i-- && a1[i] === a2[i]) {}
+
+  return i < 0;
+},
+    _addLinkedListItem = function _addLinkedListItem(parent, child, firstProp, lastProp, sortBy) {
+  if (firstProp === void 0) {
+    firstProp = "_first";
+  }
+
+  if (lastProp === void 0) {
+    lastProp = "_last";
+  }
+
+  var prev = parent[lastProp],
+      t;
+
+  if (sortBy) {
+    t = child[sortBy];
+
+    while (prev && prev[sortBy] > t) {
+      prev = prev._prev;
+    }
+  }
+
+  if (prev) {
+    child._next = prev._next;
+    prev._next = child;
   } else {
-    _typeof = function _typeof(obj) {
-      return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+    child._next = parent[firstProp];
+    parent[firstProp] = child;
+  }
+
+  if (child._next) {
+    child._next._prev = child;
+  } else {
+    parent[lastProp] = child;
+  }
+
+  child._prev = prev;
+  child.parent = child._dp = parent;
+  return child;
+},
+    _removeLinkedListItem = function _removeLinkedListItem(parent, child, firstProp, lastProp) {
+  if (firstProp === void 0) {
+    firstProp = "_first";
+  }
+
+  if (lastProp === void 0) {
+    lastProp = "_last";
+  }
+
+  var prev = child._prev,
+      next = child._next;
+
+  if (prev) {
+    prev._next = next;
+  } else if (parent[firstProp] === child) {
+    parent[firstProp] = next;
+  }
+
+  if (next) {
+    next._prev = prev;
+  } else if (parent[lastProp] === child) {
+    parent[lastProp] = prev;
+  }
+
+  child._next = child._prev = child.parent = null; // don't delete the _dp just so we can revert if necessary. But parent should be null to indicate the item isn't in a linked list.
+},
+    _removeFromParent = function _removeFromParent(child, onlyIfParentHasAutoRemove) {
+  child.parent && (!onlyIfParentHasAutoRemove || child.parent.autoRemoveChildren) && child.parent.remove(child);
+  child._act = 0;
+},
+    _uncache = function _uncache(animation, child) {
+  if (animation && (!child || child._end > animation._dur || child._start < 0)) {
+    // performance optimization: if a child animation is passed in we should only uncache if that child EXTENDS the animation (its end time is beyond the end)
+    var a = animation;
+
+    while (a) {
+      a._dirty = 1;
+      a = a.parent;
+    }
+  }
+
+  return animation;
+},
+    _recacheAncestors = function _recacheAncestors(animation) {
+  var parent = animation.parent;
+
+  while (parent && parent.parent) {
+    //sometimes we must force a re-sort of all children and update the duration/totalDuration of all ancestor timelines immediately in case, for example, in the middle of a render loop, one tween alters another tween's timeScale which shoves its startTime before 0, forcing the parent timeline to shift around and shiftChildren() which could affect that next tween's render (startTime). Doesn't matter for the root timeline though.
+    parent._dirty = 1;
+    parent.totalDuration();
+    parent = parent.parent;
+  }
+
+  return animation;
+},
+    _hasNoPausedAncestors = function _hasNoPausedAncestors(animation) {
+  return !animation || animation._ts && _hasNoPausedAncestors(animation.parent);
+},
+    _elapsedCycleDuration = function _elapsedCycleDuration(animation) {
+  return animation._repeat ? _animationCycle(animation._tTime, animation = animation.duration() + animation._rDelay) * animation : 0;
+},
+    // feed in the totalTime and cycleDuration and it'll return the cycle (iteration minus 1) and if the playhead is exactly at the very END, it will NOT bump up to the next cycle.
+_animationCycle = function _animationCycle(tTime, cycleDuration) {
+  var whole = Math.floor(tTime /= cycleDuration);
+  return tTime && whole === tTime ? whole - 1 : whole;
+},
+    _parentToChildTotalTime = function _parentToChildTotalTime(parentTime, child) {
+  return (parentTime - child._start) * child._ts + (child._ts >= 0 ? 0 : child._dirty ? child.totalDuration() : child._tDur);
+},
+    _setEnd = function _setEnd(animation) {
+  return animation._end = _roundPrecise(animation._start + (animation._tDur / Math.abs(animation._ts || animation._rts || _tinyNum) || 0));
+},
+    _alignPlayhead = function _alignPlayhead(animation, totalTime) {
+  // adjusts the animation's _start and _end according to the provided totalTime (only if the parent's smoothChildTiming is true and the animation isn't paused). It doesn't do any rendering or forcing things back into parent timelines, etc. - that's what totalTime() is for.
+  var parent = animation._dp;
+
+  if (parent && parent.smoothChildTiming && animation._ts) {
+    animation._start = _roundPrecise(parent._time - (animation._ts > 0 ? totalTime / animation._ts : ((animation._dirty ? animation.totalDuration() : animation._tDur) - totalTime) / -animation._ts));
+
+    _setEnd(animation);
+
+    parent._dirty || _uncache(parent, animation); //for performance improvement. If the parent's cache is already dirty, it already took care of marking the ancestors as dirty too, so skip the function call here.
+  }
+
+  return animation;
+},
+
+/*
+_totalTimeToTime = (clampedTotalTime, duration, repeat, repeatDelay, yoyo) => {
+	let cycleDuration = duration + repeatDelay,
+		time = _round(clampedTotalTime % cycleDuration);
+	if (time > duration) {
+		time = duration;
+	}
+	return (yoyo && (~~(clampedTotalTime / cycleDuration) & 1)) ? duration - time : time;
+},
+*/
+_postAddChecks = function _postAddChecks(timeline, child) {
+  var t;
+
+  if (child._time || child._initted && !child._dur) {
+    //in case, for example, the _start is moved on a tween that has already rendered. Imagine it's at its end state, then the startTime is moved WAY later (after the end of this timeline), it should render at its beginning.
+    t = _parentToChildTotalTime(timeline.rawTime(), child);
+
+    if (!child._dur || _clamp(0, child.totalDuration(), t) - child._tTime > _tinyNum) {
+      child.render(t, true);
+    }
+  } //if the timeline has already ended but the inserted tween/timeline extends the duration, we should enable this timeline again so that it renders properly. We should also align the playhead with the parent timeline's when appropriate.
+
+
+  if (_uncache(timeline, child)._dp && timeline._initted && timeline._time >= timeline._dur && timeline._ts) {
+    //in case any of the ancestors had completed but should now be enabled...
+    if (timeline._dur < timeline.duration()) {
+      t = timeline;
+
+      while (t._dp) {
+        t.rawTime() >= 0 && t.totalTime(t._tTime); //moves the timeline (shifts its startTime) if necessary, and also enables it. If it's currently zero, though, it may not be scheduled to render until later so there's no need to force it to align with the current playhead position. Only move to catch up with the playhead.
+
+        t = t._dp;
+      }
+    }
+
+    timeline._zTime = -_tinyNum; // helps ensure that the next render() will be forced (crossingStart = true in render()), even if the duration hasn't changed (we're adding a child which would need to get rendered). Definitely an edge case. Note: we MUST do this AFTER the loop above where the totalTime() might trigger a render() because this _addToTimeline() method gets called from the Animation constructor, BEFORE tweens even record their targets, etc. so we wouldn't want things to get triggered in the wrong order.
+  }
+},
+    _addToTimeline = function _addToTimeline(timeline, child, position, skipChecks) {
+  child.parent && _removeFromParent(child);
+  child._start = _roundPrecise((_isNumber(position) ? position : position || timeline !== _globalTimeline ? _parsePosition(timeline, position, child) : timeline._time) + child._delay);
+  child._end = _roundPrecise(child._start + (child.totalDuration() / Math.abs(child.timeScale()) || 0));
+
+  _addLinkedListItem(timeline, child, "_first", "_last", timeline._sort ? "_start" : 0);
+
+  _isFromOrFromStart(child) || (timeline._recent = child);
+  skipChecks || _postAddChecks(timeline, child);
+  return timeline;
+},
+    _scrollTrigger = function _scrollTrigger(animation, trigger) {
+  return (_globals.ScrollTrigger || _missingPlugin("scrollTrigger", trigger)) && _globals.ScrollTrigger.create(trigger, animation);
+},
+    _attemptInitTween = function _attemptInitTween(tween, totalTime, force, suppressEvents) {
+  _initTween(tween, totalTime);
+
+  if (!tween._initted) {
+    return 1;
+  }
+
+  if (!force && tween._pt && (tween._dur && tween.vars.lazy !== false || !tween._dur && tween.vars.lazy) && _lastRenderedFrame !== _ticker.frame) {
+    _lazyTweens.push(tween);
+
+    tween._lazy = [totalTime, suppressEvents];
+    return 1;
+  }
+},
+    _parentPlayheadIsBeforeStart = function _parentPlayheadIsBeforeStart(_ref) {
+  var parent = _ref.parent;
+  return parent && parent._ts && parent._initted && !parent._lock && (parent.rawTime() < 0 || _parentPlayheadIsBeforeStart(parent));
+},
+    // check parent's _lock because when a timeline repeats/yoyos and does its artificial wrapping, we shouldn't force the ratio back to 0
+_isFromOrFromStart = function _isFromOrFromStart(_ref2) {
+  var data = _ref2.data;
+  return data === "isFromStart" || data === "isStart";
+},
+    _renderZeroDurationTween = function _renderZeroDurationTween(tween, totalTime, suppressEvents, force) {
+  var prevRatio = tween.ratio,
+      ratio = totalTime < 0 || !totalTime && (!tween._start && _parentPlayheadIsBeforeStart(tween) && !(!tween._initted && _isFromOrFromStart(tween)) || (tween._ts < 0 || tween._dp._ts < 0) && !_isFromOrFromStart(tween)) ? 0 : 1,
+      // if the tween or its parent is reversed and the totalTime is 0, we should go to a ratio of 0. Edge case: if a from() or fromTo() stagger tween is placed later in a timeline, the "startAt" zero-duration tween could initially render at a time when the parent timeline's playhead is technically BEFORE where this tween is, so make sure that any "from" and "fromTo" startAt tweens are rendered the first time at a ratio of 1.
+  repeatDelay = tween._rDelay,
+      tTime = 0,
+      pt,
+      iteration,
+      prevIteration;
+
+  if (repeatDelay && tween._repeat) {
+    // in case there's a zero-duration tween that has a repeat with a repeatDelay
+    tTime = _clamp(0, tween._tDur, totalTime);
+    iteration = _animationCycle(tTime, repeatDelay);
+    tween._yoyo && iteration & 1 && (ratio = 1 - ratio);
+
+    if (iteration !== _animationCycle(tween._tTime, repeatDelay)) {
+      // if iteration changed
+      prevRatio = 1 - ratio;
+      tween.vars.repeatRefresh && tween._initted && tween.invalidate();
+    }
+  }
+
+  if (ratio !== prevRatio || force || tween._zTime === _tinyNum || !totalTime && tween._zTime) {
+    if (!tween._initted && _attemptInitTween(tween, totalTime, force, suppressEvents)) {
+      // if we render the very beginning (time == 0) of a fromTo(), we must force the render (normal tweens wouldn't need to render at a time of 0 when the prevTime was also 0). This is also mandatory to make sure overwriting kicks in immediately.
+      return;
+    }
+
+    prevIteration = tween._zTime;
+    tween._zTime = totalTime || (suppressEvents ? _tinyNum : 0); // when the playhead arrives at EXACTLY time 0 (right on top) of a zero-duration tween, we need to discern if events are suppressed so that when the playhead moves again (next time), it'll trigger the callback. If events are NOT suppressed, obviously the callback would be triggered in this render. Basically, the callback should fire either when the playhead ARRIVES or LEAVES this exact spot, not both. Imagine doing a timeline.seek(0) and there's a callback that sits at 0. Since events are suppressed on that seek() by default, nothing will fire, but when the playhead moves off of that position, the callback should fire. This behavior is what people intuitively expect.
+
+    suppressEvents || (suppressEvents = totalTime && !prevIteration); // if it was rendered previously at exactly 0 (_zTime) and now the playhead is moving away, DON'T fire callbacks otherwise they'll seem like duplicates.
+
+    tween.ratio = ratio;
+    tween._from && (ratio = 1 - ratio);
+    tween._time = 0;
+    tween._tTime = tTime;
+    pt = tween._pt;
+
+    while (pt) {
+      pt.r(ratio, pt.d);
+      pt = pt._next;
+    }
+
+    tween._startAt && totalTime < 0 && tween._startAt.render(totalTime, true, true);
+    tween._onUpdate && !suppressEvents && _callback(tween, "onUpdate");
+    tTime && tween._repeat && !suppressEvents && tween.parent && _callback(tween, "onRepeat");
+
+    if ((totalTime >= tween._tDur || totalTime < 0) && tween.ratio === ratio) {
+      ratio && _removeFromParent(tween, 1);
+
+      if (!suppressEvents) {
+        _callback(tween, ratio ? "onComplete" : "onReverseComplete", true);
+
+        tween._prom && tween._prom();
+      }
+    }
+  } else if (!tween._zTime) {
+    tween._zTime = totalTime;
+  }
+},
+    _findNextPauseTween = function _findNextPauseTween(animation, prevTime, time) {
+  var child;
+
+  if (time > prevTime) {
+    child = animation._first;
+
+    while (child && child._start <= time) {
+      if (child.data === "isPause" && child._start > prevTime) {
+        return child;
+      }
+
+      child = child._next;
+    }
+  } else {
+    child = animation._last;
+
+    while (child && child._start >= time) {
+      if (child.data === "isPause" && child._start < prevTime) {
+        return child;
+      }
+
+      child = child._prev;
+    }
+  }
+},
+    _setDuration = function _setDuration(animation, duration, skipUncache, leavePlayhead) {
+  var repeat = animation._repeat,
+      dur = _roundPrecise(duration) || 0,
+      totalProgress = animation._tTime / animation._tDur;
+  totalProgress && !leavePlayhead && (animation._time *= dur / animation._dur);
+  animation._dur = dur;
+  animation._tDur = !repeat ? dur : repeat < 0 ? 1e10 : _roundPrecise(dur * (repeat + 1) + animation._rDelay * repeat);
+  totalProgress > 0 && !leavePlayhead ? _alignPlayhead(animation, animation._tTime = animation._tDur * totalProgress) : animation.parent && _setEnd(animation);
+  skipUncache || _uncache(animation.parent, animation);
+  return animation;
+},
+    _onUpdateTotalDuration = function _onUpdateTotalDuration(animation) {
+  return animation instanceof Timeline ? _uncache(animation) : _setDuration(animation, animation._dur);
+},
+    _zeroPosition = {
+  _start: 0,
+  endTime: _emptyFunc,
+  totalDuration: _emptyFunc
+},
+    _parsePosition = function _parsePosition(animation, position, percentAnimation) {
+  var labels = animation.labels,
+      recent = animation._recent || _zeroPosition,
+      clippedDuration = animation.duration() >= _bigNum ? recent.endTime(false) : animation._dur,
+      //in case there's a child that infinitely repeats, users almost never intend for the insertion point of a new child to be based on a SUPER long value like that so we clip it and assume the most recently-added child's endTime should be used instead.
+  i,
+      offset,
+      isPercent;
+
+  if (_isString(position) && (isNaN(position) || position in labels)) {
+    //if the string is a number like "1", check to see if there's a label with that name, otherwise interpret it as a number (absolute value).
+    offset = position.charAt(0);
+    isPercent = position.substr(-1) === "%";
+    i = position.indexOf("=");
+
+    if (offset === "<" || offset === ">") {
+      i >= 0 && (position = position.replace(/=/, ""));
+      return (offset === "<" ? recent._start : recent.endTime(recent._repeat >= 0)) + (parseFloat(position.substr(1)) || 0) * (isPercent ? (i < 0 ? recent : percentAnimation).totalDuration() / 100 : 1);
+    }
+
+    if (i < 0) {
+      position in labels || (labels[position] = clippedDuration);
+      return labels[position];
+    }
+
+    offset = parseFloat(position.charAt(i - 1) + position.substr(i + 1));
+
+    if (isPercent && percentAnimation) {
+      offset = offset / 100 * (_isArray(percentAnimation) ? percentAnimation[0] : percentAnimation).totalDuration();
+    }
+
+    return i > 1 ? _parsePosition(animation, position.substr(0, i - 1), percentAnimation) + offset : clippedDuration + offset;
+  }
+
+  return position == null ? clippedDuration : +position;
+},
+    _createTweenType = function _createTweenType(type, params, timeline) {
+  var isLegacy = _isNumber(params[1]),
+      varsIndex = (isLegacy ? 2 : 1) + (type < 2 ? 0 : 1),
+      vars = params[varsIndex],
+      irVars,
+      parent;
+
+  isLegacy && (vars.duration = params[1]);
+  vars.parent = timeline;
+
+  if (type) {
+    irVars = vars;
+    parent = timeline;
+
+    while (parent && !("immediateRender" in irVars)) {
+      // inheritance hasn't happened yet, but someone may have set a default in an ancestor timeline. We could do vars.immediateRender = _isNotFalse(_inheritDefaults(vars).immediateRender) but that'd exact a slight performance penalty because _inheritDefaults() also runs in the Tween constructor. We're paying a small kb price here to gain speed.
+      irVars = parent.vars.defaults || {};
+      parent = _isNotFalse(parent.vars.inherit) && parent.parent;
+    }
+
+    vars.immediateRender = _isNotFalse(irVars.immediateRender);
+    type < 2 ? vars.runBackwards = 1 : vars.startAt = params[varsIndex - 1]; // "from" vars
+  }
+
+  return new Tween(params[0], vars, params[varsIndex + 1]);
+},
+    _conditionalReturn = function _conditionalReturn(value, func) {
+  return value || value === 0 ? func(value) : func;
+},
+    _clamp = function _clamp(min, max, value) {
+  return value < min ? min : value > max ? max : value;
+},
+    getUnit = function getUnit(value, v) {
+  return !_isString(value) || !(v = _unitExp.exec(value)) ? "" : value.substr(v.index + v[0].length);
+},
+    // note: protect against padded numbers as strings, like "100.100". That shouldn't return "00" as the unit. If it's numeric, return no unit.
+clamp = function clamp(min, max, value) {
+  return _conditionalReturn(value, function (v) {
+    return _clamp(min, max, v);
+  });
+},
+    _slice = [].slice,
+    _isArrayLike = function _isArrayLike(value, nonEmpty) {
+  return value && _isObject(value) && "length" in value && (!nonEmpty && !value.length || value.length - 1 in value && _isObject(value[0])) && !value.nodeType && value !== _win;
+},
+    _flatten = function _flatten(ar, leaveStrings, accumulator) {
+  if (accumulator === void 0) {
+    accumulator = [];
+  }
+
+  return ar.forEach(function (value) {
+    var _accumulator;
+
+    return _isString(value) && !leaveStrings || _isArrayLike(value, 1) ? (_accumulator = accumulator).push.apply(_accumulator, toArray(value)) : accumulator.push(value);
+  }) || accumulator;
+},
+    //takes any value and returns an array. If it's a string (and leaveStrings isn't true), it'll use document.querySelectorAll() and convert that to an array. It'll also accept iterables like jQuery objects.
+toArray = function toArray(value, scope, leaveStrings) {
+  return _isString(value) && !leaveStrings && (_coreInitted || !_wake()) ? _slice.call((scope || _doc).querySelectorAll(value), 0) : _isArray(value) ? _flatten(value, leaveStrings) : _isArrayLike(value) ? _slice.call(value, 0) : value ? [value] : [];
+},
+    selector = function selector(value) {
+  value = toArray(value)[0] || _warn("Invalid scope") || {};
+  return function (v) {
+    var el = value.current || value.nativeElement || value;
+    return toArray(v, el.querySelectorAll ? el : el === value ? _warn("Invalid scope") || _doc.createElement("div") : value);
+  };
+},
+    shuffle = function shuffle(a) {
+  return a.sort(function () {
+    return .5 - Math.random();
+  });
+},
+    // alternative that's a bit faster and more reliably diverse but bigger:   for (let j, v, i = a.length; i; j = Math.floor(Math.random() * i), v = a[--i], a[i] = a[j], a[j] = v); return a;
+//for distributing values across an array. Can accept a number, a function or (most commonly) a function which can contain the following properties: {base, amount, from, ease, grid, axis, length, each}. Returns a function that expects the following parameters: index, target, array. Recognizes the following
+distribute = function distribute(v) {
+  if (_isFunction(v)) {
+    return v;
+  }
+
+  var vars = _isObject(v) ? v : {
+    each: v
+  },
+      //n:1 is just to indicate v was a number; we leverage that later to set v according to the length we get. If a number is passed in, we treat it like the old stagger value where 0.1, for example, would mean that things would be distributed with 0.1 between each element in the array rather than a total "amount" that's chunked out among them all.
+  ease = _parseEase(vars.ease),
+      from = vars.from || 0,
+      base = parseFloat(vars.base) || 0,
+      cache = {},
+      isDecimal = from > 0 && from < 1,
+      ratios = isNaN(from) || isDecimal,
+      axis = vars.axis,
+      ratioX = from,
+      ratioY = from;
+
+  if (_isString(from)) {
+    ratioX = ratioY = {
+      center: .5,
+      edges: .5,
+      end: 1
+    }[from] || 0;
+  } else if (!isDecimal && ratios) {
+    ratioX = from[0];
+    ratioY = from[1];
+  }
+
+  return function (i, target, a) {
+    var l = (a || vars).length,
+        distances = cache[l],
+        originX,
+        originY,
+        x,
+        y,
+        d,
+        j,
+        max,
+        min,
+        wrapAt;
+
+    if (!distances) {
+      wrapAt = vars.grid === "auto" ? 0 : (vars.grid || [1, _bigNum])[1];
+
+      if (!wrapAt) {
+        max = -_bigNum;
+
+        while (max < (max = a[wrapAt++].getBoundingClientRect().left) && wrapAt < l) {}
+
+        wrapAt--;
+      }
+
+      distances = cache[l] = [];
+      originX = ratios ? Math.min(wrapAt, l) * ratioX - .5 : from % wrapAt;
+      originY = wrapAt === _bigNum ? 0 : ratios ? l * ratioY / wrapAt - .5 : from / wrapAt | 0;
+      max = 0;
+      min = _bigNum;
+
+      for (j = 0; j < l; j++) {
+        x = j % wrapAt - originX;
+        y = originY - (j / wrapAt | 0);
+        distances[j] = d = !axis ? _sqrt(x * x + y * y) : Math.abs(axis === "y" ? y : x);
+        d > max && (max = d);
+        d < min && (min = d);
+      }
+
+      from === "random" && shuffle(distances);
+      distances.max = max - min;
+      distances.min = min;
+      distances.v = l = (parseFloat(vars.amount) || parseFloat(vars.each) * (wrapAt > l ? l - 1 : !axis ? Math.max(wrapAt, l / wrapAt) : axis === "y" ? l / wrapAt : wrapAt) || 0) * (from === "edges" ? -1 : 1);
+      distances.b = l < 0 ? base - l : base;
+      distances.u = getUnit(vars.amount || vars.each) || 0; //unit
+
+      ease = ease && l < 0 ? _invertEase(ease) : ease;
+    }
+
+    l = (distances[i] - distances.min) / distances.max || 0;
+    return _roundPrecise(distances.b + (ease ? ease(l) : l) * distances.v) + distances.u; //round in order to work around floating point errors
+  };
+},
+    _roundModifier = function _roundModifier(v) {
+  //pass in 0.1 get a function that'll round to the nearest tenth, or 5 to round to the closest 5, or 0.001 to the closest 1000th, etc.
+  var p = Math.pow(10, ((v + "").split(".")[1] || "").length); //to avoid floating point math errors (like 24 * 0.1 == 2.4000000000000004), we chop off at a specific number of decimal places (much faster than toFixed())
+
+  return function (raw) {
+    var n = Math.round(parseFloat(raw) / v) * v * p;
+    return (n - n % 1) / p + (_isNumber(raw) ? 0 : getUnit(raw)); // n - n % 1 replaces Math.floor() in order to handle negative values properly. For example, Math.floor(-150.00000000000003) is 151!
+  };
+},
+    snap = function snap(snapTo, value) {
+  var isArray = _isArray(snapTo),
+      radius,
+      is2D;
+
+  if (!isArray && _isObject(snapTo)) {
+    radius = isArray = snapTo.radius || _bigNum;
+
+    if (snapTo.values) {
+      snapTo = toArray(snapTo.values);
+
+      if (is2D = !_isNumber(snapTo[0])) {
+        radius *= radius; //performance optimization so we don't have to Math.sqrt() in the loop.
+      }
+    } else {
+      snapTo = _roundModifier(snapTo.increment);
+    }
+  }
+
+  return _conditionalReturn(value, !isArray ? _roundModifier(snapTo) : _isFunction(snapTo) ? function (raw) {
+    is2D = snapTo(raw);
+    return Math.abs(is2D - raw) <= radius ? is2D : raw;
+  } : function (raw) {
+    var x = parseFloat(is2D ? raw.x : raw),
+        y = parseFloat(is2D ? raw.y : 0),
+        min = _bigNum,
+        closest = 0,
+        i = snapTo.length,
+        dx,
+        dy;
+
+    while (i--) {
+      if (is2D) {
+        dx = snapTo[i].x - x;
+        dy = snapTo[i].y - y;
+        dx = dx * dx + dy * dy;
+      } else {
+        dx = Math.abs(snapTo[i] - x);
+      }
+
+      if (dx < min) {
+        min = dx;
+        closest = i;
+      }
+    }
+
+    closest = !radius || min <= radius ? snapTo[closest] : raw;
+    return is2D || closest === raw || _isNumber(raw) ? closest : closest + getUnit(raw);
+  });
+},
+    random = function random(min, max, roundingIncrement, returnFunction) {
+  return _conditionalReturn(_isArray(min) ? !max : roundingIncrement === true ? !!(roundingIncrement = 0) : !returnFunction, function () {
+    return _isArray(min) ? min[~~(Math.random() * min.length)] : (roundingIncrement = roundingIncrement || 1e-5) && (returnFunction = roundingIncrement < 1 ? Math.pow(10, (roundingIncrement + "").length - 2) : 1) && Math.floor(Math.round((min - roundingIncrement / 2 + Math.random() * (max - min + roundingIncrement * .99)) / roundingIncrement) * roundingIncrement * returnFunction) / returnFunction;
+  });
+},
+    pipe = function pipe() {
+  for (var _len = arguments.length, functions = new Array(_len), _key = 0; _key < _len; _key++) {
+    functions[_key] = arguments[_key];
+  }
+
+  return function (value) {
+    return functions.reduce(function (v, f) {
+      return f(v);
+    }, value);
+  };
+},
+    unitize = function unitize(func, unit) {
+  return function (value) {
+    return func(parseFloat(value)) + (unit || getUnit(value));
+  };
+},
+    normalize = function normalize(min, max, value) {
+  return mapRange(min, max, 0, 1, value);
+},
+    _wrapArray = function _wrapArray(a, wrapper, value) {
+  return _conditionalReturn(value, function (index) {
+    return a[~~wrapper(index)];
+  });
+},
+    wrap = function wrap(min, max, value) {
+  // NOTE: wrap() CANNOT be an arrow function! A very odd compiling bug causes problems (unrelated to GSAP).
+  var range = max - min;
+  return _isArray(min) ? _wrapArray(min, wrap(0, min.length), max) : _conditionalReturn(value, function (value) {
+    return (range + (value - min) % range) % range + min;
+  });
+},
+    wrapYoyo = function wrapYoyo(min, max, value) {
+  var range = max - min,
+      total = range * 2;
+  return _isArray(min) ? _wrapArray(min, wrapYoyo(0, min.length - 1), max) : _conditionalReturn(value, function (value) {
+    value = (total + (value - min) % total) % total || 0;
+    return min + (value > range ? total - value : value);
+  });
+},
+    _replaceRandom = function _replaceRandom(value) {
+  //replaces all occurrences of random(...) in a string with the calculated random value. can be a range like random(-100, 100, 5) or an array like random([0, 100, 500])
+  var prev = 0,
+      s = "",
+      i,
+      nums,
+      end,
+      isArray;
+
+  while (~(i = value.indexOf("random(", prev))) {
+    end = value.indexOf(")", i);
+    isArray = value.charAt(i + 7) === "[";
+    nums = value.substr(i + 7, end - i - 7).match(isArray ? _delimitedValueExp : _strictNumExp);
+    s += value.substr(prev, i - prev) + random(isArray ? nums : +nums[0], isArray ? 0 : +nums[1], +nums[2] || 1e-5);
+    prev = end + 1;
+  }
+
+  return s + value.substr(prev, value.length - prev);
+},
+    mapRange = function mapRange(inMin, inMax, outMin, outMax, value) {
+  var inRange = inMax - inMin,
+      outRange = outMax - outMin;
+  return _conditionalReturn(value, function (value) {
+    return outMin + ((value - inMin) / inRange * outRange || 0);
+  });
+},
+    interpolate = function interpolate(start, end, progress, mutate) {
+  var func = isNaN(start + end) ? 0 : function (p) {
+    return (1 - p) * start + p * end;
+  };
+
+  if (!func) {
+    var isString = _isString(start),
+        master = {},
+        p,
+        i,
+        interpolators,
+        l,
+        il;
+
+    progress === true && (mutate = 1) && (progress = null);
+
+    if (isString) {
+      start = {
+        p: start
+      };
+      end = {
+        p: end
+      };
+    } else if (_isArray(start) && !_isArray(end)) {
+      interpolators = [];
+      l = start.length;
+      il = l - 2;
+
+      for (i = 1; i < l; i++) {
+        interpolators.push(interpolate(start[i - 1], start[i])); //build the interpolators up front as a performance optimization so that when the function is called many times, it can just reuse them.
+      }
+
+      l--;
+
+      func = function func(p) {
+        p *= l;
+        var i = Math.min(il, ~~p);
+        return interpolators[i](p - i);
+      };
+
+      progress = end;
+    } else if (!mutate) {
+      start = _merge(_isArray(start) ? [] : {}, start);
+    }
+
+    if (!interpolators) {
+      for (p in end) {
+        _addPropTween.call(master, start, p, "get", end[p]);
+      }
+
+      func = function func(p) {
+        return _renderPropTweens(p, master) || (isString ? start.p : start);
+      };
+    }
+  }
+
+  return _conditionalReturn(progress, func);
+},
+    _getLabelInDirection = function _getLabelInDirection(timeline, fromTime, backward) {
+  //used for nextLabel() and previousLabel()
+  var labels = timeline.labels,
+      min = _bigNum,
+      p,
+      distance,
+      label;
+
+  for (p in labels) {
+    distance = labels[p] - fromTime;
+
+    if (distance < 0 === !!backward && distance && min > (distance = Math.abs(distance))) {
+      label = p;
+      min = distance;
+    }
+  }
+
+  return label;
+},
+    _callback = function _callback(animation, type, executeLazyFirst) {
+  var v = animation.vars,
+      callback = v[type],
+      params,
+      scope;
+
+  if (!callback) {
+    return;
+  }
+
+  params = v[type + "Params"];
+  scope = v.callbackScope || animation;
+  executeLazyFirst && _lazyTweens.length && _lazyRender(); //in case rendering caused any tweens to lazy-init, we should render them because typically when a timeline finishes, users expect things to have rendered fully. Imagine an onUpdate on a timeline that reports/checks tweened values.
+
+  return params ? callback.apply(scope, params) : callback.call(scope);
+},
+    _interrupt = function _interrupt(animation) {
+  _removeFromParent(animation);
+
+  animation.scrollTrigger && animation.scrollTrigger.kill(false);
+  animation.progress() < 1 && _callback(animation, "onInterrupt");
+  return animation;
+},
+    _quickTween,
+    _createPlugin = function _createPlugin(config) {
+  config = !config.name && config["default"] || config; //UMD packaging wraps things oddly, so for example MotionPathHelper becomes {MotionPathHelper:MotionPathHelper, default:MotionPathHelper}.
+
+  var name = config.name,
+      isFunc = _isFunction(config),
+      Plugin = name && !isFunc && config.init ? function () {
+    this._props = [];
+  } : config,
+      //in case someone passes in an object that's not a plugin, like CustomEase
+  instanceDefaults = {
+    init: _emptyFunc,
+    render: _renderPropTweens,
+    add: _addPropTween,
+    kill: _killPropTweensOf,
+    modifier: _addPluginModifier,
+    rawVars: 0
+  },
+      statics = {
+    targetTest: 0,
+    get: 0,
+    getSetter: _getSetter,
+    aliases: {},
+    register: 0
+  };
+
+  _wake();
+
+  if (config !== Plugin) {
+    if (_plugins[name]) {
+      return;
+    }
+
+    _setDefaults(Plugin, _setDefaults(_copyExcluding(config, instanceDefaults), statics)); //static methods
+
+
+    _merge(Plugin.prototype, _merge(instanceDefaults, _copyExcluding(config, statics))); //instance methods
+
+
+    _plugins[Plugin.prop = name] = Plugin;
+
+    if (config.targetTest) {
+      _harnessPlugins.push(Plugin);
+
+      _reservedProps[name] = 1;
+    }
+
+    name = (name === "css" ? "CSS" : name.charAt(0).toUpperCase() + name.substr(1)) + "Plugin"; //for the global name. "motionPath" should become MotionPathPlugin
+  }
+
+  _addGlobal(name, Plugin);
+
+  config.register && config.register(gsap, Plugin, PropTween);
+},
+
+/*
+ * --------------------------------------------------------------------------------------
+ * COLORS
+ * --------------------------------------------------------------------------------------
+ */
+_255 = 255,
+    _colorLookup = {
+  aqua: [0, _255, _255],
+  lime: [0, _255, 0],
+  silver: [192, 192, 192],
+  black: [0, 0, 0],
+  maroon: [128, 0, 0],
+  teal: [0, 128, 128],
+  blue: [0, 0, _255],
+  navy: [0, 0, 128],
+  white: [_255, _255, _255],
+  olive: [128, 128, 0],
+  yellow: [_255, _255, 0],
+  orange: [_255, 165, 0],
+  gray: [128, 128, 128],
+  purple: [128, 0, 128],
+  green: [0, 128, 0],
+  red: [_255, 0, 0],
+  pink: [_255, 192, 203],
+  cyan: [0, _255, _255],
+  transparent: [_255, _255, _255, 0]
+},
+    // possible future idea to replace the hard-coded color name values - put this in the ticker.wake() where we set the _doc:
+// let ctx = _doc.createElement("canvas").getContext("2d");
+// _forEachName("aqua,lime,silver,black,maroon,teal,blue,navy,white,olive,yellow,orange,gray,purple,green,red,pink,cyan", color => {ctx.fillStyle = color; _colorLookup[color] = splitColor(ctx.fillStyle)});
+_hue = function _hue(h, m1, m2) {
+  h += h < 0 ? 1 : h > 1 ? -1 : 0;
+  return (h * 6 < 1 ? m1 + (m2 - m1) * h * 6 : h < .5 ? m2 : h * 3 < 2 ? m1 + (m2 - m1) * (2 / 3 - h) * 6 : m1) * _255 + .5 | 0;
+},
+    splitColor = function splitColor(v, toHSL, forceAlpha) {
+  var a = !v ? _colorLookup.black : _isNumber(v) ? [v >> 16, v >> 8 & _255, v & _255] : 0,
+      r,
+      g,
+      b,
+      h,
+      s,
+      l,
+      max,
+      min,
+      d,
+      wasHSL;
+
+  if (!a) {
+    if (v.substr(-1) === ",") {
+      //sometimes a trailing comma is included and we should chop it off (typically from a comma-delimited list of values like a textShadow:"2px 2px 2px blue, 5px 5px 5px rgb(255,0,0)" - in this example "blue," has a trailing comma. We could strip it out inside parseComplex() but we'd need to do it to the beginning and ending values plus it wouldn't provide protection from other potential scenarios like if the user passes in a similar value.
+      v = v.substr(0, v.length - 1);
+    }
+
+    if (_colorLookup[v]) {
+      a = _colorLookup[v];
+    } else if (v.charAt(0) === "#") {
+      if (v.length < 6) {
+        //for shorthand like #9F0 or #9F0F (could have alpha)
+        r = v.charAt(1);
+        g = v.charAt(2);
+        b = v.charAt(3);
+        v = "#" + r + r + g + g + b + b + (v.length === 5 ? v.charAt(4) + v.charAt(4) : "");
+      }
+
+      if (v.length === 9) {
+        // hex with alpha, like #fd5e53ff
+        a = parseInt(v.substr(1, 6), 16);
+        return [a >> 16, a >> 8 & _255, a & _255, parseInt(v.substr(7), 16) / 255];
+      }
+
+      v = parseInt(v.substr(1), 16);
+      a = [v >> 16, v >> 8 & _255, v & _255];
+    } else if (v.substr(0, 3) === "hsl") {
+      a = wasHSL = v.match(_strictNumExp);
+
+      if (!toHSL) {
+        h = +a[0] % 360 / 360;
+        s = +a[1] / 100;
+        l = +a[2] / 100;
+        g = l <= .5 ? l * (s + 1) : l + s - l * s;
+        r = l * 2 - g;
+        a.length > 3 && (a[3] *= 1); //cast as number
+
+        a[0] = _hue(h + 1 / 3, r, g);
+        a[1] = _hue(h, r, g);
+        a[2] = _hue(h - 1 / 3, r, g);
+      } else if (~v.indexOf("=")) {
+        //if relative values are found, just return the raw strings with the relative prefixes in place.
+        a = v.match(_numExp);
+        forceAlpha && a.length < 4 && (a[3] = 1);
+        return a;
+      }
+    } else {
+      a = v.match(_strictNumExp) || _colorLookup.transparent;
+    }
+
+    a = a.map(Number);
+  }
+
+  if (toHSL && !wasHSL) {
+    r = a[0] / _255;
+    g = a[1] / _255;
+    b = a[2] / _255;
+    max = Math.max(r, g, b);
+    min = Math.min(r, g, b);
+    l = (max + min) / 2;
+
+    if (max === min) {
+      h = s = 0;
+    } else {
+      d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      h = max === r ? (g - b) / d + (g < b ? 6 : 0) : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
+      h *= 60;
+    }
+
+    a[0] = ~~(h + .5);
+    a[1] = ~~(s * 100 + .5);
+    a[2] = ~~(l * 100 + .5);
+  }
+
+  forceAlpha && a.length < 4 && (a[3] = 1);
+  return a;
+},
+    _colorOrderData = function _colorOrderData(v) {
+  // strips out the colors from the string, finds all the numeric slots (with units) and returns an array of those. The Array also has a "c" property which is an Array of the index values where the colors belong. This is to help work around issues where there's a mis-matched order of color/numeric data like drop-shadow(#f00 0px 1px 2px) and drop-shadow(0x 1px 2px #f00). This is basically a helper function used in _formatColors()
+  var values = [],
+      c = [],
+      i = -1;
+  v.split(_colorExp).forEach(function (v) {
+    var a = v.match(_numWithUnitExp) || [];
+    values.push.apply(values, a);
+    c.push(i += a.length + 1);
+  });
+  values.c = c;
+  return values;
+},
+    _formatColors = function _formatColors(s, toHSL, orderMatchData) {
+  var result = "",
+      colors = (s + result).match(_colorExp),
+      type = toHSL ? "hsla(" : "rgba(",
+      i = 0,
+      c,
+      shell,
+      d,
+      l;
+
+  if (!colors) {
+    return s;
+  }
+
+  colors = colors.map(function (color) {
+    return (color = splitColor(color, toHSL, 1)) && type + (toHSL ? color[0] + "," + color[1] + "%," + color[2] + "%," + color[3] : color.join(",")) + ")";
+  });
+
+  if (orderMatchData) {
+    d = _colorOrderData(s);
+    c = orderMatchData.c;
+
+    if (c.join(result) !== d.c.join(result)) {
+      shell = s.replace(_colorExp, "1").split(_numWithUnitExp);
+      l = shell.length - 1;
+
+      for (; i < l; i++) {
+        result += shell[i] + (~c.indexOf(i) ? colors.shift() || type + "0,0,0,0)" : (d.length ? d : colors.length ? colors : orderMatchData).shift());
+      }
+    }
+  }
+
+  if (!shell) {
+    shell = s.split(_colorExp);
+    l = shell.length - 1;
+
+    for (; i < l; i++) {
+      result += shell[i] + colors[i];
+    }
+  }
+
+  return result + shell[l];
+},
+    _colorExp = function () {
+  var s = "(?:\\b(?:(?:rgb|rgba|hsl|hsla)\\(.+?\\))|\\B#(?:[0-9a-f]{3,4}){1,2}\\b",
+      //we'll dynamically build this Regular Expression to conserve file size. After building it, it will be able to find rgb(), rgba(), # (hexadecimal), and named color values like red, blue, purple, etc.,
+  p;
+
+  for (p in _colorLookup) {
+    s += "|" + p + "\\b";
+  }
+
+  return new RegExp(s + ")", "gi");
+}(),
+    _hslExp = /hsl[a]?\(/,
+    _colorStringFilter = function _colorStringFilter(a) {
+  var combined = a.join(" "),
+      toHSL;
+  _colorExp.lastIndex = 0;
+
+  if (_colorExp.test(combined)) {
+    toHSL = _hslExp.test(combined);
+    a[1] = _formatColors(a[1], toHSL);
+    a[0] = _formatColors(a[0], toHSL, _colorOrderData(a[1])); // make sure the order of numbers/colors match with the END value.
+
+    return true;
+  }
+},
+
+/*
+ * --------------------------------------------------------------------------------------
+ * TICKER
+ * --------------------------------------------------------------------------------------
+ */
+_tickerActive,
+    _ticker = function () {
+  var _getTime = Date.now,
+      _lagThreshold = 500,
+      _adjustedLag = 33,
+      _startTime = _getTime(),
+      _lastUpdate = _startTime,
+      _gap = 1000 / 240,
+      _nextTime = _gap,
+      _listeners = [],
+      _id,
+      _req,
+      _raf,
+      _self,
+      _delta,
+      _i,
+      _tick = function _tick(v) {
+    var elapsed = _getTime() - _lastUpdate,
+        manual = v === true,
+        overlap,
+        dispatch,
+        time,
+        frame;
+
+    elapsed > _lagThreshold && (_startTime += elapsed - _adjustedLag);
+    _lastUpdate += elapsed;
+    time = _lastUpdate - _startTime;
+    overlap = time - _nextTime;
+
+    if (overlap > 0 || manual) {
+      frame = ++_self.frame;
+      _delta = time - _self.time * 1000;
+      _self.time = time = time / 1000;
+      _nextTime += overlap + (overlap >= _gap ? 4 : _gap - overlap);
+      dispatch = 1;
+    }
+
+    manual || (_id = _req(_tick)); //make sure the request is made before we dispatch the "tick" event so that timing is maintained. Otherwise, if processing the "tick" requires a bunch of time (like 15ms) and we're using a setTimeout() that's based on 16.7ms, it'd technically take 31.7ms between frames otherwise.
+
+    if (dispatch) {
+      for (_i = 0; _i < _listeners.length; _i++) {
+        // use _i and check _listeners.length instead of a variable because a listener could get removed during the loop, and if that happens to an element less than the current index, it'd throw things off in the loop.
+        _listeners[_i](time, _delta, frame, v);
+      }
+    }
+  };
+
+  _self = {
+    time: 0,
+    frame: 0,
+    tick: function tick() {
+      _tick(true);
+    },
+    deltaRatio: function deltaRatio(fps) {
+      return _delta / (1000 / (fps || 60));
+    },
+    wake: function wake() {
+      if (_coreReady) {
+        if (!_coreInitted && _windowExists()) {
+          _win = _coreInitted = window;
+          _doc = _win.document || {};
+          _globals.gsap = gsap;
+          (_win.gsapVersions || (_win.gsapVersions = [])).push(gsap.version);
+
+          _install(_installScope || _win.GreenSockGlobals || !_win.gsap && _win || {});
+
+          _raf = _win.requestAnimationFrame;
+        }
+
+        _id && _self.sleep();
+
+        _req = _raf || function (f) {
+          return setTimeout(f, _nextTime - _self.time * 1000 + 1 | 0);
+        };
+
+        _tickerActive = 1;
+
+        _tick(2);
+      }
+    },
+    sleep: function sleep() {
+      (_raf ? _win.cancelAnimationFrame : clearTimeout)(_id);
+      _tickerActive = 0;
+      _req = _emptyFunc;
+    },
+    lagSmoothing: function lagSmoothing(threshold, adjustedLag) {
+      _lagThreshold = threshold || 1 / _tinyNum; //zero should be interpreted as basically unlimited
+
+      _adjustedLag = Math.min(adjustedLag, _lagThreshold, 0);
+    },
+    fps: function fps(_fps) {
+      _gap = 1000 / (_fps || 240);
+      _nextTime = _self.time * 1000 + _gap;
+    },
+    add: function add(callback) {
+      _listeners.indexOf(callback) < 0 && _listeners.push(callback);
+
+      _wake();
+    },
+    remove: function remove(callback, i) {
+      ~(i = _listeners.indexOf(callback)) && _listeners.splice(i, 1) && _i >= i && _i--;
+    },
+    _listeners: _listeners
+  };
+  return _self;
+}(),
+    _wake = function _wake() {
+  return !_tickerActive && _ticker.wake();
+},
+    //also ensures the core classes are initialized.
+
+/*
+* -------------------------------------------------
+* EASING
+* -------------------------------------------------
+*/
+_easeMap = {},
+    _customEaseExp = /^[\d.\-M][\d.\-,\s]/,
+    _quotesExp = /["']/g,
+    _parseObjectInString = function _parseObjectInString(value) {
+  //takes a string like "{wiggles:10, type:anticipate})" and turns it into a real object. Notice it ends in ")" and includes the {} wrappers. This is because we only use this function for parsing ease configs and prioritized optimization rather than reusability.
+  var obj = {},
+      split = value.substr(1, value.length - 3).split(":"),
+      key = split[0],
+      i = 1,
+      l = split.length,
+      index,
+      val,
+      parsedVal;
+
+  for (; i < l; i++) {
+    val = split[i];
+    index = i !== l - 1 ? val.lastIndexOf(",") : val.length;
+    parsedVal = val.substr(0, index);
+    obj[key] = isNaN(parsedVal) ? parsedVal.replace(_quotesExp, "").trim() : +parsedVal;
+    key = val.substr(index + 1).trim();
+  }
+
+  return obj;
+},
+    _valueInParentheses = function _valueInParentheses(value) {
+  var open = value.indexOf("(") + 1,
+      close = value.indexOf(")"),
+      nested = value.indexOf("(", open);
+  return value.substring(open, ~nested && nested < close ? value.indexOf(")", close + 1) : close);
+},
+    _configEaseFromString = function _configEaseFromString(name) {
+  //name can be a string like "elastic.out(1,0.5)", and pass in _easeMap as obj and it'll parse it out and call the actual function like _easeMap.Elastic.easeOut.config(1,0.5). It will also parse custom ease strings as long as CustomEase is loaded and registered (internally as _easeMap._CE).
+  var split = (name + "").split("("),
+      ease = _easeMap[split[0]];
+  return ease && split.length > 1 && ease.config ? ease.config.apply(null, ~name.indexOf("{") ? [_parseObjectInString(split[1])] : _valueInParentheses(name).split(",").map(_numericIfPossible)) : _easeMap._CE && _customEaseExp.test(name) ? _easeMap._CE("", name) : ease;
+},
+    _invertEase = function _invertEase(ease) {
+  return function (p) {
+    return 1 - ease(1 - p);
+  };
+},
+    // allow yoyoEase to be set in children and have those affected when the parent/ancestor timeline yoyos.
+_propagateYoyoEase = function _propagateYoyoEase(timeline, isYoyo) {
+  var child = timeline._first,
+      ease;
+
+  while (child) {
+    if (child instanceof Timeline) {
+      _propagateYoyoEase(child, isYoyo);
+    } else if (child.vars.yoyoEase && (!child._yoyo || !child._repeat) && child._yoyo !== isYoyo) {
+      if (child.timeline) {
+        _propagateYoyoEase(child.timeline, isYoyo);
+      } else {
+        ease = child._ease;
+        child._ease = child._yEase;
+        child._yEase = ease;
+        child._yoyo = isYoyo;
+      }
+    }
+
+    child = child._next;
+  }
+},
+    _parseEase = function _parseEase(ease, defaultEase) {
+  return !ease ? defaultEase : (_isFunction(ease) ? ease : _easeMap[ease] || _configEaseFromString(ease)) || defaultEase;
+},
+    _insertEase = function _insertEase(names, easeIn, easeOut, easeInOut) {
+  if (easeOut === void 0) {
+    easeOut = function easeOut(p) {
+      return 1 - easeIn(1 - p);
     };
   }
 
-  return _typeof(obj);
-}
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/form-select/TWFormSelectOption.vue?vue&type=script&lang=js&
-/* harmony default export */ var TWFormSelectOptionvue_type_script_lang_js_ = ({
-  name: 'TWFormSelectOption',
-  props: {
-    value: undefined,
-    disabled: {
-      type: Boolean,
-      default: false
-    }
-  },
-  render: function render(createElement) {
-    return createElement('option', {
-      attrs: {
-        value: this.value,
-        disabled: this.disabled
-      }
-    }, this.$slots.default);
+  if (easeInOut === void 0) {
+    easeInOut = function easeInOut(p) {
+      return p < .5 ? easeIn(p * 2) / 2 : 1 - easeIn((1 - p) * 2) / 2;
+    };
   }
+
+  var ease = {
+    easeIn: easeIn,
+    easeOut: easeOut,
+    easeInOut: easeInOut
+  },
+      lowercaseName;
+
+  _forEachName(names, function (name) {
+    _easeMap[name] = _globals[name] = ease;
+    _easeMap[lowercaseName = name.toLowerCase()] = easeOut;
+
+    for (var p in ease) {
+      _easeMap[lowercaseName + (p === "easeIn" ? ".in" : p === "easeOut" ? ".out" : ".inOut")] = _easeMap[name + "." + p] = ease[p];
+    }
+  });
+
+  return ease;
+},
+    _easeInOutFromOut = function _easeInOutFromOut(easeOut) {
+  return function (p) {
+    return p < .5 ? (1 - easeOut(1 - p * 2)) / 2 : .5 + easeOut((p - .5) * 2) / 2;
+  };
+},
+    _configElastic = function _configElastic(type, amplitude, period) {
+  var p1 = amplitude >= 1 ? amplitude : 1,
+      //note: if amplitude is < 1, we simply adjust the period for a more natural feel. Otherwise the math doesn't work right and the curve starts at 1.
+  p2 = (period || (type ? .3 : .45)) / (amplitude < 1 ? amplitude : 1),
+      p3 = p2 / _2PI * (Math.asin(1 / p1) || 0),
+      easeOut = function easeOut(p) {
+    return p === 1 ? 1 : p1 * Math.pow(2, -10 * p) * _sin((p - p3) * p2) + 1;
+  },
+      ease = type === "out" ? easeOut : type === "in" ? function (p) {
+    return 1 - easeOut(1 - p);
+  } : _easeInOutFromOut(easeOut);
+
+  p2 = _2PI / p2; //precalculate to optimize
+
+  ease.config = function (amplitude, period) {
+    return _configElastic(type, amplitude, period);
+  };
+
+  return ease;
+},
+    _configBack = function _configBack(type, overshoot) {
+  if (overshoot === void 0) {
+    overshoot = 1.70158;
+  }
+
+  var easeOut = function easeOut(p) {
+    return p ? --p * p * ((overshoot + 1) * p + overshoot) + 1 : 0;
+  },
+      ease = type === "out" ? easeOut : type === "in" ? function (p) {
+    return 1 - easeOut(1 - p);
+  } : _easeInOutFromOut(easeOut);
+
+  ease.config = function (overshoot) {
+    return _configBack(type, overshoot);
+  };
+
+  return ease;
+}; // a cheaper (kb and cpu) but more mild way to get a parameterized weighted ease by feeding in a value between -1 (easeIn) and 1 (easeOut) where 0 is linear.
+// _weightedEase = ratio => {
+// 	let y = 0.5 + ratio / 2;
+// 	return p => (2 * (1 - p) * p * y + p * p);
+// },
+// a stronger (but more expensive kb/cpu) parameterized weighted ease that lets you feed in a value between -1 (easeIn) and 1 (easeOut) where 0 is linear.
+// _weightedEaseStrong = ratio => {
+// 	ratio = .5 + ratio / 2;
+// 	let o = 1 / 3 * (ratio < .5 ? ratio : 1 - ratio),
+// 		b = ratio - o,
+// 		c = ratio + o;
+// 	return p => p === 1 ? p : 3 * b * (1 - p) * (1 - p) * p + 3 * c * (1 - p) * p * p + p * p * p;
+// };
+
+
+_forEachName("Linear,Quad,Cubic,Quart,Quint,Strong", function (name, i) {
+  var power = i < 5 ? i + 1 : i;
+
+  _insertEase(name + ",Power" + (power - 1), i ? function (p) {
+    return Math.pow(p, power);
+  } : function (p) {
+    return p;
+  }, function (p) {
+    return 1 - Math.pow(1 - p, power);
+  }, function (p) {
+    return p < .5 ? Math.pow(p * 2, power) / 2 : 1 - Math.pow((1 - p) * 2, power) / 2;
+  });
 });
-// CONCATENATED MODULE: ./src/components/form-select/TWFormSelectOption.vue?vue&type=script&lang=js&
- /* harmony default export */ var form_select_TWFormSelectOptionvue_type_script_lang_js_ = (TWFormSelectOptionvue_type_script_lang_js_); 
-// CONCATENATED MODULE: ./src/components/form-select/TWFormSelectOption.vue
-var TWFormSelectOption_render, TWFormSelectOption_staticRenderFns
+
+_easeMap.Linear.easeNone = _easeMap.none = _easeMap.Linear.easeIn;
+
+_insertEase("Elastic", _configElastic("in"), _configElastic("out"), _configElastic());
+
+(function (n, c) {
+  var n1 = 1 / c,
+      n2 = 2 * n1,
+      n3 = 2.5 * n1,
+      easeOut = function easeOut(p) {
+    return p < n1 ? n * p * p : p < n2 ? n * Math.pow(p - 1.5 / c, 2) + .75 : p < n3 ? n * (p -= 2.25 / c) * p + .9375 : n * Math.pow(p - 2.625 / c, 2) + .984375;
+  };
+
+  _insertEase("Bounce", function (p) {
+    return 1 - easeOut(1 - p);
+  }, easeOut);
+})(7.5625, 2.75);
+
+_insertEase("Expo", function (p) {
+  return p ? Math.pow(2, 10 * (p - 1)) : 0;
+});
+
+_insertEase("Circ", function (p) {
+  return -(_sqrt(1 - p * p) - 1);
+});
+
+_insertEase("Sine", function (p) {
+  return p === 1 ? 1 : -_cos(p * _HALF_PI) + 1;
+});
+
+_insertEase("Back", _configBack("in"), _configBack("out"), _configBack());
+
+_easeMap.SteppedEase = _easeMap.steps = _globals.SteppedEase = {
+  config: function config(steps, immediateStart) {
+    if (steps === void 0) {
+      steps = 1;
+    }
+
+    var p1 = 1 / steps,
+        p2 = steps + (immediateStart ? 0 : 1),
+        p3 = immediateStart ? 1 : 0,
+        max = 1 - _tinyNum;
+    return function (p) {
+      return ((p2 * _clamp(0, max, p) | 0) + p3) * p1;
+    };
+  }
+};
+_defaults.ease = _easeMap["quad.out"];
+
+_forEachName("onComplete,onUpdate,onStart,onRepeat,onReverseComplete,onInterrupt", function (name) {
+  return _callbackNames += name + "," + name + "Params,";
+});
+/*
+ * --------------------------------------------------------------------------------------
+ * CACHE
+ * --------------------------------------------------------------------------------------
+ */
 
 
+var GSCache = function GSCache(target, harness) {
+  this.id = _gsID++;
+  target._gsap = this;
+  this.target = target;
+  this.harness = harness;
+  this.get = harness ? harness.get : _getProperty;
+  this.set = harness ? harness.getSetter : _getSetter;
+};
+/*
+ * --------------------------------------------------------------------------------------
+ * ANIMATION
+ * --------------------------------------------------------------------------------------
+ */
 
+var Animation = /*#__PURE__*/function () {
+  function Animation(vars) {
+    this.vars = vars;
+    this._delay = +vars.delay || 0;
 
-/* normalize component */
+    if (this._repeat = vars.repeat === Infinity ? -2 : vars.repeat || 0) {
+      // TODO: repeat: Infinity on a timeline's children must flag that timeline internally and affect its totalDuration, otherwise it'll stop in the negative direction when reaching the start.
+      this._rDelay = vars.repeatDelay || 0;
+      this._yoyo = !!vars.yoyo || !!vars.yoyoEase;
+    }
 
-var TWFormSelectOption_component = normalizeComponent(
-  form_select_TWFormSelectOptionvue_type_script_lang_js_,
-  TWFormSelectOption_render,
-  TWFormSelectOption_staticRenderFns,
-  false,
-  null,
-  null,
-  null
-  
-)
+    this._ts = 1;
 
-/* harmony default export */ var TWFormSelectOption = (TWFormSelectOption_component.exports);
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/form-select/TWFormSelectOptionGroup.vue?vue&type=script&lang=js&
+    _setDuration(this, +vars.duration, 1, 1);
 
+    this.data = vars.data;
+    _tickerActive || _ticker.wake();
+  }
 
-/* harmony default export */ var TWFormSelectOptionGroupvue_type_script_lang_js_ = ({
-  name: 'TWFormSelectOptionGroup',
-  props: {
-    label: {
-      type: String,
-      default: ''
-    },
-    options: {
-      type: Array,
-      default: function _default() {
-        return [];
+  var _proto = Animation.prototype;
+
+  _proto.delay = function delay(value) {
+    if (value || value === 0) {
+      this.parent && this.parent.smoothChildTiming && this.startTime(this._start + value - this._delay);
+      this._delay = value;
+      return this;
+    }
+
+    return this._delay;
+  };
+
+  _proto.duration = function duration(value) {
+    return arguments.length ? this.totalDuration(this._repeat > 0 ? value + (value + this._rDelay) * this._repeat : value) : this.totalDuration() && this._dur;
+  };
+
+  _proto.totalDuration = function totalDuration(value) {
+    if (!arguments.length) {
+      return this._tDur;
+    }
+
+    this._dirty = 0;
+    return _setDuration(this, this._repeat < 0 ? value : (value - this._repeat * this._rDelay) / (this._repeat + 1));
+  };
+
+  _proto.totalTime = function totalTime(_totalTime, suppressEvents) {
+    _wake();
+
+    if (!arguments.length) {
+      return this._tTime;
+    }
+
+    var parent = this._dp;
+
+    if (parent && parent.smoothChildTiming && this._ts) {
+      _alignPlayhead(this, _totalTime);
+
+      !parent._dp || parent.parent || _postAddChecks(parent, this); // edge case: if this is a child of a timeline that already completed, for example, we must re-activate the parent.
+      //in case any of the ancestor timelines had completed but should now be enabled, we should reset their totalTime() which will also ensure that they're lined up properly and enabled. Skip for animations that are on the root (wasteful). Example: a TimelineLite.exportRoot() is performed when there's a paused tween on the root, the export will not complete until that tween is unpaused, but imagine a child gets restarted later, after all [unpaused] tweens have completed. The start of that child would get pushed out, but one of the ancestors may have completed.
+
+      while (parent && parent.parent) {
+        if (parent.parent._time !== parent._start + (parent._ts >= 0 ? parent._tTime / parent._ts : (parent.totalDuration() - parent._tTime) / -parent._ts)) {
+          parent.totalTime(parent._tTime, true);
+        }
+
+        parent = parent.parent;
+      }
+
+      if (!this.parent && this._dp.autoRemoveChildren && (this._ts > 0 && _totalTime < this._tDur || this._ts < 0 && _totalTime > 0 || !this._tDur && !_totalTime)) {
+        //if the animation doesn't have a parent, put it back into its last parent (recorded as _dp for exactly cases like this). Limit to parents with autoRemoveChildren (like globalTimeline) so that if the user manually removes an animation from a timeline and then alters its playhead, it doesn't get added back in.
+        _addToTimeline(this._dp, this, this._start - this._delay);
       }
     }
-  },
-  render: function render(createElement) {
-    var options = this.options.map(function (option, index) {
-      var value = option.value,
-          text = option.text,
-          selected = option.selected;
-      var key = "option_".concat(index);
-      return createElement(TWFormSelectOption, {
-        props: {
-          value: value,
-          selected: selected
-        },
-        key: key
-      }, text);
+
+    if (this._tTime !== _totalTime || !this._dur && !suppressEvents || this._initted && Math.abs(this._zTime) === _tinyNum || !_totalTime && !this._initted && (this.add || this._ptLookup)) {
+      // check for _ptLookup on a Tween instance to ensure it has actually finished being instantiated, otherwise if this.reverse() gets called in the Animation constructor, it could trigger a render() here even though the _targets weren't populated, thus when _init() is called there won't be any PropTweens (it'll act like the tween is non-functional)
+      this._ts || (this._pTime = _totalTime); // otherwise, if an animation is paused, then the playhead is moved back to zero, then resumed, it'd revert back to the original time at the pause
+      //if (!this._lock) { // avoid endless recursion (not sure we need this yet or if it's worth the performance hit)
+      //   this._lock = 1;
+
+      _lazySafeRender(this, _totalTime, suppressEvents); //   this._lock = 0;
+      //}
+
+    }
+
+    return this;
+  };
+
+  _proto.time = function time(value, suppressEvents) {
+    return arguments.length ? this.totalTime(Math.min(this.totalDuration(), value + _elapsedCycleDuration(this)) % (this._dur + this._rDelay) || (value ? this._dur : 0), suppressEvents) : this._time; // note: if the modulus results in 0, the playhead could be exactly at the end or the beginning, and we always defer to the END with a non-zero value, otherwise if you set the time() to the very end (duration()), it would render at the START!
+  };
+
+  _proto.totalProgress = function totalProgress(value, suppressEvents) {
+    return arguments.length ? this.totalTime(this.totalDuration() * value, suppressEvents) : this.totalDuration() ? Math.min(1, this._tTime / this._tDur) : this.ratio;
+  };
+
+  _proto.progress = function progress(value, suppressEvents) {
+    return arguments.length ? this.totalTime(this.duration() * (this._yoyo && !(this.iteration() & 1) ? 1 - value : value) + _elapsedCycleDuration(this), suppressEvents) : this.duration() ? Math.min(1, this._time / this._dur) : this.ratio;
+  };
+
+  _proto.iteration = function iteration(value, suppressEvents) {
+    var cycleDuration = this.duration() + this._rDelay;
+
+    return arguments.length ? this.totalTime(this._time + (value - 1) * cycleDuration, suppressEvents) : this._repeat ? _animationCycle(this._tTime, cycleDuration) + 1 : 1;
+  } // potential future addition:
+  // isPlayingBackwards() {
+  // 	let animation = this,
+  // 		orientation = 1; // 1 = forward, -1 = backward
+  // 	while (animation) {
+  // 		orientation *= animation.reversed() || (animation.repeat() && !(animation.iteration() & 1)) ? -1 : 1;
+  // 		animation = animation.parent;
+  // 	}
+  // 	return orientation < 0;
+  // }
+  ;
+
+  _proto.timeScale = function timeScale(value) {
+    if (!arguments.length) {
+      return this._rts === -_tinyNum ? 0 : this._rts; // recorded timeScale. Special case: if someone calls reverse() on an animation with timeScale of 0, we assign it -_tinyNum to remember it's reversed.
+    }
+
+    if (this._rts === value) {
+      return this;
+    }
+
+    var tTime = this.parent && this._ts ? _parentToChildTotalTime(this.parent._time, this) : this._tTime; // make sure to do the parentToChildTotalTime() BEFORE setting the new _ts because the old one must be used in that calculation.
+    // future addition? Up side: fast and minimal file size. Down side: only works on this animation; if a timeline is reversed, for example, its childrens' onReverse wouldn't get called.
+    //(+value < 0 && this._rts >= 0) && _callback(this, "onReverse", true);
+    // prioritize rendering where the parent's playhead lines up instead of this._tTime because there could be a tween that's animating another tween's timeScale in the same rendering loop (same parent), thus if the timeScale tween renders first, it would alter _start BEFORE _tTime was set on that tick (in the rendering loop), effectively freezing it until the timeScale tween finishes.
+
+    this._rts = +value || 0;
+    this._ts = this._ps || value === -_tinyNum ? 0 : this._rts; // _ts is the functional timeScale which would be 0 if the animation is paused.
+
+    _recacheAncestors(this.totalTime(_clamp(-this._delay, this._tDur, tTime), true));
+
+    _setEnd(this); // if parent.smoothChildTiming was false, the end time didn't get updated in the _alignPlayhead() method, so do it here.
+
+
+    return this;
+  };
+
+  _proto.paused = function paused(value) {
+    if (!arguments.length) {
+      return this._ps;
+    }
+
+    if (this._ps !== value) {
+      this._ps = value;
+
+      if (value) {
+        this._pTime = this._tTime || Math.max(-this._delay, this.rawTime()); // if the pause occurs during the delay phase, make sure that's factored in when resuming.
+
+        this._ts = this._act = 0; // _ts is the functional timeScale, so a paused tween would effectively have a timeScale of 0. We record the "real" timeScale as _rts (recorded time scale)
+      } else {
+        _wake();
+
+        this._ts = this._rts; //only defer to _pTime (pauseTime) if tTime is zero. Remember, someone could pause() an animation, then scrub the playhead and resume(). If the parent doesn't have smoothChildTiming, we render at the rawTime() because the startTime won't get updated.
+
+        this.totalTime(this.parent && !this.parent.smoothChildTiming ? this.rawTime() : this._tTime || this._pTime, this.progress() === 1 && Math.abs(this._zTime) !== _tinyNum && (this._tTime -= _tinyNum)); // edge case: animation.progress(1).pause().play() wouldn't render again because the playhead is already at the end, but the call to totalTime() below will add it back to its parent...and not remove it again (since removing only happens upon rendering at a new time). Offsetting the _tTime slightly is done simply to cause the final render in totalTime() that'll pop it off its timeline (if autoRemoveChildren is true, of course). Check to make sure _zTime isn't -_tinyNum to avoid an edge case where the playhead is pushed to the end but INSIDE a tween/callback, the timeline itself is paused thus halting rendering and leaving a few unrendered. When resuming, it wouldn't render those otherwise.
+      }
+    }
+
+    return this;
+  };
+
+  _proto.startTime = function startTime(value) {
+    if (arguments.length) {
+      this._start = value;
+      var parent = this.parent || this._dp;
+      parent && (parent._sort || !this.parent) && _addToTimeline(parent, this, value - this._delay);
+      return this;
+    }
+
+    return this._start;
+  };
+
+  _proto.endTime = function endTime(includeRepeats) {
+    return this._start + (_isNotFalse(includeRepeats) ? this.totalDuration() : this.duration()) / Math.abs(this._ts || 1);
+  };
+
+  _proto.rawTime = function rawTime(wrapRepeats) {
+    var parent = this.parent || this._dp; // _dp = detached parent
+
+    return !parent ? this._tTime : wrapRepeats && (!this._ts || this._repeat && this._time && this.totalProgress() < 1) ? this._tTime % (this._dur + this._rDelay) : !this._ts ? this._tTime : _parentToChildTotalTime(parent.rawTime(wrapRepeats), this);
+  };
+
+  _proto.globalTime = function globalTime(rawTime) {
+    var animation = this,
+        time = arguments.length ? rawTime : animation.rawTime();
+
+    while (animation) {
+      time = animation._start + time / (animation._ts || 1);
+      animation = animation._dp;
+    }
+
+    return time;
+  };
+
+  _proto.repeat = function repeat(value) {
+    if (arguments.length) {
+      this._repeat = value === Infinity ? -2 : value;
+      return _onUpdateTotalDuration(this);
+    }
+
+    return this._repeat === -2 ? Infinity : this._repeat;
+  };
+
+  _proto.repeatDelay = function repeatDelay(value) {
+    if (arguments.length) {
+      var time = this._time;
+      this._rDelay = value;
+
+      _onUpdateTotalDuration(this);
+
+      return time ? this.time(time) : this;
+    }
+
+    return this._rDelay;
+  };
+
+  _proto.yoyo = function yoyo(value) {
+    if (arguments.length) {
+      this._yoyo = value;
+      return this;
+    }
+
+    return this._yoyo;
+  };
+
+  _proto.seek = function seek(position, suppressEvents) {
+    return this.totalTime(_parsePosition(this, position), _isNotFalse(suppressEvents));
+  };
+
+  _proto.restart = function restart(includeDelay, suppressEvents) {
+    return this.play().totalTime(includeDelay ? -this._delay : 0, _isNotFalse(suppressEvents));
+  };
+
+  _proto.play = function play(from, suppressEvents) {
+    from != null && this.seek(from, suppressEvents);
+    return this.reversed(false).paused(false);
+  };
+
+  _proto.reverse = function reverse(from, suppressEvents) {
+    from != null && this.seek(from || this.totalDuration(), suppressEvents);
+    return this.reversed(true).paused(false);
+  };
+
+  _proto.pause = function pause(atTime, suppressEvents) {
+    atTime != null && this.seek(atTime, suppressEvents);
+    return this.paused(true);
+  };
+
+  _proto.resume = function resume() {
+    return this.paused(false);
+  };
+
+  _proto.reversed = function reversed(value) {
+    if (arguments.length) {
+      !!value !== this.reversed() && this.timeScale(-this._rts || (value ? -_tinyNum : 0)); // in case timeScale is zero, reversing would have no effect so we use _tinyNum.
+
+      return this;
+    }
+
+    return this._rts < 0;
+  };
+
+  _proto.invalidate = function invalidate() {
+    this._initted = this._act = 0;
+    this._zTime = -_tinyNum;
+    return this;
+  };
+
+  _proto.isActive = function isActive() {
+    var parent = this.parent || this._dp,
+        start = this._start,
+        rawTime;
+    return !!(!parent || this._ts && this._initted && parent.isActive() && (rawTime = parent.rawTime(true)) >= start && rawTime < this.endTime(true) - _tinyNum);
+  };
+
+  _proto.eventCallback = function eventCallback(type, callback, params) {
+    var vars = this.vars;
+
+    if (arguments.length > 1) {
+      if (!callback) {
+        delete vars[type];
+      } else {
+        vars[type] = callback;
+        params && (vars[type + "Params"] = params);
+        type === "onUpdate" && (this._onUpdate = callback);
+      }
+
+      return this;
+    }
+
+    return vars[type];
+  };
+
+  _proto.then = function then(onFulfilled) {
+    var self = this;
+    return new Promise(function (resolve) {
+      var f = _isFunction(onFulfilled) ? onFulfilled : _passThrough,
+          _resolve = function _resolve() {
+        var _then = self.then;
+        self.then = null; // temporarily null the then() method to avoid an infinite loop (see https://github.com/greensock/GSAP/issues/322)
+
+        _isFunction(f) && (f = f(self)) && (f.then || f === self) && (self.then = _then);
+        resolve(f);
+        self.then = _then;
+      };
+
+      if (self._initted && self.totalProgress() === 1 && self._ts >= 0 || !self._tTime && self._ts < 0) {
+        _resolve();
+      } else {
+        self._prom = _resolve;
+      }
     });
-    return createElement('optgroup', {
-      attrs: {
-        label: this.label
+  };
+
+  _proto.kill = function kill() {
+    _interrupt(this);
+  };
+
+  return Animation;
+}();
+
+_setDefaults(Animation.prototype, {
+  _time: 0,
+  _start: 0,
+  _end: 0,
+  _tTime: 0,
+  _tDur: 0,
+  _dirty: 0,
+  _repeat: 0,
+  _yoyo: false,
+  parent: null,
+  _initted: false,
+  _rDelay: 0,
+  _ts: 1,
+  _dp: 0,
+  ratio: 0,
+  _zTime: -_tinyNum,
+  _prom: 0,
+  _ps: false,
+  _rts: 1
+});
+/*
+ * -------------------------------------------------
+ * TIMELINE
+ * -------------------------------------------------
+ */
+
+
+var Timeline = /*#__PURE__*/function (_Animation) {
+  _inheritsLoose(Timeline, _Animation);
+
+  function Timeline(vars, position) {
+    var _this;
+
+    if (vars === void 0) {
+      vars = {};
+    }
+
+    _this = _Animation.call(this, vars) || this;
+    _this.labels = {};
+    _this.smoothChildTiming = !!vars.smoothChildTiming;
+    _this.autoRemoveChildren = !!vars.autoRemoveChildren;
+    _this._sort = _isNotFalse(vars.sortChildren);
+    _globalTimeline && _addToTimeline(vars.parent || _globalTimeline, _assertThisInitialized(_this), position);
+    vars.reversed && _this.reverse();
+    vars.paused && _this.paused(true);
+    vars.scrollTrigger && _scrollTrigger(_assertThisInitialized(_this), vars.scrollTrigger);
+    return _this;
+  }
+
+  var _proto2 = Timeline.prototype;
+
+  _proto2.to = function to(targets, vars, position) {
+    _createTweenType(0, arguments, this);
+
+    return this;
+  };
+
+  _proto2.from = function from(targets, vars, position) {
+    _createTweenType(1, arguments, this);
+
+    return this;
+  };
+
+  _proto2.fromTo = function fromTo(targets, fromVars, toVars, position) {
+    _createTweenType(2, arguments, this);
+
+    return this;
+  };
+
+  _proto2.set = function set(targets, vars, position) {
+    vars.duration = 0;
+    vars.parent = this;
+    _inheritDefaults(vars).repeatDelay || (vars.repeat = 0);
+    vars.immediateRender = !!vars.immediateRender;
+    new Tween(targets, vars, _parsePosition(this, position), 1);
+    return this;
+  };
+
+  _proto2.call = function call(callback, params, position) {
+    return _addToTimeline(this, Tween.delayedCall(0, callback, params), position);
+  } //ONLY for backward compatibility! Maybe delete?
+  ;
+
+  _proto2.staggerTo = function staggerTo(targets, duration, vars, stagger, position, onCompleteAll, onCompleteAllParams) {
+    vars.duration = duration;
+    vars.stagger = vars.stagger || stagger;
+    vars.onComplete = onCompleteAll;
+    vars.onCompleteParams = onCompleteAllParams;
+    vars.parent = this;
+    new Tween(targets, vars, _parsePosition(this, position));
+    return this;
+  };
+
+  _proto2.staggerFrom = function staggerFrom(targets, duration, vars, stagger, position, onCompleteAll, onCompleteAllParams) {
+    vars.runBackwards = 1;
+    _inheritDefaults(vars).immediateRender = _isNotFalse(vars.immediateRender);
+    return this.staggerTo(targets, duration, vars, stagger, position, onCompleteAll, onCompleteAllParams);
+  };
+
+  _proto2.staggerFromTo = function staggerFromTo(targets, duration, fromVars, toVars, stagger, position, onCompleteAll, onCompleteAllParams) {
+    toVars.startAt = fromVars;
+    _inheritDefaults(toVars).immediateRender = _isNotFalse(toVars.immediateRender);
+    return this.staggerTo(targets, duration, toVars, stagger, position, onCompleteAll, onCompleteAllParams);
+  };
+
+  _proto2.render = function render(totalTime, suppressEvents, force) {
+    var prevTime = this._time,
+        tDur = this._dirty ? this.totalDuration() : this._tDur,
+        dur = this._dur,
+        tTime = totalTime <= 0 ? 0 : _roundPrecise(totalTime),
+        // if a paused timeline is resumed (or its _start is updated for another reason...which rounds it), that could result in the playhead shifting a **tiny** amount and a zero-duration child at that spot may get rendered at a different ratio, like its totalTime in render() may be 1e-17 instead of 0, for example.
+    crossingStart = this._zTime < 0 !== totalTime < 0 && (this._initted || !dur),
+        time,
+        child,
+        next,
+        iteration,
+        cycleDuration,
+        prevPaused,
+        pauseTween,
+        timeScale,
+        prevStart,
+        prevIteration,
+        yoyo,
+        isYoyo;
+    this !== _globalTimeline && tTime > tDur && totalTime >= 0 && (tTime = tDur);
+
+    if (tTime !== this._tTime || force || crossingStart) {
+      if (prevTime !== this._time && dur) {
+        //if totalDuration() finds a child with a negative startTime and smoothChildTiming is true, things get shifted around internally so we need to adjust the time accordingly. For example, if a tween starts at -30 we must shift EVERYTHING forward 30 seconds and move this timeline's startTime backward by 30 seconds so that things align with the playhead (no jump).
+        tTime += this._time - prevTime;
+        totalTime += this._time - prevTime;
       }
-    }, [this.$slots.first, options]);
+
+      time = tTime;
+      prevStart = this._start;
+      timeScale = this._ts;
+      prevPaused = !timeScale;
+
+      if (crossingStart) {
+        dur || (prevTime = this._zTime); //when the playhead arrives at EXACTLY time 0 (right on top) of a zero-duration timeline, we need to discern if events are suppressed so that when the playhead moves again (next time), it'll trigger the callback. If events are NOT suppressed, obviously the callback would be triggered in this render. Basically, the callback should fire either when the playhead ARRIVES or LEAVES this exact spot, not both. Imagine doing a timeline.seek(0) and there's a callback that sits at 0. Since events are suppressed on that seek() by default, nothing will fire, but when the playhead moves off of that position, the callback should fire. This behavior is what people intuitively expect.
+
+        (totalTime || !suppressEvents) && (this._zTime = totalTime);
+      }
+
+      if (this._repeat) {
+        //adjust the time for repeats and yoyos
+        yoyo = this._yoyo;
+        cycleDuration = dur + this._rDelay;
+
+        if (this._repeat < -1 && totalTime < 0) {
+          return this.totalTime(cycleDuration * 100 + totalTime, suppressEvents, force);
+        }
+
+        time = _roundPrecise(tTime % cycleDuration); //round to avoid floating point errors. (4 % 0.8 should be 0 but some browsers report it as 0.79999999!)
+
+        if (tTime === tDur) {
+          // the tDur === tTime is for edge cases where there's a lengthy decimal on the duration and it may reach the very end but the time is rendered as not-quite-there (remember, tDur is rounded to 4 decimals whereas dur isn't)
+          iteration = this._repeat;
+          time = dur;
+        } else {
+          iteration = ~~(tTime / cycleDuration);
+
+          if (iteration && iteration === tTime / cycleDuration) {
+            time = dur;
+            iteration--;
+          }
+
+          time > dur && (time = dur);
+        }
+
+        prevIteration = _animationCycle(this._tTime, cycleDuration);
+        !prevTime && this._tTime && prevIteration !== iteration && (prevIteration = iteration); // edge case - if someone does addPause() at the very beginning of a repeating timeline, that pause is technically at the same spot as the end which causes this._time to get set to 0 when the totalTime would normally place the playhead at the end. See https://greensock.com/forums/topic/23823-closing-nav-animation-not-working-on-ie-and-iphone-6-maybe-other-older-browser/?tab=comments#comment-113005
+
+        if (yoyo && iteration & 1) {
+          time = dur - time;
+          isYoyo = 1;
+        }
+        /*
+        make sure children at the end/beginning of the timeline are rendered properly. If, for example,
+        a 3-second long timeline rendered at 2.9 seconds previously, and now renders at 3.2 seconds (which
+        would get translated to 2.8 seconds if the timeline yoyos or 0.2 seconds if it just repeats), there
+        could be a callback or a short tween that's at 2.95 or 3 seconds in which wouldn't render. So
+        we need to push the timeline to the end (and/or beginning depending on its yoyo value). Also we must
+        ensure that zero-duration tweens at the very beginning or end of the Timeline work.
+        */
+
+
+        if (iteration !== prevIteration && !this._lock) {
+          var rewinding = yoyo && prevIteration & 1,
+              doesWrap = rewinding === (yoyo && iteration & 1);
+          iteration < prevIteration && (rewinding = !rewinding);
+          prevTime = rewinding ? 0 : dur;
+          this._lock = 1;
+          this.render(prevTime || (isYoyo ? 0 : _roundPrecise(iteration * cycleDuration)), suppressEvents, !dur)._lock = 0;
+          this._tTime = tTime; // if a user gets the iteration() inside the onRepeat, for example, it should be accurate.
+
+          !suppressEvents && this.parent && _callback(this, "onRepeat");
+          this.vars.repeatRefresh && !isYoyo && (this.invalidate()._lock = 1);
+
+          if (prevTime && prevTime !== this._time || prevPaused !== !this._ts || this.vars.onRepeat && !this.parent && !this._act) {
+            // if prevTime is 0 and we render at the very end, _time will be the end, thus won't match. So in this edge case, prevTime won't match _time but that's okay. If it gets killed in the onRepeat, eject as well.
+            return this;
+          }
+
+          dur = this._dur; // in case the duration changed in the onRepeat
+
+          tDur = this._tDur;
+
+          if (doesWrap) {
+            this._lock = 2;
+            prevTime = rewinding ? dur : -0.0001;
+            this.render(prevTime, true);
+            this.vars.repeatRefresh && !isYoyo && this.invalidate();
+          }
+
+          this._lock = 0;
+
+          if (!this._ts && !prevPaused) {
+            return this;
+          } //in order for yoyoEase to work properly when there's a stagger, we must swap out the ease in each sub-tween.
+
+
+          _propagateYoyoEase(this, isYoyo);
+        }
+      }
+
+      if (this._hasPause && !this._forcing && this._lock < 2) {
+        pauseTween = _findNextPauseTween(this, _roundPrecise(prevTime), _roundPrecise(time));
+
+        if (pauseTween) {
+          tTime -= time - (time = pauseTween._start);
+        }
+      }
+
+      this._tTime = tTime;
+      this._time = time;
+      this._act = !timeScale; //as long as it's not paused, force it to be active so that if the user renders independent of the parent timeline, it'll be forced to re-render on the next tick.
+
+      if (!this._initted) {
+        this._onUpdate = this.vars.onUpdate;
+        this._initted = 1;
+        this._zTime = totalTime;
+        prevTime = 0; // upon init, the playhead should always go forward; someone could invalidate() a completed timeline and then if they restart(), that would make child tweens render in reverse order which could lock in the wrong starting values if they build on each other, like tl.to(obj, {x: 100}).to(obj, {x: 0}).
+      }
+
+      if (!prevTime && time && !suppressEvents) {
+        _callback(this, "onStart");
+
+        if (this._tTime !== tTime) {
+          // in case the onStart triggered a render at a different spot, eject. Like if someone did animation.pause(0.5) or something inside the onStart.
+          return this;
+        }
+      }
+
+      if (time >= prevTime && totalTime >= 0) {
+        child = this._first;
+
+        while (child) {
+          next = child._next;
+
+          if ((child._act || time >= child._start) && child._ts && pauseTween !== child) {
+            if (child.parent !== this) {
+              // an extreme edge case - the child's render could do something like kill() the "next" one in the linked list, or reparent it. In that case we must re-initiate the whole render to be safe.
+              return this.render(totalTime, suppressEvents, force);
+            }
+
+            child.render(child._ts > 0 ? (time - child._start) * child._ts : (child._dirty ? child.totalDuration() : child._tDur) + (time - child._start) * child._ts, suppressEvents, force);
+
+            if (time !== this._time || !this._ts && !prevPaused) {
+              //in case a tween pauses or seeks the timeline when rendering, like inside of an onUpdate/onComplete
+              pauseTween = 0;
+              next && (tTime += this._zTime = -_tinyNum); // it didn't finish rendering, so flag zTime as negative so that so that the next time render() is called it'll be forced (to render any remaining children)
+
+              break;
+            }
+          }
+
+          child = next;
+        }
+      } else {
+        child = this._last;
+        var adjustedTime = totalTime < 0 ? totalTime : time; //when the playhead goes backward beyond the start of this timeline, we must pass that information down to the child animations so that zero-duration tweens know whether to render their starting or ending values.
+
+        while (child) {
+          next = child._prev;
+
+          if ((child._act || adjustedTime <= child._end) && child._ts && pauseTween !== child) {
+            if (child.parent !== this) {
+              // an extreme edge case - the child's render could do something like kill() the "next" one in the linked list, or reparent it. In that case we must re-initiate the whole render to be safe.
+              return this.render(totalTime, suppressEvents, force);
+            }
+
+            child.render(child._ts > 0 ? (adjustedTime - child._start) * child._ts : (child._dirty ? child.totalDuration() : child._tDur) + (adjustedTime - child._start) * child._ts, suppressEvents, force);
+
+            if (time !== this._time || !this._ts && !prevPaused) {
+              //in case a tween pauses or seeks the timeline when rendering, like inside of an onUpdate/onComplete
+              pauseTween = 0;
+              next && (tTime += this._zTime = adjustedTime ? -_tinyNum : _tinyNum); // it didn't finish rendering, so adjust zTime so that so that the next time render() is called it'll be forced (to render any remaining children)
+
+              break;
+            }
+          }
+
+          child = next;
+        }
+      }
+
+      if (pauseTween && !suppressEvents) {
+        this.pause();
+        pauseTween.render(time >= prevTime ? 0 : -_tinyNum)._zTime = time >= prevTime ? 1 : -1;
+
+        if (this._ts) {
+          //the callback resumed playback! So since we may have held back the playhead due to where the pause is positioned, go ahead and jump to where it's SUPPOSED to be (if no pause happened).
+          this._start = prevStart; //if the pause was at an earlier time and the user resumed in the callback, it could reposition the timeline (changing its startTime), throwing things off slightly, so we make sure the _start doesn't shift.
+
+          _setEnd(this);
+
+          return this.render(totalTime, suppressEvents, force);
+        }
+      }
+
+      this._onUpdate && !suppressEvents && _callback(this, "onUpdate", true);
+      if (tTime === tDur && tDur >= this.totalDuration() || !tTime && prevTime) if (prevStart === this._start || Math.abs(timeScale) !== Math.abs(this._ts)) if (!this._lock) {
+        (totalTime || !dur) && (tTime === tDur && this._ts > 0 || !tTime && this._ts < 0) && _removeFromParent(this, 1); // don't remove if the timeline is reversed and the playhead isn't at 0, otherwise tl.progress(1).reverse() won't work. Only remove if the playhead is at the end and timeScale is positive, or if the playhead is at 0 and the timeScale is negative.
+
+        if (!suppressEvents && !(totalTime < 0 && !prevTime) && (tTime || prevTime || !tDur)) {
+          _callback(this, tTime === tDur && totalTime >= 0 ? "onComplete" : "onReverseComplete", true);
+
+          this._prom && !(tTime < tDur && this.timeScale() > 0) && this._prom();
+        }
+      }
+    }
+
+    return this;
+  };
+
+  _proto2.add = function add(child, position) {
+    var _this2 = this;
+
+    _isNumber(position) || (position = _parsePosition(this, position, child));
+
+    if (!(child instanceof Animation)) {
+      if (_isArray(child)) {
+        child.forEach(function (obj) {
+          return _this2.add(obj, position);
+        });
+        return this;
+      }
+
+      if (_isString(child)) {
+        return this.addLabel(child, position);
+      }
+
+      if (_isFunction(child)) {
+        child = Tween.delayedCall(0, child);
+      } else {
+        return this;
+      }
+    }
+
+    return this !== child ? _addToTimeline(this, child, position) : this; //don't allow a timeline to be added to itself as a child!
+  };
+
+  _proto2.getChildren = function getChildren(nested, tweens, timelines, ignoreBeforeTime) {
+    if (nested === void 0) {
+      nested = true;
+    }
+
+    if (tweens === void 0) {
+      tweens = true;
+    }
+
+    if (timelines === void 0) {
+      timelines = true;
+    }
+
+    if (ignoreBeforeTime === void 0) {
+      ignoreBeforeTime = -_bigNum;
+    }
+
+    var a = [],
+        child = this._first;
+
+    while (child) {
+      if (child._start >= ignoreBeforeTime) {
+        if (child instanceof Tween) {
+          tweens && a.push(child);
+        } else {
+          timelines && a.push(child);
+          nested && a.push.apply(a, child.getChildren(true, tweens, timelines));
+        }
+      }
+
+      child = child._next;
+    }
+
+    return a;
+  };
+
+  _proto2.getById = function getById(id) {
+    var animations = this.getChildren(1, 1, 1),
+        i = animations.length;
+
+    while (i--) {
+      if (animations[i].vars.id === id) {
+        return animations[i];
+      }
+    }
+  };
+
+  _proto2.remove = function remove(child) {
+    if (_isString(child)) {
+      return this.removeLabel(child);
+    }
+
+    if (_isFunction(child)) {
+      return this.killTweensOf(child);
+    }
+
+    _removeLinkedListItem(this, child);
+
+    if (child === this._recent) {
+      this._recent = this._last;
+    }
+
+    return _uncache(this);
+  };
+
+  _proto2.totalTime = function totalTime(_totalTime2, suppressEvents) {
+    if (!arguments.length) {
+      return this._tTime;
+    }
+
+    this._forcing = 1;
+
+    if (!this._dp && this._ts) {
+      //special case for the global timeline (or any other that has no parent or detached parent).
+      this._start = _roundPrecise(_ticker.time - (this._ts > 0 ? _totalTime2 / this._ts : (this.totalDuration() - _totalTime2) / -this._ts));
+    }
+
+    _Animation.prototype.totalTime.call(this, _totalTime2, suppressEvents);
+
+    this._forcing = 0;
+    return this;
+  };
+
+  _proto2.addLabel = function addLabel(label, position) {
+    this.labels[label] = _parsePosition(this, position);
+    return this;
+  };
+
+  _proto2.removeLabel = function removeLabel(label) {
+    delete this.labels[label];
+    return this;
+  };
+
+  _proto2.addPause = function addPause(position, callback, params) {
+    var t = Tween.delayedCall(0, callback || _emptyFunc, params);
+    t.data = "isPause";
+    this._hasPause = 1;
+    return _addToTimeline(this, t, _parsePosition(this, position));
+  };
+
+  _proto2.removePause = function removePause(position) {
+    var child = this._first;
+    position = _parsePosition(this, position);
+
+    while (child) {
+      if (child._start === position && child.data === "isPause") {
+        _removeFromParent(child);
+      }
+
+      child = child._next;
+    }
+  };
+
+  _proto2.killTweensOf = function killTweensOf(targets, props, onlyActive) {
+    var tweens = this.getTweensOf(targets, onlyActive),
+        i = tweens.length;
+
+    while (i--) {
+      _overwritingTween !== tweens[i] && tweens[i].kill(targets, props);
+    }
+
+    return this;
+  };
+
+  _proto2.getTweensOf = function getTweensOf(targets, onlyActive) {
+    var a = [],
+        parsedTargets = toArray(targets),
+        child = this._first,
+        isGlobalTime = _isNumber(onlyActive),
+        // a number is interpreted as a global time. If the animation spans
+    children;
+
+    while (child) {
+      if (child instanceof Tween) {
+        if (_arrayContainsAny(child._targets, parsedTargets) && (isGlobalTime ? (!_overwritingTween || child._initted && child._ts) && child.globalTime(0) <= onlyActive && child.globalTime(child.totalDuration()) > onlyActive : !onlyActive || child.isActive())) {
+          // note: if this is for overwriting, it should only be for tweens that aren't paused and are initted.
+          a.push(child);
+        }
+      } else if ((children = child.getTweensOf(parsedTargets, onlyActive)).length) {
+        a.push.apply(a, children);
+      }
+
+      child = child._next;
+    }
+
+    return a;
+  } // potential future feature - targets() on timelines
+  // targets() {
+  // 	let result = [];
+  // 	this.getChildren(true, true, false).forEach(t => result.push(...t.targets()));
+  // 	return result.filter((v, i) => result.indexOf(v) === i);
+  // }
+  ;
+
+  _proto2.tweenTo = function tweenTo(position, vars) {
+    vars = vars || {};
+
+    var tl = this,
+        endTime = _parsePosition(tl, position),
+        _vars = vars,
+        startAt = _vars.startAt,
+        _onStart = _vars.onStart,
+        onStartParams = _vars.onStartParams,
+        immediateRender = _vars.immediateRender,
+        initted,
+        tween = Tween.to(tl, _setDefaults({
+      ease: vars.ease || "none",
+      lazy: false,
+      immediateRender: false,
+      time: endTime,
+      overwrite: "auto",
+      duration: vars.duration || Math.abs((endTime - (startAt && "time" in startAt ? startAt.time : tl._time)) / tl.timeScale()) || _tinyNum,
+      onStart: function onStart() {
+        tl.pause();
+
+        if (!initted) {
+          var duration = vars.duration || Math.abs((endTime - (startAt && "time" in startAt ? startAt.time : tl._time)) / tl.timeScale());
+          tween._dur !== duration && _setDuration(tween, duration, 0, 1).render(tween._time, true, true);
+          initted = 1;
+        }
+
+        _onStart && _onStart.apply(tween, onStartParams || []); //in case the user had an onStart in the vars - we don't want to overwrite it.
+      }
+    }, vars));
+
+    return immediateRender ? tween.render(0) : tween;
+  };
+
+  _proto2.tweenFromTo = function tweenFromTo(fromPosition, toPosition, vars) {
+    return this.tweenTo(toPosition, _setDefaults({
+      startAt: {
+        time: _parsePosition(this, fromPosition)
+      }
+    }, vars));
+  };
+
+  _proto2.recent = function recent() {
+    return this._recent;
+  };
+
+  _proto2.nextLabel = function nextLabel(afterTime) {
+    if (afterTime === void 0) {
+      afterTime = this._time;
+    }
+
+    return _getLabelInDirection(this, _parsePosition(this, afterTime));
+  };
+
+  _proto2.previousLabel = function previousLabel(beforeTime) {
+    if (beforeTime === void 0) {
+      beforeTime = this._time;
+    }
+
+    return _getLabelInDirection(this, _parsePosition(this, beforeTime), 1);
+  };
+
+  _proto2.currentLabel = function currentLabel(value) {
+    return arguments.length ? this.seek(value, true) : this.previousLabel(this._time + _tinyNum);
+  };
+
+  _proto2.shiftChildren = function shiftChildren(amount, adjustLabels, ignoreBeforeTime) {
+    if (ignoreBeforeTime === void 0) {
+      ignoreBeforeTime = 0;
+    }
+
+    var child = this._first,
+        labels = this.labels,
+        p;
+
+    while (child) {
+      if (child._start >= ignoreBeforeTime) {
+        child._start += amount;
+        child._end += amount;
+      }
+
+      child = child._next;
+    }
+
+    if (adjustLabels) {
+      for (p in labels) {
+        if (labels[p] >= ignoreBeforeTime) {
+          labels[p] += amount;
+        }
+      }
+    }
+
+    return _uncache(this);
+  };
+
+  _proto2.invalidate = function invalidate() {
+    var child = this._first;
+    this._lock = 0;
+
+    while (child) {
+      child.invalidate();
+      child = child._next;
+    }
+
+    return _Animation.prototype.invalidate.call(this);
+  };
+
+  _proto2.clear = function clear(includeLabels) {
+    if (includeLabels === void 0) {
+      includeLabels = true;
+    }
+
+    var child = this._first,
+        next;
+
+    while (child) {
+      next = child._next;
+      this.remove(child);
+      child = next;
+    }
+
+    this._dp && (this._time = this._tTime = this._pTime = 0);
+    includeLabels && (this.labels = {});
+    return _uncache(this);
+  };
+
+  _proto2.totalDuration = function totalDuration(value) {
+    var max = 0,
+        self = this,
+        child = self._last,
+        prevStart = _bigNum,
+        prev,
+        start,
+        parent;
+
+    if (arguments.length) {
+      return self.timeScale((self._repeat < 0 ? self.duration() : self.totalDuration()) / (self.reversed() ? -value : value));
+    }
+
+    if (self._dirty) {
+      parent = self.parent;
+
+      while (child) {
+        prev = child._prev; //record it here in case the tween changes position in the sequence...
+
+        child._dirty && child.totalDuration(); //could change the tween._startTime, so make sure the animation's cache is clean before analyzing it.
+
+        start = child._start;
+
+        if (start > prevStart && self._sort && child._ts && !self._lock) {
+          //in case one of the tweens shifted out of order, it needs to be re-inserted into the correct position in the sequence
+          self._lock = 1; //prevent endless recursive calls - there are methods that get triggered that check duration/totalDuration when we add().
+
+          _addToTimeline(self, child, start - child._delay, 1)._lock = 0;
+        } else {
+          prevStart = start;
+        }
+
+        if (start < 0 && child._ts) {
+          //children aren't allowed to have negative startTimes unless smoothChildTiming is true, so adjust here if one is found.
+          max -= start;
+
+          if (!parent && !self._dp || parent && parent.smoothChildTiming) {
+            self._start += start / self._ts;
+            self._time -= start;
+            self._tTime -= start;
+          }
+
+          self.shiftChildren(-start, false, -1e999);
+          prevStart = 0;
+        }
+
+        child._end > max && child._ts && (max = child._end);
+        child = prev;
+      }
+
+      _setDuration(self, self === _globalTimeline && self._time > max ? self._time : max, 1, 1);
+
+      self._dirty = 0;
+    }
+
+    return self._tDur;
+  };
+
+  Timeline.updateRoot = function updateRoot(time) {
+    if (_globalTimeline._ts) {
+      _lazySafeRender(_globalTimeline, _parentToChildTotalTime(time, _globalTimeline));
+
+      _lastRenderedFrame = _ticker.frame;
+    }
+
+    if (_ticker.frame >= _nextGCFrame) {
+      _nextGCFrame += _config.autoSleep || 120;
+      var child = _globalTimeline._first;
+      if (!child || !child._ts) if (_config.autoSleep && _ticker._listeners.length < 2) {
+        while (child && !child._ts) {
+          child = child._next;
+        }
+
+        child || _ticker.sleep();
+      }
+    }
+  };
+
+  return Timeline;
+}(Animation);
+
+_setDefaults(Timeline.prototype, {
+  _lock: 0,
+  _hasPause: 0,
+  _forcing: 0
+});
+
+var _addComplexStringPropTween = function _addComplexStringPropTween(target, prop, start, end, setter, stringFilter, funcParam) {
+  //note: we call _addComplexStringPropTween.call(tweenInstance...) to ensure that it's scoped properly. We may call it from within a plugin too, thus "this" would refer to the plugin.
+  var pt = new PropTween(this._pt, target, prop, 0, 1, _renderComplexString, null, setter),
+      index = 0,
+      matchIndex = 0,
+      result,
+      startNums,
+      color,
+      endNum,
+      chunk,
+      startNum,
+      hasRandom,
+      a;
+  pt.b = start;
+  pt.e = end;
+  start += ""; //ensure values are strings
+
+  end += "";
+
+  if (hasRandom = ~end.indexOf("random(")) {
+    end = _replaceRandom(end);
+  }
+
+  if (stringFilter) {
+    a = [start, end];
+    stringFilter(a, target, prop); //pass an array with the starting and ending values and let the filter do whatever it needs to the values.
+
+    start = a[0];
+    end = a[1];
+  }
+
+  startNums = start.match(_complexStringNumExp) || [];
+
+  while (result = _complexStringNumExp.exec(end)) {
+    endNum = result[0];
+    chunk = end.substring(index, result.index);
+
+    if (color) {
+      color = (color + 1) % 5;
+    } else if (chunk.substr(-5) === "rgba(") {
+      color = 1;
+    }
+
+    if (endNum !== startNums[matchIndex++]) {
+      startNum = parseFloat(startNums[matchIndex - 1]) || 0; //these nested PropTweens are handled in a special way - we'll never actually call a render or setter method on them. We'll just loop through them in the parent complex string PropTween's render method.
+
+      pt._pt = {
+        _next: pt._pt,
+        p: chunk || matchIndex === 1 ? chunk : ",",
+        //note: SVG spec allows omission of comma/space when a negative sign is wedged between two numbers, like 2.5-5.3 instead of 2.5,-5.3 but when tweening, the negative value may switch to positive, so we insert the comma just in case.
+        s: startNum,
+        c: endNum.charAt(1) === "=" ? parseFloat(endNum.substr(2)) * (endNum.charAt(0) === "-" ? -1 : 1) : parseFloat(endNum) - startNum,
+        m: color && color < 4 ? Math.round : 0
+      };
+      index = _complexStringNumExp.lastIndex;
+    }
+  }
+
+  pt.c = index < end.length ? end.substring(index, end.length) : ""; //we use the "c" of the PropTween to store the final part of the string (after the last number)
+
+  pt.fp = funcParam;
+
+  if (_relExp.test(end) || hasRandom) {
+    pt.e = 0; //if the end string contains relative values or dynamic random(...) values, delete the end it so that on the final render we don't actually set it to the string with += or -= characters (forces it to use the calculated value).
+  }
+
+  this._pt = pt; //start the linked list with this new PropTween. Remember, we call _addComplexStringPropTween.call(tweenInstance...) to ensure that it's scoped properly. We may call it from within a plugin too, thus "this" would refer to the plugin.
+
+  return pt;
+},
+    _addPropTween = function _addPropTween(target, prop, start, end, index, targets, modifier, stringFilter, funcParam) {
+  _isFunction(end) && (end = end(index || 0, target, targets));
+  var currentValue = target[prop],
+      parsedStart = start !== "get" ? start : !_isFunction(currentValue) ? currentValue : funcParam ? target[prop.indexOf("set") || !_isFunction(target["get" + prop.substr(3)]) ? prop : "get" + prop.substr(3)](funcParam) : target[prop](),
+      setter = !_isFunction(currentValue) ? _setterPlain : funcParam ? _setterFuncWithParam : _setterFunc,
+      pt;
+
+  if (_isString(end)) {
+    if (~end.indexOf("random(")) {
+      end = _replaceRandom(end);
+    }
+
+    if (end.charAt(1) === "=") {
+      pt = parseFloat(parsedStart) + parseFloat(end.substr(2)) * (end.charAt(0) === "-" ? -1 : 1) + (getUnit(parsedStart) || 0);
+
+      if (pt || pt === 0) {
+        // to avoid isNaN, like if someone passes in a value like "!= whatever"
+        end = pt;
+      }
+    }
+  }
+
+  if (parsedStart !== end) {
+    if (!isNaN(parsedStart * end) && end !== "") {
+      // fun fact: any number multiplied by "" is evaluated as the number 0!
+      pt = new PropTween(this._pt, target, prop, +parsedStart || 0, end - (parsedStart || 0), typeof currentValue === "boolean" ? _renderBoolean : _renderPlain, 0, setter);
+      funcParam && (pt.fp = funcParam);
+      modifier && pt.modifier(modifier, this, target);
+      return this._pt = pt;
+    }
+
+    !currentValue && !(prop in target) && _missingPlugin(prop, end);
+    return _addComplexStringPropTween.call(this, target, prop, parsedStart, end, setter, stringFilter || _config.stringFilter, funcParam);
+  }
+},
+    //creates a copy of the vars object and processes any function-based values (putting the resulting values directly into the copy) as well as strings with "random()" in them. It does NOT process relative values.
+_processVars = function _processVars(vars, index, target, targets, tween) {
+  _isFunction(vars) && (vars = _parseFuncOrString(vars, tween, index, target, targets));
+
+  if (!_isObject(vars) || vars.style && vars.nodeType || _isArray(vars) || _isTypedArray(vars)) {
+    return _isString(vars) ? _parseFuncOrString(vars, tween, index, target, targets) : vars;
+  }
+
+  var copy = {},
+      p;
+
+  for (p in vars) {
+    copy[p] = _parseFuncOrString(vars[p], tween, index, target, targets);
+  }
+
+  return copy;
+},
+    _checkPlugin = function _checkPlugin(property, vars, tween, index, target, targets) {
+  var plugin, pt, ptLookup, i;
+
+  if (_plugins[property] && (plugin = new _plugins[property]()).init(target, plugin.rawVars ? vars[property] : _processVars(vars[property], index, target, targets, tween), tween, index, targets) !== false) {
+    tween._pt = pt = new PropTween(tween._pt, target, property, 0, 1, plugin.render, plugin, 0, plugin.priority);
+
+    if (tween !== _quickTween) {
+      ptLookup = tween._ptLookup[tween._targets.indexOf(target)]; //note: we can't use tween._ptLookup[index] because for staggered tweens, the index from the fullTargets array won't match what it is in each individual tween that spawns from the stagger.
+
+      i = plugin._props.length;
+
+      while (i--) {
+        ptLookup[plugin._props[i]] = pt;
+      }
+    }
+  }
+
+  return plugin;
+},
+    _overwritingTween,
+    //store a reference temporarily so we can avoid overwriting itself.
+_initTween = function _initTween(tween, time) {
+  var vars = tween.vars,
+      ease = vars.ease,
+      startAt = vars.startAt,
+      immediateRender = vars.immediateRender,
+      lazy = vars.lazy,
+      onUpdate = vars.onUpdate,
+      onUpdateParams = vars.onUpdateParams,
+      callbackScope = vars.callbackScope,
+      runBackwards = vars.runBackwards,
+      yoyoEase = vars.yoyoEase,
+      keyframes = vars.keyframes,
+      autoRevert = vars.autoRevert,
+      dur = tween._dur,
+      prevStartAt = tween._startAt,
+      targets = tween._targets,
+      parent = tween.parent,
+      fullTargets = parent && parent.data === "nested" ? parent.parent._targets : targets,
+      autoOverwrite = tween._overwrite === "auto" && !_suppressOverwrites,
+      tl = tween.timeline,
+      cleanVars,
+      i,
+      p,
+      pt,
+      target,
+      hasPriority,
+      gsData,
+      harness,
+      plugin,
+      ptLookup,
+      index,
+      harnessVars,
+      overwritten;
+  tl && (!keyframes || !ease) && (ease = "none");
+  tween._ease = _parseEase(ease, _defaults.ease);
+  tween._yEase = yoyoEase ? _invertEase(_parseEase(yoyoEase === true ? ease : yoyoEase, _defaults.ease)) : 0;
+
+  if (yoyoEase && tween._yoyo && !tween._repeat) {
+    //there must have been a parent timeline with yoyo:true that is currently in its yoyo phase, so flip the eases.
+    yoyoEase = tween._yEase;
+    tween._yEase = tween._ease;
+    tween._ease = yoyoEase;
+  }
+
+  tween._from = !tl && !!vars.runBackwards; //nested timelines should never run backwards - the backwards-ness is in the child tweens.
+
+  if (!tl || keyframes && !vars.stagger) {
+    //if there's an internal timeline, skip all the parsing because we passed that task down the chain.
+    harness = targets[0] ? _getCache(targets[0]).harness : 0;
+    harnessVars = harness && vars[harness.prop]; //someone may need to specify CSS-specific values AND non-CSS values, like if the element has an "x" property plus it's a standard DOM element. We allow people to distinguish by wrapping plugin-specific stuff in a css:{} object for example.
+
+    cleanVars = _copyExcluding(vars, _reservedProps);
+    prevStartAt && _removeFromParent(prevStartAt.render(-1, true));
+
+    if (startAt) {
+      _removeFromParent(tween._startAt = Tween.set(targets, _setDefaults({
+        data: "isStart",
+        overwrite: false,
+        parent: parent,
+        immediateRender: true,
+        lazy: _isNotFalse(lazy),
+        startAt: null,
+        delay: 0,
+        onUpdate: onUpdate,
+        onUpdateParams: onUpdateParams,
+        callbackScope: callbackScope,
+        stagger: 0
+      }, startAt))); //copy the properties/values into a new object to avoid collisions, like var to = {x:0}, from = {x:500}; timeline.fromTo(e, from, to).fromTo(e, to, from);
+
+
+      time < 0 && !immediateRender && !autoRevert && tween._startAt.render(-1, true); // rare edge case, like if a render is forced in the negative direction of a non-initted tween.
+
+      if (immediateRender) {
+        time > 0 && !autoRevert && (tween._startAt = 0); //tweens that render immediately (like most from() and fromTo() tweens) shouldn't revert when their parent timeline's playhead goes backward past the startTime because the initial render could have happened anytime and it shouldn't be directly correlated to this tween's startTime. Imagine setting up a complex animation where the beginning states of various objects are rendered immediately but the tween doesn't happen for quite some time - if we revert to the starting values as soon as the playhead goes backward past the tween's startTime, it will throw things off visually. Reversion should only happen in Timeline instances where immediateRender was false or when autoRevert is explicitly set to true.
+
+        if (dur && time <= 0) {
+          time && (tween._zTime = time);
+          return; //we skip initialization here so that overwriting doesn't occur until the tween actually begins. Otherwise, if you create several immediateRender:true tweens of the same target/properties to drop into a Timeline, the last one created would overwrite the first ones because they didn't get placed into the timeline yet before the first render occurs and kicks in overwriting.
+        } // if (time > 0) {
+        // 	autoRevert || (tween._startAt = 0); //tweens that render immediately (like most from() and fromTo() tweens) shouldn't revert when their parent timeline's playhead goes backward past the startTime because the initial render could have happened anytime and it shouldn't be directly correlated to this tween's startTime. Imagine setting up a complex animation where the beginning states of various objects are rendered immediately but the tween doesn't happen for quite some time - if we revert to the starting values as soon as the playhead goes backward past the tween's startTime, it will throw things off visually. Reversion should only happen in Timeline instances where immediateRender was false or when autoRevert is explicitly set to true.
+        // } else if (dur && !(time < 0 && prevStartAt)) {
+        // 	time && (tween._zTime = time);
+        // 	return; //we skip initialization here so that overwriting doesn't occur until the tween actually begins. Otherwise, if you create several immediateRender:true tweens of the same target/properties to drop into a Timeline, the last one created would overwrite the first ones because they didn't get placed into the timeline yet before the first render occurs and kicks in overwriting.
+        // }
+
+      } else if (autoRevert === false) {
+        tween._startAt = 0;
+      }
+    } else if (runBackwards && dur) {
+      //from() tweens must be handled uniquely: their beginning values must be rendered but we don't want overwriting to occur yet (when time is still 0). Wait until the tween actually begins before doing all the routines like overwriting. At that time, we should render at the END of the tween to ensure that things initialize correctly (remember, from() tweens go backwards)
+      if (prevStartAt) {
+        !autoRevert && (tween._startAt = 0);
+      } else {
+        time && (immediateRender = false); //in rare cases (like if a from() tween runs and then is invalidate()-ed), immediateRender could be true but the initial forced-render gets skipped, so there's no need to force the render in this context when the _time is greater than 0
+
+        p = _setDefaults({
+          overwrite: false,
+          data: "isFromStart",
+          //we tag the tween with as "isFromStart" so that if [inside a plugin] we need to only do something at the very END of a tween, we have a way of identifying this tween as merely the one that's setting the beginning values for a "from()" tween. For example, clearProps in CSSPlugin should only get applied at the very END of a tween and without this tag, from(...{height:100, clearProps:"height", delay:1}) would wipe the height at the beginning of the tween and after 1 second, it'd kick back in.
+          lazy: immediateRender && _isNotFalse(lazy),
+          immediateRender: immediateRender,
+          //zero-duration tweens render immediately by default, but if we're not specifically instructed to render this tween immediately, we should skip this and merely _init() to record the starting values (rendering them immediately would push them to completion which is wasteful in that case - we'd have to render(-1) immediately after)
+          stagger: 0,
+          parent: parent //ensures that nested tweens that had a stagger are handled properly, like gsap.from(".class", {y:gsap.utils.wrap([-100,100])})
+
+        }, cleanVars);
+        harnessVars && (p[harness.prop] = harnessVars); // in case someone does something like .from(..., {css:{}})
+
+        _removeFromParent(tween._startAt = Tween.set(targets, p));
+
+        time < 0 && tween._startAt.render(-1, true); // rare edge case, like if a render is forced in the negative direction of a non-initted from() tween.
+
+        tween._zTime = time;
+
+        if (!immediateRender) {
+          _initTween(tween._startAt, _tinyNum); //ensures that the initial values are recorded
+
+        } else if (!time) {
+          return;
+        }
+      }
+    }
+
+    tween._pt = 0;
+    lazy = dur && _isNotFalse(lazy) || lazy && !dur;
+
+    for (i = 0; i < targets.length; i++) {
+      target = targets[i];
+      gsData = target._gsap || _harness(targets)[i]._gsap;
+      tween._ptLookup[i] = ptLookup = {};
+      _lazyLookup[gsData.id] && _lazyTweens.length && _lazyRender(); //if other tweens of the same target have recently initted but haven't rendered yet, we've got to force the render so that the starting values are correct (imagine populating a timeline with a bunch of sequential tweens and then jumping to the end)
+
+      index = fullTargets === targets ? i : fullTargets.indexOf(target);
+
+      if (harness && (plugin = new harness()).init(target, harnessVars || cleanVars, tween, index, fullTargets) !== false) {
+        tween._pt = pt = new PropTween(tween._pt, target, plugin.name, 0, 1, plugin.render, plugin, 0, plugin.priority);
+
+        plugin._props.forEach(function (name) {
+          ptLookup[name] = pt;
+        });
+
+        plugin.priority && (hasPriority = 1);
+      }
+
+      if (!harness || harnessVars) {
+        for (p in cleanVars) {
+          if (_plugins[p] && (plugin = _checkPlugin(p, cleanVars, tween, index, target, fullTargets))) {
+            plugin.priority && (hasPriority = 1);
+          } else {
+            ptLookup[p] = pt = _addPropTween.call(tween, target, p, "get", cleanVars[p], index, fullTargets, 0, vars.stringFilter);
+          }
+        }
+      }
+
+      tween._op && tween._op[i] && tween.kill(target, tween._op[i]);
+
+      if (autoOverwrite && tween._pt) {
+        _overwritingTween = tween;
+
+        _globalTimeline.killTweensOf(target, ptLookup, tween.globalTime(time)); // make sure the overwriting doesn't overwrite THIS tween!!!
+
+
+        overwritten = !tween.parent;
+        _overwritingTween = 0;
+      }
+
+      tween._pt && lazy && (_lazyLookup[gsData.id] = 1);
+    }
+
+    hasPriority && _sortPropTweensByPriority(tween);
+    tween._onInit && tween._onInit(tween); //plugins like RoundProps must wait until ALL of the PropTweens are instantiated. In the plugin's init() function, it sets the _onInit on the tween instance. May not be pretty/intuitive, but it's fast and keeps file size down.
+  }
+
+  tween._onUpdate = onUpdate;
+  tween._initted = (!tween._op || tween._pt) && !overwritten; // if overwrittenProps resulted in the entire tween being killed, do NOT flag it as initted or else it may render for one tick.
+
+  keyframes && time <= 0 && tl.render(_bigNum, true, true); // if there's a 0% keyframe, it'll render in the "before" state for any staggered/delayed animations thus when the following tween initializes, it'll use the "before" state instead of the "after" state as the initial values.
+},
+    _addAliasesToVars = function _addAliasesToVars(targets, vars) {
+  var harness = targets[0] ? _getCache(targets[0]).harness : 0,
+      propertyAliases = harness && harness.aliases,
+      copy,
+      p,
+      i,
+      aliases;
+
+  if (!propertyAliases) {
+    return vars;
+  }
+
+  copy = _merge({}, vars);
+
+  for (p in propertyAliases) {
+    if (p in copy) {
+      aliases = propertyAliases[p].split(",");
+      i = aliases.length;
+
+      while (i--) {
+        copy[aliases[i]] = copy[p];
+      }
+    }
+  }
+
+  return copy;
+},
+    // parses multiple formats, like {"0%": {x: 100}, {"50%": {x: -20}} and { x: {"0%": 100, "50%": -20} }, and an "ease" can be set on any object. We populate an "allProps" object with an Array for each property, like {x: [{}, {}], y:[{}, {}]} with data for each property tween. The objects have a "t" (time), "v", (value), and "e" (ease) property. This allows us to piece together a timeline later.
+_parseKeyframe = function _parseKeyframe(prop, obj, allProps, easeEach) {
+  var ease = obj.ease || easeEach || "power1.inOut",
+      p,
+      a;
+
+  if (_isArray(obj)) {
+    a = allProps[prop] || (allProps[prop] = []); // t = time (out of 100), v = value, e = ease
+
+    obj.forEach(function (value, i) {
+      return a.push({
+        t: i / (obj.length - 1) * 100,
+        v: value,
+        e: ease
+      });
+    });
+  } else {
+    for (p in obj) {
+      a = allProps[p] || (allProps[p] = []);
+      p === "ease" || a.push({
+        t: parseFloat(prop),
+        v: obj[p],
+        e: ease
+      });
+    }
+  }
+},
+    _parseFuncOrString = function _parseFuncOrString(value, tween, i, target, targets) {
+  return _isFunction(value) ? value.call(tween, i, target, targets) : _isString(value) && ~value.indexOf("random(") ? _replaceRandom(value) : value;
+},
+    _staggerTweenProps = _callbackNames + "repeat,repeatDelay,yoyo,repeatRefresh,yoyoEase",
+    _staggerPropsToSkip = {};
+
+_forEachName(_staggerTweenProps + ",id,stagger,delay,duration,paused,scrollTrigger", function (name) {
+  return _staggerPropsToSkip[name] = 1;
+});
+/*
+ * --------------------------------------------------------------------------------------
+ * TWEEN
+ * --------------------------------------------------------------------------------------
+ */
+
+
+var Tween = /*#__PURE__*/function (_Animation2) {
+  _inheritsLoose(Tween, _Animation2);
+
+  function Tween(targets, vars, position, skipInherit) {
+    var _this3;
+
+    if (typeof vars === "number") {
+      position.duration = vars;
+      vars = position;
+      position = null;
+    }
+
+    _this3 = _Animation2.call(this, skipInherit ? vars : _inheritDefaults(vars)) || this;
+    var _this3$vars = _this3.vars,
+        duration = _this3$vars.duration,
+        delay = _this3$vars.delay,
+        immediateRender = _this3$vars.immediateRender,
+        stagger = _this3$vars.stagger,
+        overwrite = _this3$vars.overwrite,
+        keyframes = _this3$vars.keyframes,
+        defaults = _this3$vars.defaults,
+        scrollTrigger = _this3$vars.scrollTrigger,
+        yoyoEase = _this3$vars.yoyoEase,
+        parent = vars.parent || _globalTimeline,
+        parsedTargets = (_isArray(targets) || _isTypedArray(targets) ? _isNumber(targets[0]) : "length" in vars) ? [targets] : toArray(targets),
+        tl,
+        i,
+        copy,
+        l,
+        p,
+        curTarget,
+        staggerFunc,
+        staggerVarsToMerge;
+    _this3._targets = parsedTargets.length ? _harness(parsedTargets) : _warn("GSAP target " + targets + " not found. https://greensock.com", !_config.nullTargetWarn) || [];
+    _this3._ptLookup = []; //PropTween lookup. An array containing an object for each target, having keys for each tweening property
+
+    _this3._overwrite = overwrite;
+
+    if (keyframes || stagger || _isFuncOrString(duration) || _isFuncOrString(delay)) {
+      vars = _this3.vars;
+      tl = _this3.timeline = new Timeline({
+        data: "nested",
+        defaults: defaults || {}
+      });
+      tl.kill();
+      tl.parent = tl._dp = _assertThisInitialized(_this3);
+      tl._start = 0;
+
+      if (stagger || _isFuncOrString(duration) || _isFuncOrString(delay)) {
+        l = parsedTargets.length;
+        staggerFunc = stagger && distribute(stagger);
+
+        if (_isObject(stagger)) {
+          //users can pass in callbacks like onStart/onComplete in the stagger object. These should fire with each individual tween.
+          for (p in stagger) {
+            if (~_staggerTweenProps.indexOf(p)) {
+              staggerVarsToMerge || (staggerVarsToMerge = {});
+              staggerVarsToMerge[p] = stagger[p];
+            }
+          }
+        }
+
+        for (i = 0; i < l; i++) {
+          copy = _copyExcluding(vars, _staggerPropsToSkip);
+          copy.stagger = 0;
+          yoyoEase && (copy.yoyoEase = yoyoEase);
+          staggerVarsToMerge && _merge(copy, staggerVarsToMerge);
+          curTarget = parsedTargets[i]; //don't just copy duration or delay because if they're a string or function, we'd end up in an infinite loop because _isFuncOrString() would evaluate as true in the child tweens, entering this loop, etc. So we parse the value straight from vars and default to 0.
+
+          copy.duration = +_parseFuncOrString(duration, _assertThisInitialized(_this3), i, curTarget, parsedTargets);
+          copy.delay = (+_parseFuncOrString(delay, _assertThisInitialized(_this3), i, curTarget, parsedTargets) || 0) - _this3._delay;
+
+          if (!stagger && l === 1 && copy.delay) {
+            // if someone does delay:"random(1, 5)", repeat:-1, for example, the delay shouldn't be inside the repeat.
+            _this3._delay = delay = copy.delay;
+            _this3._start += delay;
+            copy.delay = 0;
+          }
+
+          tl.to(curTarget, copy, staggerFunc ? staggerFunc(i, curTarget, parsedTargets) : 0);
+          tl._ease = _easeMap.none;
+        }
+
+        tl.duration() ? duration = delay = 0 : _this3.timeline = 0; // if the timeline's duration is 0, we don't need a timeline internally!
+      } else if (keyframes) {
+        _inheritDefaults(_setDefaults(tl.vars.defaults, {
+          ease: "none"
+        }));
+
+        tl._ease = _parseEase(keyframes.ease || vars.ease || "none");
+        var time = 0,
+            a,
+            kf,
+            v;
+
+        if (_isArray(keyframes)) {
+          keyframes.forEach(function (frame) {
+            return tl.to(parsedTargets, frame, ">");
+          });
+        } else {
+          copy = {};
+
+          for (p in keyframes) {
+            p === "ease" || p === "easeEach" || _parseKeyframe(p, keyframes[p], copy, keyframes.easeEach);
+          }
+
+          for (p in copy) {
+            a = copy[p].sort(function (a, b) {
+              return a.t - b.t;
+            });
+            time = 0;
+
+            for (i = 0; i < a.length; i++) {
+              kf = a[i];
+              v = {
+                ease: kf.e,
+                duration: (kf.t - (i ? a[i - 1].t : 0)) / 100 * duration
+              };
+              v[p] = kf.v;
+              tl.to(parsedTargets, v, time);
+              time += v.duration;
+            }
+          }
+
+          tl.duration() < duration && tl.to({}, {
+            duration: duration - tl.duration()
+          }); // in case keyframes didn't go to 100%
+        }
+      }
+
+      duration || _this3.duration(duration = tl.duration());
+    } else {
+      _this3.timeline = 0; //speed optimization, faster lookups (no going up the prototype chain)
+    }
+
+    if (overwrite === true && !_suppressOverwrites) {
+      _overwritingTween = _assertThisInitialized(_this3);
+
+      _globalTimeline.killTweensOf(parsedTargets);
+
+      _overwritingTween = 0;
+    }
+
+    _addToTimeline(parent, _assertThisInitialized(_this3), position);
+
+    vars.reversed && _this3.reverse();
+    vars.paused && _this3.paused(true);
+
+    if (immediateRender || !duration && !keyframes && _this3._start === _roundPrecise(parent._time) && _isNotFalse(immediateRender) && _hasNoPausedAncestors(_assertThisInitialized(_this3)) && parent.data !== "nested") {
+      _this3._tTime = -_tinyNum; //forces a render without having to set the render() "force" parameter to true because we want to allow lazying by default (using the "force" parameter always forces an immediate full render)
+
+      _this3.render(Math.max(0, -delay)); //in case delay is negative
+
+    }
+
+    scrollTrigger && _scrollTrigger(_assertThisInitialized(_this3), scrollTrigger);
+    return _this3;
+  }
+
+  var _proto3 = Tween.prototype;
+
+  _proto3.render = function render(totalTime, suppressEvents, force) {
+    var prevTime = this._time,
+        tDur = this._tDur,
+        dur = this._dur,
+        tTime = totalTime > tDur - _tinyNum && totalTime >= 0 ? tDur : totalTime < _tinyNum ? 0 : totalTime,
+        time,
+        pt,
+        iteration,
+        cycleDuration,
+        prevIteration,
+        isYoyo,
+        ratio,
+        timeline,
+        yoyoEase;
+
+    if (!dur) {
+      _renderZeroDurationTween(this, totalTime, suppressEvents, force);
+    } else if (tTime !== this._tTime || !totalTime || force || !this._initted && this._tTime || this._startAt && this._zTime < 0 !== totalTime < 0) {
+      //this senses if we're crossing over the start time, in which case we must record _zTime and force the render, but we do it in this lengthy conditional way for performance reasons (usually we can skip the calculations): this._initted && (this._zTime < 0) !== (totalTime < 0)
+      time = tTime;
+      timeline = this.timeline;
+
+      if (this._repeat) {
+        //adjust the time for repeats and yoyos
+        cycleDuration = dur + this._rDelay;
+
+        if (this._repeat < -1 && totalTime < 0) {
+          return this.totalTime(cycleDuration * 100 + totalTime, suppressEvents, force);
+        }
+
+        time = _roundPrecise(tTime % cycleDuration); //round to avoid floating point errors. (4 % 0.8 should be 0 but some browsers report it as 0.79999999!)
+
+        if (tTime === tDur) {
+          // the tDur === tTime is for edge cases where there's a lengthy decimal on the duration and it may reach the very end but the time is rendered as not-quite-there (remember, tDur is rounded to 4 decimals whereas dur isn't)
+          iteration = this._repeat;
+          time = dur;
+        } else {
+          iteration = ~~(tTime / cycleDuration);
+
+          if (iteration && iteration === tTime / cycleDuration) {
+            time = dur;
+            iteration--;
+          }
+
+          time > dur && (time = dur);
+        }
+
+        isYoyo = this._yoyo && iteration & 1;
+
+        if (isYoyo) {
+          yoyoEase = this._yEase;
+          time = dur - time;
+        }
+
+        prevIteration = _animationCycle(this._tTime, cycleDuration);
+
+        if (time === prevTime && !force && this._initted) {
+          //could be during the repeatDelay part. No need to render and fire callbacks.
+          return this;
+        }
+
+        if (iteration !== prevIteration) {
+          timeline && this._yEase && _propagateYoyoEase(timeline, isYoyo); //repeatRefresh functionality
+
+          if (this.vars.repeatRefresh && !isYoyo && !this._lock) {
+            this._lock = force = 1; //force, otherwise if lazy is true, the _attemptInitTween() will return and we'll jump out and get caught bouncing on each tick.
+
+            this.render(_roundPrecise(cycleDuration * iteration), true).invalidate()._lock = 0;
+          }
+        }
+      }
+
+      if (!this._initted) {
+        if (_attemptInitTween(this, totalTime < 0 ? totalTime : time, force, suppressEvents)) {
+          this._tTime = 0; // in constructor if immediateRender is true, we set _tTime to -_tinyNum to have the playhead cross the starting point but we can't leave _tTime as a negative number.
+
+          return this;
+        }
+
+        if (dur !== this._dur) {
+          // while initting, a plugin like InertiaPlugin might alter the duration, so rerun from the start to ensure everything renders as it should.
+          return this.render(totalTime, suppressEvents, force);
+        }
+      }
+
+      this._tTime = tTime;
+      this._time = time;
+
+      if (!this._act && this._ts) {
+        this._act = 1; //as long as it's not paused, force it to be active so that if the user renders independent of the parent timeline, it'll be forced to re-render on the next tick.
+
+        this._lazy = 0;
+      }
+
+      this.ratio = ratio = (yoyoEase || this._ease)(time / dur);
+
+      if (this._from) {
+        this.ratio = ratio = 1 - ratio;
+      }
+
+      if (time && !prevTime && !suppressEvents) {
+        _callback(this, "onStart");
+
+        if (this._tTime !== tTime) {
+          // in case the onStart triggered a render at a different spot, eject. Like if someone did animation.pause(0.5) or something inside the onStart.
+          return this;
+        }
+      }
+
+      pt = this._pt;
+
+      while (pt) {
+        pt.r(ratio, pt.d);
+        pt = pt._next;
+      }
+
+      timeline && timeline.render(totalTime < 0 ? totalTime : !time && isYoyo ? -_tinyNum : timeline._dur * timeline._ease(time / this._dur), suppressEvents, force) || this._startAt && (this._zTime = totalTime);
+
+      if (this._onUpdate && !suppressEvents) {
+        totalTime < 0 && this._startAt && this._startAt.render(totalTime, true, force); //note: for performance reasons, we tuck this conditional logic inside less traveled areas (most tweens don't have an onUpdate). We'd just have it at the end before the onComplete, but the values should be updated before any onUpdate is called, so we ALSO put it here and then if it's not called, we do so later near the onComplete.
+
+        _callback(this, "onUpdate");
+      }
+
+      this._repeat && iteration !== prevIteration && this.vars.onRepeat && !suppressEvents && this.parent && _callback(this, "onRepeat");
+
+      if ((tTime === this._tDur || !tTime) && this._tTime === tTime) {
+        totalTime < 0 && this._startAt && !this._onUpdate && this._startAt.render(totalTime, true, true);
+        (totalTime || !dur) && (tTime === this._tDur && this._ts > 0 || !tTime && this._ts < 0) && _removeFromParent(this, 1); // don't remove if we're rendering at exactly a time of 0, as there could be autoRevert values that should get set on the next tick (if the playhead goes backward beyond the startTime, negative totalTime). Don't remove if the timeline is reversed and the playhead isn't at 0, otherwise tl.progress(1).reverse() won't work. Only remove if the playhead is at the end and timeScale is positive, or if the playhead is at 0 and the timeScale is negative.
+
+        if (!suppressEvents && !(totalTime < 0 && !prevTime) && (tTime || prevTime)) {
+          // if prevTime and tTime are zero, we shouldn't fire the onReverseComplete. This could happen if you gsap.to(... {paused:true}).play();
+          _callback(this, tTime === tDur ? "onComplete" : "onReverseComplete", true);
+
+          this._prom && !(tTime < tDur && this.timeScale() > 0) && this._prom();
+        }
+      }
+    }
+
+    return this;
+  };
+
+  _proto3.targets = function targets() {
+    return this._targets;
+  };
+
+  _proto3.invalidate = function invalidate() {
+    this._pt = this._op = this._startAt = this._onUpdate = this._lazy = this.ratio = 0;
+    this._ptLookup = [];
+    this.timeline && this.timeline.invalidate();
+    return _Animation2.prototype.invalidate.call(this);
+  };
+
+  _proto3.kill = function kill(targets, vars) {
+    if (vars === void 0) {
+      vars = "all";
+    }
+
+    if (!targets && (!vars || vars === "all")) {
+      this._lazy = this._pt = 0;
+      return this.parent ? _interrupt(this) : this;
+    }
+
+    if (this.timeline) {
+      var tDur = this.timeline.totalDuration();
+      this.timeline.killTweensOf(targets, vars, _overwritingTween && _overwritingTween.vars.overwrite !== true)._first || _interrupt(this); // if nothing is left tweening, interrupt.
+
+      this.parent && tDur !== this.timeline.totalDuration() && _setDuration(this, this._dur * this.timeline._tDur / tDur, 0, 1); // if a nested tween is killed that changes the duration, it should affect this tween's duration. We must use the ratio, though, because sometimes the internal timeline is stretched like for keyframes where they don't all add up to whatever the parent tween's duration was set to.
+
+      return this;
+    }
+
+    var parsedTargets = this._targets,
+        killingTargets = targets ? toArray(targets) : parsedTargets,
+        propTweenLookup = this._ptLookup,
+        firstPT = this._pt,
+        overwrittenProps,
+        curLookup,
+        curOverwriteProps,
+        props,
+        p,
+        pt,
+        i;
+
+    if ((!vars || vars === "all") && _arraysMatch(parsedTargets, killingTargets)) {
+      vars === "all" && (this._pt = 0);
+      return _interrupt(this);
+    }
+
+    overwrittenProps = this._op = this._op || [];
+
+    if (vars !== "all") {
+      //so people can pass in a comma-delimited list of property names
+      if (_isString(vars)) {
+        p = {};
+
+        _forEachName(vars, function (name) {
+          return p[name] = 1;
+        });
+
+        vars = p;
+      }
+
+      vars = _addAliasesToVars(parsedTargets, vars);
+    }
+
+    i = parsedTargets.length;
+
+    while (i--) {
+      if (~killingTargets.indexOf(parsedTargets[i])) {
+        curLookup = propTweenLookup[i];
+
+        if (vars === "all") {
+          overwrittenProps[i] = vars;
+          props = curLookup;
+          curOverwriteProps = {};
+        } else {
+          curOverwriteProps = overwrittenProps[i] = overwrittenProps[i] || {};
+          props = vars;
+        }
+
+        for (p in props) {
+          pt = curLookup && curLookup[p];
+
+          if (pt) {
+            if (!("kill" in pt.d) || pt.d.kill(p) === true) {
+              _removeLinkedListItem(this, pt, "_pt");
+            }
+
+            delete curLookup[p];
+          }
+
+          if (curOverwriteProps !== "all") {
+            curOverwriteProps[p] = 1;
+          }
+        }
+      }
+    }
+
+    this._initted && !this._pt && firstPT && _interrupt(this); //if all tweening properties are killed, kill the tween. Without this line, if there's a tween with multiple targets and then you killTweensOf() each target individually, the tween would technically still remain active and fire its onComplete even though there aren't any more properties tweening.
+
+    return this;
+  };
+
+  Tween.to = function to(targets, vars) {
+    return new Tween(targets, vars, arguments[2]);
+  };
+
+  Tween.from = function from(targets, vars) {
+    return _createTweenType(1, arguments);
+  };
+
+  Tween.delayedCall = function delayedCall(delay, callback, params, scope) {
+    return new Tween(callback, 0, {
+      immediateRender: false,
+      lazy: false,
+      overwrite: false,
+      delay: delay,
+      onComplete: callback,
+      onReverseComplete: callback,
+      onCompleteParams: params,
+      onReverseCompleteParams: params,
+      callbackScope: scope
+    });
+  };
+
+  Tween.fromTo = function fromTo(targets, fromVars, toVars) {
+    return _createTweenType(2, arguments);
+  };
+
+  Tween.set = function set(targets, vars) {
+    vars.duration = 0;
+    vars.repeatDelay || (vars.repeat = 0);
+    return new Tween(targets, vars);
+  };
+
+  Tween.killTweensOf = function killTweensOf(targets, props, onlyActive) {
+    return _globalTimeline.killTweensOf(targets, props, onlyActive);
+  };
+
+  return Tween;
+}(Animation);
+
+_setDefaults(Tween.prototype, {
+  _targets: [],
+  _lazy: 0,
+  _startAt: 0,
+  _op: 0,
+  _onInit: 0
+}); //add the pertinent timeline methods to Tween instances so that users can chain conveniently and create a timeline automatically. (removed due to concerns that it'd ultimately add to more confusion especially for beginners)
+// _forEachName("to,from,fromTo,set,call,add,addLabel,addPause", name => {
+// 	Tween.prototype[name] = function() {
+// 		let tl = new Timeline();
+// 		return _addToTimeline(tl, this)[name].apply(tl, toArray(arguments));
+// 	}
+// });
+//for backward compatibility. Leverage the timeline calls.
+
+
+_forEachName("staggerTo,staggerFrom,staggerFromTo", function (name) {
+  Tween[name] = function () {
+    var tl = new Timeline(),
+        params = _slice.call(arguments, 0);
+
+    params.splice(name === "staggerFromTo" ? 5 : 4, 0, 0);
+    return tl[name].apply(tl, params);
+  };
+});
+/*
+ * --------------------------------------------------------------------------------------
+ * PROPTWEEN
+ * --------------------------------------------------------------------------------------
+ */
+
+
+var _setterPlain = function _setterPlain(target, property, value) {
+  return target[property] = value;
+},
+    _setterFunc = function _setterFunc(target, property, value) {
+  return target[property](value);
+},
+    _setterFuncWithParam = function _setterFuncWithParam(target, property, value, data) {
+  return target[property](data.fp, value);
+},
+    _setterAttribute = function _setterAttribute(target, property, value) {
+  return target.setAttribute(property, value);
+},
+    _getSetter = function _getSetter(target, property) {
+  return _isFunction(target[property]) ? _setterFunc : _isUndefined(target[property]) && target.setAttribute ? _setterAttribute : _setterPlain;
+},
+    _renderPlain = function _renderPlain(ratio, data) {
+  return data.set(data.t, data.p, Math.round((data.s + data.c * ratio) * 1000000) / 1000000, data);
+},
+    _renderBoolean = function _renderBoolean(ratio, data) {
+  return data.set(data.t, data.p, !!(data.s + data.c * ratio), data);
+},
+    _renderComplexString = function _renderComplexString(ratio, data) {
+  var pt = data._pt,
+      s = "";
+
+  if (!ratio && data.b) {
+    //b = beginning string
+    s = data.b;
+  } else if (ratio === 1 && data.e) {
+    //e = ending string
+    s = data.e;
+  } else {
+    while (pt) {
+      s = pt.p + (pt.m ? pt.m(pt.s + pt.c * ratio) : Math.round((pt.s + pt.c * ratio) * 10000) / 10000) + s; //we use the "p" property for the text inbetween (like a suffix). And in the context of a complex string, the modifier (m) is typically just Math.round(), like for RGB colors.
+
+      pt = pt._next;
+    }
+
+    s += data.c; //we use the "c" of the PropTween to store the final chunk of non-numeric text.
+  }
+
+  data.set(data.t, data.p, s, data);
+},
+    _renderPropTweens = function _renderPropTweens(ratio, data) {
+  var pt = data._pt;
+
+  while (pt) {
+    pt.r(ratio, pt.d);
+    pt = pt._next;
+  }
+},
+    _addPluginModifier = function _addPluginModifier(modifier, tween, target, property) {
+  var pt = this._pt,
+      next;
+
+  while (pt) {
+    next = pt._next;
+    pt.p === property && pt.modifier(modifier, tween, target);
+    pt = next;
+  }
+},
+    _killPropTweensOf = function _killPropTweensOf(property) {
+  var pt = this._pt,
+      hasNonDependentRemaining,
+      next;
+
+  while (pt) {
+    next = pt._next;
+
+    if (pt.p === property && !pt.op || pt.op === property) {
+      _removeLinkedListItem(this, pt, "_pt");
+    } else if (!pt.dep) {
+      hasNonDependentRemaining = 1;
+    }
+
+    pt = next;
+  }
+
+  return !hasNonDependentRemaining;
+},
+    _setterWithModifier = function _setterWithModifier(target, property, value, data) {
+  data.mSet(target, property, data.m.call(data.tween, value, data.mt), data);
+},
+    _sortPropTweensByPriority = function _sortPropTweensByPriority(parent) {
+  var pt = parent._pt,
+      next,
+      pt2,
+      first,
+      last; //sorts the PropTween linked list in order of priority because some plugins need to do their work after ALL of the PropTweens were created (like RoundPropsPlugin and ModifiersPlugin)
+
+  while (pt) {
+    next = pt._next;
+    pt2 = first;
+
+    while (pt2 && pt2.pr > pt.pr) {
+      pt2 = pt2._next;
+    }
+
+    if (pt._prev = pt2 ? pt2._prev : last) {
+      pt._prev._next = pt;
+    } else {
+      first = pt;
+    }
+
+    if (pt._next = pt2) {
+      pt2._prev = pt;
+    } else {
+      last = pt;
+    }
+
+    pt = next;
+  }
+
+  parent._pt = first;
+}; //PropTween key: t = target, p = prop, r = renderer, d = data, s = start, c = change, op = overwriteProperty (ONLY populated when it's different than p), pr = priority, _next/_prev for the linked list siblings, set = setter, m = modifier, mSet = modifierSetter (the original setter, before a modifier was added)
+
+
+var PropTween = /*#__PURE__*/function () {
+  function PropTween(next, target, prop, start, change, renderer, data, setter, priority) {
+    this.t = target;
+    this.s = start;
+    this.c = change;
+    this.p = prop;
+    this.r = renderer || _renderPlain;
+    this.d = data || this;
+    this.set = setter || _setterPlain;
+    this.pr = priority || 0;
+    this._next = next;
+
+    if (next) {
+      next._prev = this;
+    }
+  }
+
+  var _proto4 = PropTween.prototype;
+
+  _proto4.modifier = function modifier(func, tween, target) {
+    this.mSet = this.mSet || this.set; //in case it was already set (a PropTween can only have one modifier)
+
+    this.set = _setterWithModifier;
+    this.m = func;
+    this.mt = target; //modifier target
+
+    this.tween = tween;
+  };
+
+  return PropTween;
+}(); //Initialization tasks
+
+_forEachName(_callbackNames + "parent,duration,ease,delay,overwrite,runBackwards,startAt,yoyo,immediateRender,repeat,repeatDelay,data,paused,reversed,lazy,callbackScope,stringFilter,id,yoyoEase,stagger,inherit,repeatRefresh,keyframes,autoRevert,scrollTrigger", function (name) {
+  return _reservedProps[name] = 1;
+});
+
+_globals.TweenMax = _globals.TweenLite = Tween;
+_globals.TimelineLite = _globals.TimelineMax = Timeline;
+_globalTimeline = new Timeline({
+  sortChildren: false,
+  defaults: _defaults,
+  autoRemoveChildren: true,
+  id: "root",
+  smoothChildTiming: true
+});
+_config.stringFilter = _colorStringFilter;
+/*
+ * --------------------------------------------------------------------------------------
+ * GSAP
+ * --------------------------------------------------------------------------------------
+ */
+
+var _gsap = {
+  registerPlugin: function registerPlugin() {
+    for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+      args[_key2] = arguments[_key2];
+    }
+
+    args.forEach(function (config) {
+      return _createPlugin(config);
+    });
+  },
+  timeline: function timeline(vars) {
+    return new Timeline(vars);
+  },
+  getTweensOf: function getTweensOf(targets, onlyActive) {
+    return _globalTimeline.getTweensOf(targets, onlyActive);
+  },
+  getProperty: function getProperty(target, property, unit, uncache) {
+    _isString(target) && (target = toArray(target)[0]); //in case selector text or an array is passed in
+
+    var getter = _getCache(target || {}).get,
+        format = unit ? _passThrough : _numericIfPossible;
+
+    unit === "native" && (unit = "");
+    return !target ? target : !property ? function (property, unit, uncache) {
+      return format((_plugins[property] && _plugins[property].get || getter)(target, property, unit, uncache));
+    } : format((_plugins[property] && _plugins[property].get || getter)(target, property, unit, uncache));
+  },
+  quickSetter: function quickSetter(target, property, unit) {
+    target = toArray(target);
+
+    if (target.length > 1) {
+      var setters = target.map(function (t) {
+        return gsap.quickSetter(t, property, unit);
+      }),
+          l = setters.length;
+      return function (value) {
+        var i = l;
+
+        while (i--) {
+          setters[i](value);
+        }
+      };
+    }
+
+    target = target[0] || {};
+
+    var Plugin = _plugins[property],
+        cache = _getCache(target),
+        p = cache.harness && (cache.harness.aliases || {})[property] || property,
+        // in case it's an alias, like "rotate" for "rotation".
+    setter = Plugin ? function (value) {
+      var p = new Plugin();
+      _quickTween._pt = 0;
+      p.init(target, unit ? value + unit : value, _quickTween, 0, [target]);
+      p.render(1, p);
+      _quickTween._pt && _renderPropTweens(1, _quickTween);
+    } : cache.set(target, p);
+
+    return Plugin ? setter : function (value) {
+      return setter(target, p, unit ? value + unit : value, cache, 1);
+    };
+  },
+  isTweening: function isTweening(targets) {
+    return _globalTimeline.getTweensOf(targets, true).length > 0;
+  },
+  defaults: function defaults(value) {
+    value && value.ease && (value.ease = _parseEase(value.ease, _defaults.ease));
+    return _mergeDeep(_defaults, value || {});
+  },
+  config: function config(value) {
+    return _mergeDeep(_config, value || {});
+  },
+  registerEffect: function registerEffect(_ref3) {
+    var name = _ref3.name,
+        effect = _ref3.effect,
+        plugins = _ref3.plugins,
+        defaults = _ref3.defaults,
+        extendTimeline = _ref3.extendTimeline;
+    (plugins || "").split(",").forEach(function (pluginName) {
+      return pluginName && !_plugins[pluginName] && !_globals[pluginName] && _warn(name + " effect requires " + pluginName + " plugin.");
+    });
+
+    _effects[name] = function (targets, vars, tl) {
+      return effect(toArray(targets), _setDefaults(vars || {}, defaults), tl);
+    };
+
+    if (extendTimeline) {
+      Timeline.prototype[name] = function (targets, vars, position) {
+        return this.add(_effects[name](targets, _isObject(vars) ? vars : (position = vars) && {}, this), position);
+      };
+    }
+  },
+  registerEase: function registerEase(name, ease) {
+    _easeMap[name] = _parseEase(ease);
+  },
+  parseEase: function parseEase(ease, defaultEase) {
+    return arguments.length ? _parseEase(ease, defaultEase) : _easeMap;
+  },
+  getById: function getById(id) {
+    return _globalTimeline.getById(id);
+  },
+  exportRoot: function exportRoot(vars, includeDelayedCalls) {
+    if (vars === void 0) {
+      vars = {};
+    }
+
+    var tl = new Timeline(vars),
+        child,
+        next;
+    tl.smoothChildTiming = _isNotFalse(vars.smoothChildTiming);
+
+    _globalTimeline.remove(tl);
+
+    tl._dp = 0; //otherwise it'll get re-activated when adding children and be re-introduced into _globalTimeline's linked list (then added to itself).
+
+    tl._time = tl._tTime = _globalTimeline._time;
+    child = _globalTimeline._first;
+
+    while (child) {
+      next = child._next;
+
+      if (includeDelayedCalls || !(!child._dur && child instanceof Tween && child.vars.onComplete === child._targets[0])) {
+        _addToTimeline(tl, child, child._start - child._delay);
+      }
+
+      child = next;
+    }
+
+    _addToTimeline(_globalTimeline, tl, 0);
+
+    return tl;
+  },
+  utils: {
+    wrap: wrap,
+    wrapYoyo: wrapYoyo,
+    distribute: distribute,
+    random: random,
+    snap: snap,
+    normalize: normalize,
+    getUnit: getUnit,
+    clamp: clamp,
+    splitColor: splitColor,
+    toArray: toArray,
+    selector: selector,
+    mapRange: mapRange,
+    pipe: pipe,
+    unitize: unitize,
+    interpolate: interpolate,
+    shuffle: shuffle
+  },
+  install: _install,
+  effects: _effects,
+  ticker: _ticker,
+  updateRoot: Timeline.updateRoot,
+  plugins: _plugins,
+  globalTimeline: _globalTimeline,
+  core: {
+    PropTween: PropTween,
+    globals: _addGlobal,
+    Tween: Tween,
+    Timeline: Timeline,
+    Animation: Animation,
+    getCache: _getCache,
+    _removeLinkedListItem: _removeLinkedListItem,
+    suppressOverwrites: function suppressOverwrites(value) {
+      return _suppressOverwrites = value;
+    }
+  }
+};
+
+_forEachName("to,from,fromTo,delayedCall,set,killTweensOf", function (name) {
+  return _gsap[name] = Tween[name];
+});
+
+_ticker.add(Timeline.updateRoot);
+
+_quickTween = _gsap.to({}, {
+  duration: 0
+}); // ---- EXTRA PLUGINS --------------------------------------------------------
+
+var _getPluginPropTween = function _getPluginPropTween(plugin, prop) {
+  var pt = plugin._pt;
+
+  while (pt && pt.p !== prop && pt.op !== prop && pt.fp !== prop) {
+    pt = pt._next;
+  }
+
+  return pt;
+},
+    _addModifiers = function _addModifiers(tween, modifiers) {
+  var targets = tween._targets,
+      p,
+      i,
+      pt;
+
+  for (p in modifiers) {
+    i = targets.length;
+
+    while (i--) {
+      pt = tween._ptLookup[i][p];
+
+      if (pt && (pt = pt.d)) {
+        if (pt._pt) {
+          // is a plugin
+          pt = _getPluginPropTween(pt, p);
+        }
+
+        pt && pt.modifier && pt.modifier(modifiers[p], tween, targets[i], p);
+      }
+    }
+  }
+},
+    _buildModifierPlugin = function _buildModifierPlugin(name, modifier) {
+  return {
+    name: name,
+    rawVars: 1,
+    //don't pre-process function-based values or "random()" strings.
+    init: function init(target, vars, tween) {
+      tween._onInit = function (tween) {
+        var temp, p;
+
+        if (_isString(vars)) {
+          temp = {};
+
+          _forEachName(vars, function (name) {
+            return temp[name] = 1;
+          }); //if the user passes in a comma-delimited list of property names to roundProps, like "x,y", we round to whole numbers.
+
+
+          vars = temp;
+        }
+
+        if (modifier) {
+          temp = {};
+
+          for (p in vars) {
+            temp[p] = modifier(vars[p]);
+          }
+
+          vars = temp;
+        }
+
+        _addModifiers(tween, vars);
+      };
+    }
+  };
+}; //register core plugins
+
+
+var gsap = _gsap.registerPlugin({
+  name: "attr",
+  init: function init(target, vars, tween, index, targets) {
+    var p, pt;
+
+    for (p in vars) {
+      pt = this.add(target, "setAttribute", (target.getAttribute(p) || 0) + "", vars[p], index, targets, 0, 0, p);
+      pt && (pt.op = p);
+
+      this._props.push(p);
+    }
+  }
+}, {
+  name: "endArray",
+  init: function init(target, value) {
+    var i = value.length;
+
+    while (i--) {
+      this.add(target, i, target[i] || 0, value[i]);
+    }
+  }
+}, _buildModifierPlugin("roundProps", _roundModifier), _buildModifierPlugin("modifiers"), _buildModifierPlugin("snap", snap)) || _gsap; //to prevent the core plugins from being dropped via aggressive tree shaking, we must include them in the variable declaration in this way.
+
+Tween.version = Timeline.version = gsap.version = "3.9.1";
+_coreReady = 1;
+_windowExists() && _wake();
+var Power0 = _easeMap.Power0,
+    Power1 = _easeMap.Power1,
+    Power2 = _easeMap.Power2,
+    Power3 = _easeMap.Power3,
+    Power4 = _easeMap.Power4,
+    Linear = _easeMap.Linear,
+    Quad = _easeMap.Quad,
+    Cubic = _easeMap.Cubic,
+    Quart = _easeMap.Quart,
+    Quint = _easeMap.Quint,
+    Strong = _easeMap.Strong,
+    Elastic = _easeMap.Elastic,
+    Back = _easeMap.Back,
+    SteppedEase = _easeMap.SteppedEase,
+    Bounce = _easeMap.Bounce,
+    Sine = _easeMap.Sine,
+    Expo = _easeMap.Expo,
+    Circ = _easeMap.Circ;
+
+ //export some internal methods/orojects for use in CSSPlugin so that we can externalize that file and allow custom builds that exclude it.
+
+
+// CONCATENATED MODULE: ./node_modules/gsap/CSSPlugin.js
+/*!
+ * CSSPlugin 3.9.1
+ * https://greensock.com
+ *
+ * Copyright 2008-2021, GreenSock. All rights reserved.
+ * Subject to the terms at https://greensock.com/standard-license or for
+ * Club GreenSock members, the agreement issued with that membership.
+ * @author: Jack Doyle, jack@greensock.com
+*/
+
+/* eslint-disable */
+
+
+var CSSPlugin_win,
+    CSSPlugin_doc,
+    _docElement,
+    _pluginInitted,
+    _tempDiv,
+    _tempDivStyler,
+    _recentSetterPlugin,
+    CSSPlugin_windowExists = function _windowExists() {
+  return typeof window !== "undefined";
+},
+    _transformProps = {},
+    _RAD2DEG = 180 / Math.PI,
+    _DEG2RAD = Math.PI / 180,
+    _atan2 = Math.atan2,
+    CSSPlugin_bigNum = 1e8,
+    _capsExp = /([A-Z])/g,
+    _horizontalExp = /(?:left|right|width|margin|padding|x)/i,
+    _complexExp = /[\s,\(]\S/,
+    _propertyAliases = {
+  autoAlpha: "opacity,visibility",
+  scale: "scaleX,scaleY",
+  alpha: "opacity"
+},
+    _renderCSSProp = function _renderCSSProp(ratio, data) {
+  return data.set(data.t, data.p, Math.round((data.s + data.c * ratio) * 10000) / 10000 + data.u, data);
+},
+    _renderPropWithEnd = function _renderPropWithEnd(ratio, data) {
+  return data.set(data.t, data.p, ratio === 1 ? data.e : Math.round((data.s + data.c * ratio) * 10000) / 10000 + data.u, data);
+},
+    _renderCSSPropWithBeginning = function _renderCSSPropWithBeginning(ratio, data) {
+  return data.set(data.t, data.p, ratio ? Math.round((data.s + data.c * ratio) * 10000) / 10000 + data.u : data.b, data);
+},
+    //if units change, we need a way to render the original unit/value when the tween goes all the way back to the beginning (ratio:0)
+_renderRoundedCSSProp = function _renderRoundedCSSProp(ratio, data) {
+  var value = data.s + data.c * ratio;
+  data.set(data.t, data.p, ~~(value + (value < 0 ? -.5 : .5)) + data.u, data);
+},
+    _renderNonTweeningValue = function _renderNonTweeningValue(ratio, data) {
+  return data.set(data.t, data.p, ratio ? data.e : data.b, data);
+},
+    _renderNonTweeningValueOnlyAtEnd = function _renderNonTweeningValueOnlyAtEnd(ratio, data) {
+  return data.set(data.t, data.p, ratio !== 1 ? data.b : data.e, data);
+},
+    _setterCSSStyle = function _setterCSSStyle(target, property, value) {
+  return target.style[property] = value;
+},
+    _setterCSSProp = function _setterCSSProp(target, property, value) {
+  return target.style.setProperty(property, value);
+},
+    _setterTransform = function _setterTransform(target, property, value) {
+  return target._gsap[property] = value;
+},
+    _setterScale = function _setterScale(target, property, value) {
+  return target._gsap.scaleX = target._gsap.scaleY = value;
+},
+    _setterScaleWithRender = function _setterScaleWithRender(target, property, value, data, ratio) {
+  var cache = target._gsap;
+  cache.scaleX = cache.scaleY = value;
+  cache.renderTransform(ratio, cache);
+},
+    _setterTransformWithRender = function _setterTransformWithRender(target, property, value, data, ratio) {
+  var cache = target._gsap;
+  cache[property] = value;
+  cache.renderTransform(ratio, cache);
+},
+    _transformProp = "transform",
+    _transformOriginProp = _transformProp + "Origin",
+    _supports3D,
+    _createElement = function _createElement(type, ns) {
+  var e = CSSPlugin_doc.createElementNS ? CSSPlugin_doc.createElementNS((ns || "http://www.w3.org/1999/xhtml").replace(/^https/, "http"), type) : CSSPlugin_doc.createElement(type); //some servers swap in https for http in the namespace which can break things, making "style" inaccessible.
+
+  return e.style ? e : CSSPlugin_doc.createElement(type); //some environments won't allow access to the element's style when created with a namespace in which case we default to the standard createElement() to work around the issue. Also note that when GSAP is embedded directly inside an SVG file, createElement() won't allow access to the style object in Firefox (see https://greensock.com/forums/topic/20215-problem-using-tweenmax-in-standalone-self-containing-svg-file-err-cannot-set-property-csstext-of-undefined/).
+},
+    _getComputedProperty = function _getComputedProperty(target, property, skipPrefixFallback) {
+  var cs = getComputedStyle(target);
+  return cs[property] || cs.getPropertyValue(property.replace(_capsExp, "-$1").toLowerCase()) || cs.getPropertyValue(property) || !skipPrefixFallback && _getComputedProperty(target, _checkPropPrefix(property) || property, 1) || ""; //css variables may not need caps swapped out for dashes and lowercase.
+},
+    _prefixes = "O,Moz,ms,Ms,Webkit".split(","),
+    _checkPropPrefix = function _checkPropPrefix(property, element, preferPrefix) {
+  var e = element || _tempDiv,
+      s = e.style,
+      i = 5;
+
+  if (property in s && !preferPrefix) {
+    return property;
+  }
+
+  property = property.charAt(0).toUpperCase() + property.substr(1);
+
+  while (i-- && !(_prefixes[i] + property in s)) {}
+
+  return i < 0 ? null : (i === 3 ? "ms" : i >= 0 ? _prefixes[i] : "") + property;
+},
+    _initCore = function _initCore() {
+  if (CSSPlugin_windowExists() && window.document) {
+    CSSPlugin_win = window;
+    CSSPlugin_doc = CSSPlugin_win.document;
+    _docElement = CSSPlugin_doc.documentElement;
+    _tempDiv = _createElement("div") || {
+      style: {}
+    };
+    _tempDivStyler = _createElement("div");
+    _transformProp = _checkPropPrefix(_transformProp);
+    _transformOriginProp = _transformProp + "Origin";
+    _tempDiv.style.cssText = "border-width:0;line-height:0;position:absolute;padding:0"; //make sure to override certain properties that may contaminate measurements, in case the user has overreaching style sheets.
+
+    _supports3D = !!_checkPropPrefix("perspective");
+    _pluginInitted = 1;
+  }
+},
+    _getBBoxHack = function _getBBoxHack(swapIfPossible) {
+  //works around issues in some browsers (like Firefox) that don't correctly report getBBox() on SVG elements inside a <defs> element and/or <mask>. We try creating an SVG, adding it to the documentElement and toss the element in there so that it's definitely part of the rendering tree, then grab the bbox and if it works, we actually swap out the original getBBox() method for our own that does these extra steps whenever getBBox is needed. This helps ensure that performance is optimal (only do all these extra steps when absolutely necessary...most elements don't need it).
+  var svg = _createElement("svg", this.ownerSVGElement && this.ownerSVGElement.getAttribute("xmlns") || "http://www.w3.org/2000/svg"),
+      oldParent = this.parentNode,
+      oldSibling = this.nextSibling,
+      oldCSS = this.style.cssText,
+      bbox;
+
+  _docElement.appendChild(svg);
+
+  svg.appendChild(this);
+  this.style.display = "block";
+
+  if (swapIfPossible) {
+    try {
+      bbox = this.getBBox();
+      this._gsapBBox = this.getBBox; //store the original
+
+      this.getBBox = _getBBoxHack;
+    } catch (e) {}
+  } else if (this._gsapBBox) {
+    bbox = this._gsapBBox();
+  }
+
+  if (oldParent) {
+    if (oldSibling) {
+      oldParent.insertBefore(this, oldSibling);
+    } else {
+      oldParent.appendChild(this);
+    }
+  }
+
+  _docElement.removeChild(svg);
+
+  this.style.cssText = oldCSS;
+  return bbox;
+},
+    _getAttributeFallbacks = function _getAttributeFallbacks(target, attributesArray) {
+  var i = attributesArray.length;
+
+  while (i--) {
+    if (target.hasAttribute(attributesArray[i])) {
+      return target.getAttribute(attributesArray[i]);
+    }
+  }
+},
+    _getBBox = function _getBBox(target) {
+  var bounds;
+
+  try {
+    bounds = target.getBBox(); //Firefox throws errors if you try calling getBBox() on an SVG element that's not rendered (like in a <symbol> or <defs>). https://bugzilla.mozilla.org/show_bug.cgi?id=612118
+  } catch (error) {
+    bounds = _getBBoxHack.call(target, true);
+  }
+
+  bounds && (bounds.width || bounds.height) || target.getBBox === _getBBoxHack || (bounds = _getBBoxHack.call(target, true)); //some browsers (like Firefox) misreport the bounds if the element has zero width and height (it just assumes it's at x:0, y:0), thus we need to manually grab the position in that case.
+
+  return bounds && !bounds.width && !bounds.x && !bounds.y ? {
+    x: +_getAttributeFallbacks(target, ["x", "cx", "x1"]) || 0,
+    y: +_getAttributeFallbacks(target, ["y", "cy", "y1"]) || 0,
+    width: 0,
+    height: 0
+  } : bounds;
+},
+    _isSVG = function _isSVG(e) {
+  return !!(e.getCTM && (!e.parentNode || e.ownerSVGElement) && _getBBox(e));
+},
+    //reports if the element is an SVG on which getBBox() actually works
+_removeProperty = function _removeProperty(target, property) {
+  if (property) {
+    var style = target.style;
+
+    if (property in _transformProps && property !== _transformOriginProp) {
+      property = _transformProp;
+    }
+
+    if (style.removeProperty) {
+      if (property.substr(0, 2) === "ms" || property.substr(0, 6) === "webkit") {
+        //Microsoft and some Webkit browsers don't conform to the standard of capitalizing the first prefix character, so we adjust so that when we prefix the caps with a dash, it's correct (otherwise it'd be "ms-transform" instead of "-ms-transform" for IE9, for example)
+        property = "-" + property;
+      }
+
+      style.removeProperty(property.replace(_capsExp, "-$1").toLowerCase());
+    } else {
+      //note: old versions of IE use "removeAttribute()" instead of "removeProperty()"
+      style.removeAttribute(property);
+    }
+  }
+},
+    CSSPlugin_addNonTweeningPT = function _addNonTweeningPT(plugin, target, property, beginning, end, onlySetAtEnd) {
+  var pt = new PropTween(plugin._pt, target, property, 0, 1, onlySetAtEnd ? _renderNonTweeningValueOnlyAtEnd : _renderNonTweeningValue);
+  plugin._pt = pt;
+  pt.b = beginning;
+  pt.e = end;
+
+  plugin._props.push(property);
+
+  return pt;
+},
+    _nonConvertibleUnits = {
+  deg: 1,
+  rad: 1,
+  turn: 1
+},
+    //takes a single value like 20px and converts it to the unit specified, like "%", returning only the numeric amount.
+CSSPlugin_convertToUnit = function _convertToUnit(target, property, value, unit) {
+  var curValue = parseFloat(value) || 0,
+      curUnit = (value + "").trim().substr((curValue + "").length) || "px",
+      // some browsers leave extra whitespace at the beginning of CSS variables, hence the need to trim()
+  style = _tempDiv.style,
+      horizontal = _horizontalExp.test(property),
+      isRootSVG = target.tagName.toLowerCase() === "svg",
+      measureProperty = (isRootSVG ? "client" : "offset") + (horizontal ? "Width" : "Height"),
+      amount = 100,
+      toPixels = unit === "px",
+      toPercent = unit === "%",
+      px,
+      parent,
+      cache,
+      isSVG;
+
+  if (unit === curUnit || !curValue || _nonConvertibleUnits[unit] || _nonConvertibleUnits[curUnit]) {
+    return curValue;
+  }
+
+  curUnit !== "px" && !toPixels && (curValue = _convertToUnit(target, property, value, "px"));
+  isSVG = target.getCTM && _isSVG(target);
+
+  if ((toPercent || curUnit === "%") && (_transformProps[property] || ~property.indexOf("adius"))) {
+    px = isSVG ? target.getBBox()[horizontal ? "width" : "height"] : target[measureProperty];
+    return _round(toPercent ? curValue / px * amount : curValue / 100 * px);
+  }
+
+  style[horizontal ? "width" : "height"] = amount + (toPixels ? curUnit : unit);
+  parent = ~property.indexOf("adius") || unit === "em" && target.appendChild && !isRootSVG ? target : target.parentNode;
+
+  if (isSVG) {
+    parent = (target.ownerSVGElement || {}).parentNode;
+  }
+
+  if (!parent || parent === CSSPlugin_doc || !parent.appendChild) {
+    parent = CSSPlugin_doc.body;
+  }
+
+  cache = parent._gsap;
+
+  if (cache && toPercent && cache.width && horizontal && cache.time === _ticker.time) {
+    return _round(curValue / cache.width * amount);
+  } else {
+    (toPercent || curUnit === "%") && (style.position = _getComputedProperty(target, "position"));
+    parent === target && (style.position = "static"); // like for borderRadius, if it's a % we must have it relative to the target itself but that may not have position: relative or position: absolute in which case it'd go up the chain until it finds its offsetParent (bad). position: static protects against that.
+
+    parent.appendChild(_tempDiv);
+    px = _tempDiv[measureProperty];
+    parent.removeChild(_tempDiv);
+    style.position = "absolute";
+
+    if (horizontal && toPercent) {
+      cache = _getCache(parent);
+      cache.time = _ticker.time;
+      cache.width = parent[measureProperty];
+    }
+  }
+
+  return _round(toPixels ? px * curValue / amount : px && curValue ? amount / px * curValue : 0);
+},
+    CSSPlugin_get = function _get(target, property, unit, uncache) {
+  var value;
+  _pluginInitted || _initCore();
+
+  if (property in _propertyAliases && property !== "transform") {
+    property = _propertyAliases[property];
+
+    if (~property.indexOf(",")) {
+      property = property.split(",")[0];
+    }
+  }
+
+  if (_transformProps[property] && property !== "transform") {
+    value = CSSPlugin_parseTransform(target, uncache);
+    value = property !== "transformOrigin" ? value[property] : value.svg ? value.origin : _firstTwoOnly(_getComputedProperty(target, _transformOriginProp)) + " " + value.zOrigin + "px";
+  } else {
+    value = target.style[property];
+
+    if (!value || value === "auto" || uncache || ~(value + "").indexOf("calc(")) {
+      value = _specialProps[property] && _specialProps[property](target, property, unit) || _getComputedProperty(target, property) || _getProperty(target, property) || (property === "opacity" ? 1 : 0); // note: some browsers, like Firefox, don't report borderRadius correctly! Instead, it only reports every corner like  borderTopLeftRadius
+    }
+  }
+
+  return unit && !~(value + "").trim().indexOf(" ") ? CSSPlugin_convertToUnit(target, property, value, unit) + unit : value;
+},
+    CSSPlugin_tweenComplexCSSString = function _tweenComplexCSSString(target, prop, start, end) {
+  //note: we call _tweenComplexCSSString.call(pluginInstance...) to ensure that it's scoped properly. We may call it from within a plugin too, thus "this" would refer to the plugin.
+  if (!start || start === "none") {
+    // some browsers like Safari actually PREFER the prefixed property and mis-report the unprefixed value like clipPath (BUG). In other words, even though clipPath exists in the style ("clipPath" in target.style) and it's set in the CSS properly (along with -webkit-clip-path), Safari reports clipPath as "none" whereas WebkitClipPath reports accurately like "ellipse(100% 0% at 50% 0%)", so in this case we must SWITCH to using the prefixed property instead. See https://greensock.com/forums/topic/18310-clippath-doesnt-work-on-ios/
+    var p = _checkPropPrefix(prop, target, 1),
+        s = p && _getComputedProperty(target, p, 1);
+
+    if (s && s !== start) {
+      prop = p;
+      start = s;
+    } else if (prop === "borderColor") {
+      start = _getComputedProperty(target, "borderTopColor"); // Firefox bug: always reports "borderColor" as "", so we must fall back to borderTopColor. See https://greensock.com/forums/topic/24583-how-to-return-colors-that-i-had-after-reverse/
+    }
+  }
+
+  var pt = new PropTween(this._pt, target.style, prop, 0, 1, _renderComplexString),
+      index = 0,
+      matchIndex = 0,
+      a,
+      result,
+      startValues,
+      startNum,
+      color,
+      startValue,
+      endValue,
+      endNum,
+      chunk,
+      endUnit,
+      startUnit,
+      relative,
+      endValues;
+  pt.b = start;
+  pt.e = end;
+  start += ""; //ensure values are strings
+
+  end += "";
+
+  if (end === "auto") {
+    target.style[prop] = end;
+    end = _getComputedProperty(target, prop) || end;
+    target.style[prop] = start;
+  }
+
+  a = [start, end];
+
+  _colorStringFilter(a); //pass an array with the starting and ending values and let the filter do whatever it needs to the values. If colors are found, it returns true and then we must match where the color shows up order-wise because for things like boxShadow, sometimes the browser provides the computed values with the color FIRST, but the user provides it with the color LAST, so flip them if necessary. Same for drop-shadow().
+
+
+  start = a[0];
+  end = a[1];
+  startValues = start.match(_numWithUnitExp) || [];
+  endValues = end.match(_numWithUnitExp) || [];
+
+  if (endValues.length) {
+    while (result = _numWithUnitExp.exec(end)) {
+      endValue = result[0];
+      chunk = end.substring(index, result.index);
+
+      if (color) {
+        color = (color + 1) % 5;
+      } else if (chunk.substr(-5) === "rgba(" || chunk.substr(-5) === "hsla(") {
+        color = 1;
+      }
+
+      if (endValue !== (startValue = startValues[matchIndex++] || "")) {
+        startNum = parseFloat(startValue) || 0;
+        startUnit = startValue.substr((startNum + "").length);
+        relative = endValue.charAt(1) === "=" ? +(endValue.charAt(0) + "1") : 0;
+
+        if (relative) {
+          endValue = endValue.substr(2);
+        }
+
+        endNum = parseFloat(endValue);
+        endUnit = endValue.substr((endNum + "").length);
+        index = _numWithUnitExp.lastIndex - endUnit.length;
+
+        if (!endUnit) {
+          //if something like "perspective:300" is passed in and we must add a unit to the end
+          endUnit = endUnit || _config.units[prop] || startUnit;
+
+          if (index === end.length) {
+            end += endUnit;
+            pt.e += endUnit;
+          }
+        }
+
+        if (startUnit !== endUnit) {
+          startNum = CSSPlugin_convertToUnit(target, prop, startValue, endUnit) || 0;
+        } //these nested PropTweens are handled in a special way - we'll never actually call a render or setter method on them. We'll just loop through them in the parent complex string PropTween's render method.
+
+
+        pt._pt = {
+          _next: pt._pt,
+          p: chunk || matchIndex === 1 ? chunk : ",",
+          //note: SVG spec allows omission of comma/space when a negative sign is wedged between two numbers, like 2.5-5.3 instead of 2.5,-5.3 but when tweening, the negative value may switch to positive, so we insert the comma just in case.
+          s: startNum,
+          c: relative ? relative * endNum : endNum - startNum,
+          m: color && color < 4 || prop === "zIndex" ? Math.round : 0
+        };
+      }
+    }
+
+    pt.c = index < end.length ? end.substring(index, end.length) : ""; //we use the "c" of the PropTween to store the final part of the string (after the last number)
+  } else {
+    pt.r = prop === "display" && end === "none" ? _renderNonTweeningValueOnlyAtEnd : _renderNonTweeningValue;
+  }
+
+  _relExp.test(end) && (pt.e = 0); //if the end string contains relative values or dynamic random(...) values, delete the end it so that on the final render we don't actually set it to the string with += or -= characters (forces it to use the calculated value).
+
+  this._pt = pt; //start the linked list with this new PropTween. Remember, we call _tweenComplexCSSString.call(pluginInstance...) to ensure that it's scoped properly. We may call it from within another plugin too, thus "this" would refer to the plugin.
+
+  return pt;
+},
+    _keywordToPercent = {
+  top: "0%",
+  bottom: "100%",
+  left: "0%",
+  right: "100%",
+  center: "50%"
+},
+    _convertKeywordsToPercentages = function _convertKeywordsToPercentages(value) {
+  var split = value.split(" "),
+      x = split[0],
+      y = split[1] || "50%";
+
+  if (x === "top" || x === "bottom" || y === "left" || y === "right") {
+    //the user provided them in the wrong order, so flip them
+    value = x;
+    x = y;
+    y = value;
+  }
+
+  split[0] = _keywordToPercent[x] || x;
+  split[1] = _keywordToPercent[y] || y;
+  return split.join(" ");
+},
+    _renderClearProps = function _renderClearProps(ratio, data) {
+  if (data.tween && data.tween._time === data.tween._dur) {
+    var target = data.t,
+        style = target.style,
+        props = data.u,
+        cache = target._gsap,
+        prop,
+        clearTransforms,
+        i;
+
+    if (props === "all" || props === true) {
+      style.cssText = "";
+      clearTransforms = 1;
+    } else {
+      props = props.split(",");
+      i = props.length;
+
+      while (--i > -1) {
+        prop = props[i];
+
+        if (_transformProps[prop]) {
+          clearTransforms = 1;
+          prop = prop === "transformOrigin" ? _transformOriginProp : _transformProp;
+        }
+
+        _removeProperty(target, prop);
+      }
+    }
+
+    if (clearTransforms) {
+      _removeProperty(target, _transformProp);
+
+      if (cache) {
+        cache.svg && target.removeAttribute("transform");
+
+        CSSPlugin_parseTransform(target, 1); // force all the cached values back to "normal"/identity, otherwise if there's another tween that's already set to render transforms on this element, it could display the wrong values.
+
+
+        cache.uncache = 1;
+      }
+    }
+  }
+},
+    // note: specialProps should return 1 if (and only if) they have a non-zero priority. It indicates we need to sort the linked list.
+_specialProps = {
+  clearProps: function clearProps(plugin, target, property, endValue, tween) {
+    if (tween.data !== "isFromStart") {
+      var pt = plugin._pt = new PropTween(plugin._pt, target, property, 0, 0, _renderClearProps);
+      pt.u = endValue;
+      pt.pr = -10;
+      pt.tween = tween;
+
+      plugin._props.push(property);
+
+      return 1;
+    }
+  }
+  /* className feature (about 0.4kb gzipped).
+  , className(plugin, target, property, endValue, tween) {
+  	let _renderClassName = (ratio, data) => {
+  			data.css.render(ratio, data.css);
+  			if (!ratio || ratio === 1) {
+  				let inline = data.rmv,
+  					target = data.t,
+  					p;
+  				target.setAttribute("class", ratio ? data.e : data.b);
+  				for (p in inline) {
+  					_removeProperty(target, p);
+  				}
+  			}
+  		},
+  		_getAllStyles = (target) => {
+  			let styles = {},
+  				computed = getComputedStyle(target),
+  				p;
+  			for (p in computed) {
+  				if (isNaN(p) && p !== "cssText" && p !== "length") {
+  					styles[p] = computed[p];
+  				}
+  			}
+  			_setDefaults(styles, _parseTransform(target, 1));
+  			return styles;
+  		},
+  		startClassList = target.getAttribute("class"),
+  		style = target.style,
+  		cssText = style.cssText,
+  		cache = target._gsap,
+  		classPT = cache.classPT,
+  		inlineToRemoveAtEnd = {},
+  		data = {t:target, plugin:plugin, rmv:inlineToRemoveAtEnd, b:startClassList, e:(endValue.charAt(1) !== "=") ? endValue : startClassList.replace(new RegExp("(?:\\s|^)" + endValue.substr(2) + "(?![\\w-])"), "") + ((endValue.charAt(0) === "+") ? " " + endValue.substr(2) : "")},
+  		changingVars = {},
+  		startVars = _getAllStyles(target),
+  		transformRelated = /(transform|perspective)/i,
+  		endVars, p;
+  	if (classPT) {
+  		classPT.r(1, classPT.d);
+  		_removeLinkedListItem(classPT.d.plugin, classPT, "_pt");
+  	}
+  	target.setAttribute("class", data.e);
+  	endVars = _getAllStyles(target, true);
+  	target.setAttribute("class", startClassList);
+  	for (p in endVars) {
+  		if (endVars[p] !== startVars[p] && !transformRelated.test(p)) {
+  			changingVars[p] = endVars[p];
+  			if (!style[p] && style[p] !== "0") {
+  				inlineToRemoveAtEnd[p] = 1;
+  			}
+  		}
+  	}
+  	cache.classPT = plugin._pt = new PropTween(plugin._pt, target, "className", 0, 0, _renderClassName, data, 0, -11);
+  	if (style.cssText !== cssText) { //only apply if things change. Otherwise, in cases like a background-image that's pulled dynamically, it could cause a refresh. See https://greensock.com/forums/topic/20368-possible-gsap-bug-switching-classnames-in-chrome/.
+  		style.cssText = cssText; //we recorded cssText before we swapped classes and ran _getAllStyles() because in cases when a className tween is overwritten, we remove all the related tweening properties from that class change (otherwise class-specific stuff can't override properties we've directly set on the target's style object due to specificity).
+  	}
+  	_parseTransform(target, true); //to clear the caching of transforms
+  	data.css = new gsap.plugins.css();
+  	data.css.init(target, changingVars, tween);
+  	plugin._props.push(...data.css._props);
+  	return 1;
+  }
+  */
+
+},
+
+/*
+ * --------------------------------------------------------------------------------------
+ * TRANSFORMS
+ * --------------------------------------------------------------------------------------
+ */
+_identity2DMatrix = [1, 0, 0, 1, 0, 0],
+    _rotationalProperties = {},
+    _isNullTransform = function _isNullTransform(value) {
+  return value === "matrix(1, 0, 0, 1, 0, 0)" || value === "none" || !value;
+},
+    CSSPlugin_getComputedTransformMatrixAsArray = function _getComputedTransformMatrixAsArray(target) {
+  var matrixString = _getComputedProperty(target, _transformProp);
+
+  return _isNullTransform(matrixString) ? _identity2DMatrix : matrixString.substr(7).match(_numExp).map(_round);
+},
+    CSSPlugin_getMatrix = function _getMatrix(target, force2D) {
+  var cache = target._gsap || _getCache(target),
+      style = target.style,
+      matrix = CSSPlugin_getComputedTransformMatrixAsArray(target),
+      parent,
+      nextSibling,
+      temp,
+      addedToDOM;
+
+  if (cache.svg && target.getAttribute("transform")) {
+    temp = target.transform.baseVal.consolidate().matrix; //ensures that even complex values like "translate(50,60) rotate(135,0,0)" are parsed because it mashes it into a matrix.
+
+    matrix = [temp.a, temp.b, temp.c, temp.d, temp.e, temp.f];
+    return matrix.join(",") === "1,0,0,1,0,0" ? _identity2DMatrix : matrix;
+  } else if (matrix === _identity2DMatrix && !target.offsetParent && target !== _docElement && !cache.svg) {
+    //note: if offsetParent is null, that means the element isn't in the normal document flow, like if it has display:none or one of its ancestors has display:none). Firefox returns null for getComputedStyle() if the element is in an iframe that has display:none. https://bugzilla.mozilla.org/show_bug.cgi?id=548397
+    //browsers don't report transforms accurately unless the element is in the DOM and has a display value that's not "none". Firefox and Microsoft browsers have a partial bug where they'll report transforms even if display:none BUT not any percentage-based values like translate(-50%, 8px) will be reported as if it's translate(0, 8px).
+    temp = style.display;
+    style.display = "block";
+    parent = target.parentNode;
+
+    if (!parent || !target.offsetParent) {
+      // note: in 3.3.0 we switched target.offsetParent to _doc.body.contains(target) to avoid [sometimes unnecessary] MutationObserver calls but that wasn't adequate because there are edge cases where nested position: fixed elements need to get reparented to accurately sense transforms. See https://github.com/greensock/GSAP/issues/388 and https://github.com/greensock/GSAP/issues/375
+      addedToDOM = 1; //flag
+
+      nextSibling = target.nextSibling;
+
+      _docElement.appendChild(target); //we must add it to the DOM in order to get values properly
+
+    }
+
+    matrix = CSSPlugin_getComputedTransformMatrixAsArray(target);
+    temp ? style.display = temp : _removeProperty(target, "display");
+
+    if (addedToDOM) {
+      nextSibling ? parent.insertBefore(target, nextSibling) : parent ? parent.appendChild(target) : _docElement.removeChild(target);
+    }
+  }
+
+  return force2D && matrix.length > 6 ? [matrix[0], matrix[1], matrix[4], matrix[5], matrix[12], matrix[13]] : matrix;
+},
+    _applySVGOrigin = function _applySVGOrigin(target, origin, originIsAbsolute, smooth, matrixArray, pluginToAddPropTweensTo) {
+  var cache = target._gsap,
+      matrix = matrixArray || CSSPlugin_getMatrix(target, true),
+      xOriginOld = cache.xOrigin || 0,
+      yOriginOld = cache.yOrigin || 0,
+      xOffsetOld = cache.xOffset || 0,
+      yOffsetOld = cache.yOffset || 0,
+      a = matrix[0],
+      b = matrix[1],
+      c = matrix[2],
+      d = matrix[3],
+      tx = matrix[4],
+      ty = matrix[5],
+      originSplit = origin.split(" "),
+      xOrigin = parseFloat(originSplit[0]) || 0,
+      yOrigin = parseFloat(originSplit[1]) || 0,
+      bounds,
+      determinant,
+      x,
+      y;
+
+  if (!originIsAbsolute) {
+    bounds = _getBBox(target);
+    xOrigin = bounds.x + (~originSplit[0].indexOf("%") ? xOrigin / 100 * bounds.width : xOrigin);
+    yOrigin = bounds.y + (~(originSplit[1] || originSplit[0]).indexOf("%") ? yOrigin / 100 * bounds.height : yOrigin);
+  } else if (matrix !== _identity2DMatrix && (determinant = a * d - b * c)) {
+    //if it's zero (like if scaleX and scaleY are zero), skip it to avoid errors with dividing by zero.
+    x = xOrigin * (d / determinant) + yOrigin * (-c / determinant) + (c * ty - d * tx) / determinant;
+    y = xOrigin * (-b / determinant) + yOrigin * (a / determinant) - (a * ty - b * tx) / determinant;
+    xOrigin = x;
+    yOrigin = y;
+  }
+
+  if (smooth || smooth !== false && cache.smooth) {
+    tx = xOrigin - xOriginOld;
+    ty = yOrigin - yOriginOld;
+    cache.xOffset = xOffsetOld + (tx * a + ty * c) - tx;
+    cache.yOffset = yOffsetOld + (tx * b + ty * d) - ty;
+  } else {
+    cache.xOffset = cache.yOffset = 0;
+  }
+
+  cache.xOrigin = xOrigin;
+  cache.yOrigin = yOrigin;
+  cache.smooth = !!smooth;
+  cache.origin = origin;
+  cache.originIsAbsolute = !!originIsAbsolute;
+  target.style[_transformOriginProp] = "0px 0px"; //otherwise, if someone sets  an origin via CSS, it will likely interfere with the SVG transform attribute ones (because remember, we're baking the origin into the matrix() value).
+
+  if (pluginToAddPropTweensTo) {
+    CSSPlugin_addNonTweeningPT(pluginToAddPropTweensTo, cache, "xOrigin", xOriginOld, xOrigin);
+
+    CSSPlugin_addNonTweeningPT(pluginToAddPropTweensTo, cache, "yOrigin", yOriginOld, yOrigin);
+
+    CSSPlugin_addNonTweeningPT(pluginToAddPropTweensTo, cache, "xOffset", xOffsetOld, cache.xOffset);
+
+    CSSPlugin_addNonTweeningPT(pluginToAddPropTweensTo, cache, "yOffset", yOffsetOld, cache.yOffset);
+  }
+
+  target.setAttribute("data-svg-origin", xOrigin + " " + yOrigin);
+},
+    CSSPlugin_parseTransform = function _parseTransform(target, uncache) {
+  var cache = target._gsap || new GSCache(target);
+
+  if ("x" in cache && !uncache && !cache.uncache) {
+    return cache;
+  }
+
+  var style = target.style,
+      invertedScaleX = cache.scaleX < 0,
+      px = "px",
+      deg = "deg",
+      origin = _getComputedProperty(target, _transformOriginProp) || "0",
+      x,
+      y,
+      z,
+      scaleX,
+      scaleY,
+      rotation,
+      rotationX,
+      rotationY,
+      skewX,
+      skewY,
+      perspective,
+      xOrigin,
+      yOrigin,
+      matrix,
+      angle,
+      cos,
+      sin,
+      a,
+      b,
+      c,
+      d,
+      a12,
+      a22,
+      t1,
+      t2,
+      t3,
+      a13,
+      a23,
+      a33,
+      a42,
+      a43,
+      a32;
+  x = y = z = rotation = rotationX = rotationY = skewX = skewY = perspective = 0;
+  scaleX = scaleY = 1;
+  cache.svg = !!(target.getCTM && _isSVG(target));
+  matrix = CSSPlugin_getMatrix(target, cache.svg);
+
+  if (cache.svg) {
+    t1 = (!cache.uncache || origin === "0px 0px") && !uncache && target.getAttribute("data-svg-origin"); // if origin is 0,0 and cache.uncache is true, let the recorded data-svg-origin stay. Otherwise, whenever we set cache.uncache to true, we'd need to set element.style.transformOrigin = (cache.xOrigin - bbox.x) + "px " + (cache.yOrigin - bbox.y) + "px". Remember, to work around browser inconsistencies we always force SVG elements' transformOrigin to 0,0 and offset the translation accordingly.
+
+    _applySVGOrigin(target, t1 || origin, !!t1 || cache.originIsAbsolute, cache.smooth !== false, matrix);
+  }
+
+  xOrigin = cache.xOrigin || 0;
+  yOrigin = cache.yOrigin || 0;
+
+  if (matrix !== _identity2DMatrix) {
+    a = matrix[0]; //a11
+
+    b = matrix[1]; //a21
+
+    c = matrix[2]; //a31
+
+    d = matrix[3]; //a41
+
+    x = a12 = matrix[4];
+    y = a22 = matrix[5]; //2D matrix
+
+    if (matrix.length === 6) {
+      scaleX = Math.sqrt(a * a + b * b);
+      scaleY = Math.sqrt(d * d + c * c);
+      rotation = a || b ? _atan2(b, a) * _RAD2DEG : 0; //note: if scaleX is 0, we cannot accurately measure rotation. Same for skewX with a scaleY of 0. Therefore, we default to the previously recorded value (or zero if that doesn't exist).
+
+      skewX = c || d ? _atan2(c, d) * _RAD2DEG + rotation : 0;
+      skewX && (scaleY *= Math.abs(Math.cos(skewX * _DEG2RAD)));
+
+      if (cache.svg) {
+        x -= xOrigin - (xOrigin * a + yOrigin * c);
+        y -= yOrigin - (xOrigin * b + yOrigin * d);
+      } //3D matrix
+
+    } else {
+      a32 = matrix[6];
+      a42 = matrix[7];
+      a13 = matrix[8];
+      a23 = matrix[9];
+      a33 = matrix[10];
+      a43 = matrix[11];
+      x = matrix[12];
+      y = matrix[13];
+      z = matrix[14];
+      angle = _atan2(a32, a33);
+      rotationX = angle * _RAD2DEG; //rotationX
+
+      if (angle) {
+        cos = Math.cos(-angle);
+        sin = Math.sin(-angle);
+        t1 = a12 * cos + a13 * sin;
+        t2 = a22 * cos + a23 * sin;
+        t3 = a32 * cos + a33 * sin;
+        a13 = a12 * -sin + a13 * cos;
+        a23 = a22 * -sin + a23 * cos;
+        a33 = a32 * -sin + a33 * cos;
+        a43 = a42 * -sin + a43 * cos;
+        a12 = t1;
+        a22 = t2;
+        a32 = t3;
+      } //rotationY
+
+
+      angle = _atan2(-c, a33);
+      rotationY = angle * _RAD2DEG;
+
+      if (angle) {
+        cos = Math.cos(-angle);
+        sin = Math.sin(-angle);
+        t1 = a * cos - a13 * sin;
+        t2 = b * cos - a23 * sin;
+        t3 = c * cos - a33 * sin;
+        a43 = d * sin + a43 * cos;
+        a = t1;
+        b = t2;
+        c = t3;
+      } //rotationZ
+
+
+      angle = _atan2(b, a);
+      rotation = angle * _RAD2DEG;
+
+      if (angle) {
+        cos = Math.cos(angle);
+        sin = Math.sin(angle);
+        t1 = a * cos + b * sin;
+        t2 = a12 * cos + a22 * sin;
+        b = b * cos - a * sin;
+        a22 = a22 * cos - a12 * sin;
+        a = t1;
+        a12 = t2;
+      }
+
+      if (rotationX && Math.abs(rotationX) + Math.abs(rotation) > 359.9) {
+        //when rotationY is set, it will often be parsed as 180 degrees different than it should be, and rotationX and rotation both being 180 (it looks the same), so we adjust for that here.
+        rotationX = rotation = 0;
+        rotationY = 180 - rotationY;
+      }
+
+      scaleX = _round(Math.sqrt(a * a + b * b + c * c));
+      scaleY = _round(Math.sqrt(a22 * a22 + a32 * a32));
+      angle = _atan2(a12, a22);
+      skewX = Math.abs(angle) > 0.0002 ? angle * _RAD2DEG : 0;
+      perspective = a43 ? 1 / (a43 < 0 ? -a43 : a43) : 0;
+    }
+
+    if (cache.svg) {
+      //sense if there are CSS transforms applied on an SVG element in which case we must overwrite them when rendering. The transform attribute is more reliable cross-browser, but we can't just remove the CSS ones because they may be applied in a CSS rule somewhere (not just inline).
+      t1 = target.getAttribute("transform");
+      cache.forceCSS = target.setAttribute("transform", "") || !_isNullTransform(_getComputedProperty(target, _transformProp));
+      t1 && target.setAttribute("transform", t1);
+    }
+  }
+
+  if (Math.abs(skewX) > 90 && Math.abs(skewX) < 270) {
+    if (invertedScaleX) {
+      scaleX *= -1;
+      skewX += rotation <= 0 ? 180 : -180;
+      rotation += rotation <= 0 ? 180 : -180;
+    } else {
+      scaleY *= -1;
+      skewX += skewX <= 0 ? 180 : -180;
+    }
+  }
+
+  cache.x = x - ((cache.xPercent = x && (cache.xPercent || (Math.round(target.offsetWidth / 2) === Math.round(-x) ? -50 : 0))) ? target.offsetWidth * cache.xPercent / 100 : 0) + px;
+  cache.y = y - ((cache.yPercent = y && (cache.yPercent || (Math.round(target.offsetHeight / 2) === Math.round(-y) ? -50 : 0))) ? target.offsetHeight * cache.yPercent / 100 : 0) + px;
+  cache.z = z + px;
+  cache.scaleX = _round(scaleX);
+  cache.scaleY = _round(scaleY);
+  cache.rotation = _round(rotation) + deg;
+  cache.rotationX = _round(rotationX) + deg;
+  cache.rotationY = _round(rotationY) + deg;
+  cache.skewX = skewX + deg;
+  cache.skewY = skewY + deg;
+  cache.transformPerspective = perspective + px;
+
+  if (cache.zOrigin = parseFloat(origin.split(" ")[2]) || 0) {
+    style[_transformOriginProp] = _firstTwoOnly(origin);
+  }
+
+  cache.xOffset = cache.yOffset = 0;
+  cache.force3D = _config.force3D;
+  cache.renderTransform = cache.svg ? CSSPlugin_renderSVGTransforms : _supports3D ? _renderCSSTransforms : _renderNon3DTransforms;
+  cache.uncache = 0;
+  return cache;
+},
+    _firstTwoOnly = function _firstTwoOnly(value) {
+  return (value = value.split(" "))[0] + " " + value[1];
+},
+    //for handling transformOrigin values, stripping out the 3rd dimension
+CSSPlugin_addPxTranslate = function _addPxTranslate(target, start, value) {
+  var unit = getUnit(start);
+  return _round(parseFloat(start) + parseFloat(CSSPlugin_convertToUnit(target, "x", value + "px", unit))) + unit;
+},
+    _renderNon3DTransforms = function _renderNon3DTransforms(ratio, cache) {
+  cache.z = "0px";
+  cache.rotationY = cache.rotationX = "0deg";
+  cache.force3D = 0;
+
+  _renderCSSTransforms(ratio, cache);
+},
+    _zeroDeg = "0deg",
+    _zeroPx = "0px",
+    _endParenthesis = ") ",
+    _renderCSSTransforms = function _renderCSSTransforms(ratio, cache) {
+  var _ref = cache || this,
+      xPercent = _ref.xPercent,
+      yPercent = _ref.yPercent,
+      x = _ref.x,
+      y = _ref.y,
+      z = _ref.z,
+      rotation = _ref.rotation,
+      rotationY = _ref.rotationY,
+      rotationX = _ref.rotationX,
+      skewX = _ref.skewX,
+      skewY = _ref.skewY,
+      scaleX = _ref.scaleX,
+      scaleY = _ref.scaleY,
+      transformPerspective = _ref.transformPerspective,
+      force3D = _ref.force3D,
+      target = _ref.target,
+      zOrigin = _ref.zOrigin,
+      transforms = "",
+      use3D = force3D === "auto" && ratio && ratio !== 1 || force3D === true; // Safari has a bug that causes it not to render 3D transform-origin values properly, so we force the z origin to 0, record it in the cache, and then do the math here to offset the translate values accordingly (basically do the 3D transform-origin part manually)
+
+
+  if (zOrigin && (rotationX !== _zeroDeg || rotationY !== _zeroDeg)) {
+    var angle = parseFloat(rotationY) * _DEG2RAD,
+        a13 = Math.sin(angle),
+        a33 = Math.cos(angle),
+        cos;
+
+    angle = parseFloat(rotationX) * _DEG2RAD;
+    cos = Math.cos(angle);
+    x = CSSPlugin_addPxTranslate(target, x, a13 * cos * -zOrigin);
+    y = CSSPlugin_addPxTranslate(target, y, -Math.sin(angle) * -zOrigin);
+    z = CSSPlugin_addPxTranslate(target, z, a33 * cos * -zOrigin + zOrigin);
+  }
+
+  if (transformPerspective !== _zeroPx) {
+    transforms += "perspective(" + transformPerspective + _endParenthesis;
+  }
+
+  if (xPercent || yPercent) {
+    transforms += "translate(" + xPercent + "%, " + yPercent + "%) ";
+  }
+
+  if (use3D || x !== _zeroPx || y !== _zeroPx || z !== _zeroPx) {
+    transforms += z !== _zeroPx || use3D ? "translate3d(" + x + ", " + y + ", " + z + ") " : "translate(" + x + ", " + y + _endParenthesis;
+  }
+
+  if (rotation !== _zeroDeg) {
+    transforms += "rotate(" + rotation + _endParenthesis;
+  }
+
+  if (rotationY !== _zeroDeg) {
+    transforms += "rotateY(" + rotationY + _endParenthesis;
+  }
+
+  if (rotationX !== _zeroDeg) {
+    transforms += "rotateX(" + rotationX + _endParenthesis;
+  }
+
+  if (skewX !== _zeroDeg || skewY !== _zeroDeg) {
+    transforms += "skew(" + skewX + ", " + skewY + _endParenthesis;
+  }
+
+  if (scaleX !== 1 || scaleY !== 1) {
+    transforms += "scale(" + scaleX + ", " + scaleY + _endParenthesis;
+  }
+
+  target.style[_transformProp] = transforms || "translate(0, 0)";
+},
+    CSSPlugin_renderSVGTransforms = function _renderSVGTransforms(ratio, cache) {
+  var _ref2 = cache || this,
+      xPercent = _ref2.xPercent,
+      yPercent = _ref2.yPercent,
+      x = _ref2.x,
+      y = _ref2.y,
+      rotation = _ref2.rotation,
+      skewX = _ref2.skewX,
+      skewY = _ref2.skewY,
+      scaleX = _ref2.scaleX,
+      scaleY = _ref2.scaleY,
+      target = _ref2.target,
+      xOrigin = _ref2.xOrigin,
+      yOrigin = _ref2.yOrigin,
+      xOffset = _ref2.xOffset,
+      yOffset = _ref2.yOffset,
+      forceCSS = _ref2.forceCSS,
+      tx = parseFloat(x),
+      ty = parseFloat(y),
+      a11,
+      a21,
+      a12,
+      a22,
+      temp;
+
+  rotation = parseFloat(rotation);
+  skewX = parseFloat(skewX);
+  skewY = parseFloat(skewY);
+
+  if (skewY) {
+    //for performance reasons, we combine all skewing into the skewX and rotation values. Remember, a skewY of 10 degrees looks the same as a rotation of 10 degrees plus a skewX of 10 degrees.
+    skewY = parseFloat(skewY);
+    skewX += skewY;
+    rotation += skewY;
+  }
+
+  if (rotation || skewX) {
+    rotation *= _DEG2RAD;
+    skewX *= _DEG2RAD;
+    a11 = Math.cos(rotation) * scaleX;
+    a21 = Math.sin(rotation) * scaleX;
+    a12 = Math.sin(rotation - skewX) * -scaleY;
+    a22 = Math.cos(rotation - skewX) * scaleY;
+
+    if (skewX) {
+      skewY *= _DEG2RAD;
+      temp = Math.tan(skewX - skewY);
+      temp = Math.sqrt(1 + temp * temp);
+      a12 *= temp;
+      a22 *= temp;
+
+      if (skewY) {
+        temp = Math.tan(skewY);
+        temp = Math.sqrt(1 + temp * temp);
+        a11 *= temp;
+        a21 *= temp;
+      }
+    }
+
+    a11 = _round(a11);
+    a21 = _round(a21);
+    a12 = _round(a12);
+    a22 = _round(a22);
+  } else {
+    a11 = scaleX;
+    a22 = scaleY;
+    a21 = a12 = 0;
+  }
+
+  if (tx && !~(x + "").indexOf("px") || ty && !~(y + "").indexOf("px")) {
+    tx = CSSPlugin_convertToUnit(target, "x", x, "px");
+    ty = CSSPlugin_convertToUnit(target, "y", y, "px");
+  }
+
+  if (xOrigin || yOrigin || xOffset || yOffset) {
+    tx = _round(tx + xOrigin - (xOrigin * a11 + yOrigin * a12) + xOffset);
+    ty = _round(ty + yOrigin - (xOrigin * a21 + yOrigin * a22) + yOffset);
+  }
+
+  if (xPercent || yPercent) {
+    //The SVG spec doesn't support percentage-based translation in the "transform" attribute, so we merge it into the translation to simulate it.
+    temp = target.getBBox();
+    tx = _round(tx + xPercent / 100 * temp.width);
+    ty = _round(ty + yPercent / 100 * temp.height);
+  }
+
+  temp = "matrix(" + a11 + "," + a21 + "," + a12 + "," + a22 + "," + tx + "," + ty + ")";
+  target.setAttribute("transform", temp);
+  forceCSS && (target.style[_transformProp] = temp); //some browsers prioritize CSS transforms over the transform attribute. When we sense that the user has CSS transforms applied, we must overwrite them this way (otherwise some browser simply won't render the  transform attribute changes!)
+},
+    CSSPlugin_addRotationalPropTween = function _addRotationalPropTween(plugin, target, property, startNum, endValue, relative) {
+  var cap = 360,
+      isString = _isString(endValue),
+      endNum = parseFloat(endValue) * (isString && ~endValue.indexOf("rad") ? _RAD2DEG : 1),
+      change = relative ? endNum * relative : endNum - startNum,
+      finalValue = startNum + change + "deg",
+      direction,
+      pt;
+
+  if (isString) {
+    direction = endValue.split("_")[1];
+
+    if (direction === "short") {
+      change %= cap;
+
+      if (change !== change % (cap / 2)) {
+        change += change < 0 ? cap : -cap;
+      }
+    }
+
+    if (direction === "cw" && change < 0) {
+      change = (change + cap * CSSPlugin_bigNum) % cap - ~~(change / cap) * cap;
+    } else if (direction === "ccw" && change > 0) {
+      change = (change - cap * CSSPlugin_bigNum) % cap - ~~(change / cap) * cap;
+    }
+  }
+
+  plugin._pt = pt = new PropTween(plugin._pt, target, property, startNum, change, _renderPropWithEnd);
+  pt.e = finalValue;
+  pt.u = "deg";
+
+  plugin._props.push(property);
+
+  return pt;
+},
+    _assign = function _assign(target, source) {
+  // Internet Explorer doesn't have Object.assign(), so we recreate it here.
+  for (var p in source) {
+    target[p] = source[p];
+  }
+
+  return target;
+},
+    CSSPlugin_addRawTransformPTs = function _addRawTransformPTs(plugin, transforms, target) {
+  //for handling cases where someone passes in a whole transform string, like transform: "scale(2, 3) rotate(20deg) translateY(30em)"
+  var startCache = _assign({}, target._gsap),
+      exclude = "perspective,force3D,transformOrigin,svgOrigin",
+      style = target.style,
+      endCache,
+      p,
+      startValue,
+      endValue,
+      startNum,
+      endNum,
+      startUnit,
+      endUnit;
+
+  if (startCache.svg) {
+    startValue = target.getAttribute("transform");
+    target.setAttribute("transform", "");
+    style[_transformProp] = transforms;
+    endCache = CSSPlugin_parseTransform(target, 1);
+
+    _removeProperty(target, _transformProp);
+
+    target.setAttribute("transform", startValue);
+  } else {
+    startValue = getComputedStyle(target)[_transformProp];
+    style[_transformProp] = transforms;
+    endCache = CSSPlugin_parseTransform(target, 1);
+    style[_transformProp] = startValue;
+  }
+
+  for (p in _transformProps) {
+    startValue = startCache[p];
+    endValue = endCache[p];
+
+    if (startValue !== endValue && exclude.indexOf(p) < 0) {
+      //tweening to no perspective gives very unintuitive results - just keep the same perspective in that case.
+      startUnit = getUnit(startValue);
+      endUnit = getUnit(endValue);
+      startNum = startUnit !== endUnit ? CSSPlugin_convertToUnit(target, p, startValue, endUnit) : parseFloat(startValue);
+      endNum = parseFloat(endValue);
+      plugin._pt = new PropTween(plugin._pt, endCache, p, startNum, endNum - startNum, _renderCSSProp);
+      plugin._pt.u = endUnit || 0;
+
+      plugin._props.push(p);
+    }
+  }
+
+  _assign(endCache, startCache);
+}; // handle splitting apart padding, margin, borderWidth, and borderRadius into their 4 components. Firefox, for example, won't report borderRadius correctly - it will only do borderTopLeftRadius and the other corners. We also want to handle paddingTop, marginLeft, borderRightWidth, etc.
+
+
+_forEachName("padding,margin,Width,Radius", function (name, index) {
+  var t = "Top",
+      r = "Right",
+      b = "Bottom",
+      l = "Left",
+      props = (index < 3 ? [t, r, b, l] : [t + l, t + r, b + r, b + l]).map(function (side) {
+    return index < 2 ? name + side : "border" + side + name;
+  });
+
+  _specialProps[index > 1 ? "border" + name : name] = function (plugin, target, property, endValue, tween) {
+    var a, vars;
+
+    if (arguments.length < 4) {
+      // getter, passed target, property, and unit (from _get())
+      a = props.map(function (prop) {
+        return CSSPlugin_get(plugin, prop, property);
+      });
+      vars = a.join(" ");
+      return vars.split(a[0]).length === 5 ? a[0] : vars;
+    }
+
+    a = (endValue + "").split(" ");
+    vars = {};
+    props.forEach(function (prop, i) {
+      return vars[prop] = a[i] = a[i] || a[(i - 1) / 2 | 0];
+    });
+    plugin.init(target, vars, tween);
+  };
+});
+
+var CSSPlugin = {
+  name: "css",
+  register: _initCore,
+  targetTest: function targetTest(target) {
+    return target.style && target.nodeType;
+  },
+  init: function init(target, vars, tween, index, targets) {
+    var props = this._props,
+        style = target.style,
+        startAt = tween.vars.startAt,
+        startValue,
+        endValue,
+        endNum,
+        startNum,
+        type,
+        specialProp,
+        p,
+        startUnit,
+        endUnit,
+        relative,
+        isTransformRelated,
+        transformPropTween,
+        cache,
+        smooth,
+        hasPriority;
+    _pluginInitted || _initCore();
+
+    for (p in vars) {
+      if (p === "autoRound") {
+        continue;
+      }
+
+      endValue = vars[p];
+
+      if (_plugins[p] && _checkPlugin(p, vars, tween, index, target, targets)) {
+        // plugins
+        continue;
+      }
+
+      type = typeof endValue;
+      specialProp = _specialProps[p];
+
+      if (type === "function") {
+        endValue = endValue.call(tween, index, target, targets);
+        type = typeof endValue;
+      }
+
+      if (type === "string" && ~endValue.indexOf("random(")) {
+        endValue = _replaceRandom(endValue);
+      }
+
+      if (specialProp) {
+        specialProp(this, target, p, endValue, tween) && (hasPriority = 1);
+      } else if (p.substr(0, 2) === "--") {
+        //CSS variable
+        startValue = (getComputedStyle(target).getPropertyValue(p) + "").trim();
+        endValue += "";
+        _colorExp.lastIndex = 0;
+
+        if (!_colorExp.test(startValue)) {
+          // colors don't have units
+          startUnit = getUnit(startValue);
+          endUnit = getUnit(endValue);
+        }
+
+        endUnit ? startUnit !== endUnit && (startValue = CSSPlugin_convertToUnit(target, p, startValue, endUnit) + endUnit) : startUnit && (endValue += startUnit);
+        this.add(style, "setProperty", startValue, endValue, index, targets, 0, 0, p);
+        props.push(p);
+      } else if (type !== "undefined") {
+        if (startAt && p in startAt) {
+          // in case someone hard-codes a complex value as the start, like top: "calc(2vh / 2)". Without this, it'd use the computed value (always in px)
+          startValue = typeof startAt[p] === "function" ? startAt[p].call(tween, index, target, targets) : startAt[p];
+          _isString(startValue) && ~startValue.indexOf("random(") && (startValue = _replaceRandom(startValue));
+          getUnit(startValue + "") || (startValue += _config.units[p] || getUnit(CSSPlugin_get(target, p)) || ""); // for cases when someone passes in a unitless value like {x: 100}; if we try setting translate(100, 0px) it won't work.
+
+          (startValue + "").charAt(1) === "=" && (startValue = CSSPlugin_get(target, p)); // can't work with relative values
+        } else {
+          startValue = CSSPlugin_get(target, p);
+        }
+
+        startNum = parseFloat(startValue);
+        relative = type === "string" && endValue.charAt(1) === "=" ? +(endValue.charAt(0) + "1") : 0;
+        relative && (endValue = endValue.substr(2));
+        endNum = parseFloat(endValue);
+
+        if (p in _propertyAliases) {
+          if (p === "autoAlpha") {
+            //special case where we control the visibility along with opacity. We still allow the opacity value to pass through and get tweened.
+            if (startNum === 1 && CSSPlugin_get(target, "visibility") === "hidden" && endNum) {
+              //if visibility is initially set to "hidden", we should interpret that as intent to make opacity 0 (a convenience)
+              startNum = 0;
+            }
+
+            CSSPlugin_addNonTweeningPT(this, style, "visibility", startNum ? "inherit" : "hidden", endNum ? "inherit" : "hidden", !endNum);
+          }
+
+          if (p !== "scale" && p !== "transform") {
+            p = _propertyAliases[p];
+            ~p.indexOf(",") && (p = p.split(",")[0]);
+          }
+        }
+
+        isTransformRelated = p in _transformProps; //--- TRANSFORM-RELATED ---
+
+        if (isTransformRelated) {
+          if (!transformPropTween) {
+            cache = target._gsap;
+            cache.renderTransform && !vars.parseTransform || CSSPlugin_parseTransform(target, vars.parseTransform); // if, for example, gsap.set(... {transform:"translateX(50vw)"}), the _get() call doesn't parse the transform, thus cache.renderTransform won't be set yet so force the parsing of the transform here.
+
+            smooth = vars.smoothOrigin !== false && cache.smooth;
+            transformPropTween = this._pt = new PropTween(this._pt, style, _transformProp, 0, 1, cache.renderTransform, cache, 0, -1); //the first time through, create the rendering PropTween so that it runs LAST (in the linked list, we keep adding to the beginning)
+
+            transformPropTween.dep = 1; //flag it as dependent so that if things get killed/overwritten and this is the only PropTween left, we can safely kill the whole tween.
+          }
+
+          if (p === "scale") {
+            this._pt = new PropTween(this._pt, cache, "scaleY", cache.scaleY, (relative ? relative * endNum : endNum - cache.scaleY) || 0);
+            props.push("scaleY", p);
+            p += "X";
+          } else if (p === "transformOrigin") {
+            endValue = _convertKeywordsToPercentages(endValue); //in case something like "left top" or "bottom right" is passed in. Convert to percentages.
+
+            if (cache.svg) {
+              _applySVGOrigin(target, endValue, 0, smooth, 0, this);
+            } else {
+              endUnit = parseFloat(endValue.split(" ")[2]) || 0; //handle the zOrigin separately!
+
+              endUnit !== cache.zOrigin && CSSPlugin_addNonTweeningPT(this, cache, "zOrigin", cache.zOrigin, endUnit);
+
+              CSSPlugin_addNonTweeningPT(this, style, p, _firstTwoOnly(startValue), _firstTwoOnly(endValue));
+            }
+
+            continue;
+          } else if (p === "svgOrigin") {
+            _applySVGOrigin(target, endValue, 1, smooth, 0, this);
+
+            continue;
+          } else if (p in _rotationalProperties) {
+            CSSPlugin_addRotationalPropTween(this, cache, p, startNum, endValue, relative);
+
+            continue;
+          } else if (p === "smoothOrigin") {
+            CSSPlugin_addNonTweeningPT(this, cache, "smooth", cache.smooth, endValue);
+
+            continue;
+          } else if (p === "force3D") {
+            cache[p] = endValue;
+            continue;
+          } else if (p === "transform") {
+            CSSPlugin_addRawTransformPTs(this, endValue, target);
+
+            continue;
+          }
+        } else if (!(p in style)) {
+          p = _checkPropPrefix(p) || p;
+        }
+
+        if (isTransformRelated || (endNum || endNum === 0) && (startNum || startNum === 0) && !_complexExp.test(endValue) && p in style) {
+          startUnit = (startValue + "").substr((startNum + "").length);
+          endNum || (endNum = 0); // protect against NaN
+
+          endUnit = getUnit(endValue) || (p in _config.units ? _config.units[p] : startUnit);
+          startUnit !== endUnit && (startNum = CSSPlugin_convertToUnit(target, p, startValue, endUnit));
+          this._pt = new PropTween(this._pt, isTransformRelated ? cache : style, p, startNum, relative ? relative * endNum : endNum - startNum, !isTransformRelated && (endUnit === "px" || p === "zIndex") && vars.autoRound !== false ? _renderRoundedCSSProp : _renderCSSProp);
+          this._pt.u = endUnit || 0;
+
+          if (startUnit !== endUnit && endUnit !== "%") {
+            //when the tween goes all the way back to the beginning, we need to revert it to the OLD/ORIGINAL value (with those units). We record that as a "b" (beginning) property and point to a render method that handles that. (performance optimization)
+            this._pt.b = startValue;
+            this._pt.r = _renderCSSPropWithBeginning;
+          }
+        } else if (!(p in style)) {
+          if (p in target) {
+            //maybe it's not a style - it could be a property added directly to an element in which case we'll try to animate that.
+            this.add(target, p, startValue || target[p], endValue, index, targets);
+          } else {
+            _missingPlugin(p, endValue);
+
+            continue;
+          }
+        } else {
+          CSSPlugin_tweenComplexCSSString.call(this, target, p, startValue, endValue);
+        }
+
+        props.push(p);
+      }
+    }
+
+    hasPriority && _sortPropTweensByPriority(this);
+  },
+  get: CSSPlugin_get,
+  aliases: _propertyAliases,
+  getSetter: function getSetter(target, property, plugin) {
+    //returns a setter function that accepts target, property, value and applies it accordingly. Remember, properties like "x" aren't as simple as target.style.property = value because they've got to be applied to a proxy object and then merged into a transform string in a renderer.
+    var p = _propertyAliases[property];
+    p && p.indexOf(",") < 0 && (property = p);
+    return property in _transformProps && property !== _transformOriginProp && (target._gsap.x || CSSPlugin_get(target, "x")) ? plugin && _recentSetterPlugin === plugin ? property === "scale" ? _setterScale : _setterTransform : (_recentSetterPlugin = plugin || {}) && (property === "scale" ? _setterScaleWithRender : _setterTransformWithRender) : target.style && !_isUndefined(target.style[property]) ? _setterCSSStyle : ~property.indexOf("-") ? _setterCSSProp : _getSetter(target, property);
+  },
+  core: {
+    _removeProperty: _removeProperty,
+    _getMatrix: CSSPlugin_getMatrix
+  }
+};
+gsap.utils.checkPrefix = _checkPropPrefix;
+
+(function (positionAndScale, rotation, others, aliases) {
+  var all = _forEachName(positionAndScale + "," + rotation + "," + others, function (name) {
+    _transformProps[name] = 1;
+  });
+
+  _forEachName(rotation, function (name) {
+    _config.units[name] = "deg";
+    _rotationalProperties[name] = 1;
+  });
+
+  _propertyAliases[all[13]] = positionAndScale + "," + rotation;
+
+  _forEachName(aliases, function (name) {
+    var split = name.split(":");
+    _propertyAliases[split[1]] = all[split[0]];
+  });
+})("x,y,z,scale,scaleX,scaleY,xPercent,yPercent", "rotation,rotationX,rotationY,skewX,skewY", "transform,transformOrigin,svgOrigin,force3D,smoothOrigin,transformPerspective", "0:translateX,1:translateY,2:translateZ,8:rotate,8:rotationZ,8:rotateZ,9:rotateX,10:rotateY");
+
+_forEachName("x,y,z,top,right,bottom,left,width,height,fontSize,padding,margin,perspective", function (name) {
+  _config.units[name] = "px";
+});
+
+gsap.registerPlugin(CSSPlugin);
+
+// CONCATENATED MODULE: ./node_modules/gsap/index.js
+
+
+var gsapWithCSS = gsap.registerPlugin(CSSPlugin) || gsap,
+    // to protect from tree shaking
+TweenMaxWithCSS = gsapWithCSS.core.Tween;
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"3483aeeb-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/drawer/DrawerHeader.vue?vue&type=template&id=2b0dae00&
+var DrawerHeadervue_type_template_id_2b0dae00_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{class:_vm.TWDrawer.headerClass},[_c('div',{staticClass:"flex items-center justify-between"},[_c(_vm.TWDrawer.titleTag,{tag:"Component",class:_vm.TWDrawer.titleClass},[_vm._v(" "+_vm._s(_vm.TWDrawer.title)+" ")]),_c('div',{staticClass:"ml-3 h-7 flex items-center"},[_c('TWButtonClose',{class:_vm.TWDrawer.btnCloseClass,attrs:{"size":"sm"},on:{"click":function($event){return _vm.TWDrawer.close()}}})],1)],1),(_vm.TWDrawer.description)?_c('div',{class:_vm.TWDrawer.descriptionWrapperClass},[_vm._t("description",[_c('p',{class:_vm.TWDrawer.descriptionClass},[_vm._v(" "+_vm._s(_vm.TWDrawer.description)+" ")])])],2):_vm._e()])}
+var DrawerHeadervue_type_template_id_2b0dae00_staticRenderFns = []
+
+
+// CONCATENATED MODULE: ./src/components/drawer/DrawerHeader.vue?vue&type=template&id=2b0dae00&
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/drawer/DrawerHeader.vue?vue&type=script&lang=js&
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ var DrawerHeadervue_type_script_lang_js_ = ({
+  name: 'TWDrawerHeader',
+  inject: ['TWDrawer'],
+  components: {
+    TWButtonClose: ButtonClose
   }
 });
-// CONCATENATED MODULE: ./src/components/form-select/TWFormSelectOptionGroup.vue?vue&type=script&lang=js&
- /* harmony default export */ var form_select_TWFormSelectOptionGroupvue_type_script_lang_js_ = (TWFormSelectOptionGroupvue_type_script_lang_js_); 
-// CONCATENATED MODULE: ./src/components/form-select/TWFormSelectOptionGroup.vue
-var TWFormSelectOptionGroup_render, TWFormSelectOptionGroup_staticRenderFns
+// CONCATENATED MODULE: ./src/components/drawer/DrawerHeader.vue?vue&type=script&lang=js&
+ /* harmony default export */ var drawer_DrawerHeadervue_type_script_lang_js_ = (DrawerHeadervue_type_script_lang_js_); 
+// CONCATENATED MODULE: ./src/components/drawer/DrawerHeader.vue
+
 
 
 
 
 /* normalize component */
 
-var TWFormSelectOptionGroup_component = normalizeComponent(
-  form_select_TWFormSelectOptionGroupvue_type_script_lang_js_,
-  TWFormSelectOptionGroup_render,
-  TWFormSelectOptionGroup_staticRenderFns,
+var DrawerHeader_component = normalizeComponent(
+  drawer_DrawerHeadervue_type_script_lang_js_,
+  DrawerHeadervue_type_template_id_2b0dae00_render,
+  DrawerHeadervue_type_template_id_2b0dae00_staticRenderFns,
   false,
   null,
   null,
@@ -22743,8 +27694,119 @@ var TWFormSelectOptionGroup_component = normalizeComponent(
   
 )
 
-/* harmony default export */ var TWFormSelectOptionGroup = (TWFormSelectOptionGroup_component.exports);
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/form-select/TWFormSelect.vue?vue&type=script&lang=js&
+/* harmony default export */ var DrawerHeader = (DrawerHeader_component.exports);
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"3483aeeb-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/drawer/DrawerFooter.vue?vue&type=template&id=dbfe69b6&
+var DrawerFootervue_type_template_id_dbfe69b6_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{class:_vm.TWDrawer.footerClass},[(!_vm.TWDrawer.hideBtnCancel)?_c('TWButton',{attrs:{"variant":_vm.TWDrawer.btnCancelVariant},on:{"click":function($event){return _vm.TWDrawer.onCancelClick()}}},[_vm._v(" "+_vm._s(_vm.TWDrawer.btnCancelText)+" ")]):_vm._e(),(!_vm.TWDrawer.hideBtnOk)?_c('TWButton',{attrs:{"variant":_vm.TWDrawer.btnOkVariant},on:{"click":function($event){return _vm.TWDrawer.onOkClick()}}},[_vm._v(" "+_vm._s(_vm.TWDrawer.btnOkText)+" ")]):_vm._e()],1)}
+var DrawerFootervue_type_template_id_dbfe69b6_staticRenderFns = []
+
+
+// CONCATENATED MODULE: ./src/components/drawer/DrawerFooter.vue?vue&type=template&id=dbfe69b6&
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/drawer/DrawerFooter.vue?vue&type=script&lang=js&
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ var DrawerFootervue_type_script_lang_js_ = ({
+  name: 'TWDrawerFooter',
+  components: {
+    TWButton: Button
+  },
+  inject: ['TWDrawer']
+});
+// CONCATENATED MODULE: ./src/components/drawer/DrawerFooter.vue?vue&type=script&lang=js&
+ /* harmony default export */ var drawer_DrawerFootervue_type_script_lang_js_ = (DrawerFootervue_type_script_lang_js_); 
+// CONCATENATED MODULE: ./src/components/drawer/DrawerFooter.vue
+
+
+
+
+
+/* normalize component */
+
+var DrawerFooter_component = normalizeComponent(
+  drawer_DrawerFootervue_type_script_lang_js_,
+  DrawerFootervue_type_template_id_dbfe69b6_render,
+  DrawerFootervue_type_template_id_dbfe69b6_staticRenderFns,
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* harmony default export */ var DrawerFooter = (DrawerFooter_component.exports);
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/drawer/Drawer.vue?vue&type=script&lang=js&
+
+
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -22752,219 +27814,263 @@ var TWFormSelectOptionGroup_component = normalizeComponent(
 
 
 
-
-
-
-/* harmony default export */ var TWFormSelectvue_type_script_lang_js_ = ({
-  name: 'TWFormSelect',
+/* harmony default export */ var Drawervue_type_script_lang_js_ = ({
+  name: 'TWDrawer',
+  mixins: [FixedMixin, VariantMixin, SizeMixin],
+  provide: function provide() {
+    return {
+      TWDrawer: this
+    };
+  },
   props: {
-    value: {
-      type: [String, Number, Object, Boolean],
-      default: undefined
-    },
-    variant: {
+    value: Boolean,
+    title: String,
+    titleTag: {
       type: String,
-      default: 'default'
+      default: 'h5'
     },
-    id: {
+    description: String,
+    direction: {
       type: String,
-      default: undefined
-    },
-    name: {
-      type: String,
-      default: undefined
-    },
-    multiple: {
-      type: Boolean,
-      default: false
-    },
-    disabled: {
-      type: Boolean,
-      default: false
-    },
-    readonly: {
-      type: Boolean,
-      default: false
-    },
-    required: {
-      type: Boolean,
-      default: false
-    },
-    autofocus: {
-      type: Boolean,
-      default: false
-    },
-    size: {
-      type: String,
-      default: 'md'
-    },
-    options: {
-      type: Array,
-      default: function _default() {
-        return [];
+      default: 'right',
+      validator: function validator(value) {
+        return ['right', 'left'].includes(value);
       }
     },
-    textField: {
+    noAnimation: Boolean,
+    hideHeader: Boolean,
+    hideFooter: Boolean,
+    noCloseOnBackdrop: Boolean,
+    noCloseOnEsc: Boolean,
+    noBackdrop: Boolean,
+    btnCancelVariant: {
       type: String,
-      default: 'text'
+      default: 'secondary'
     },
-    valueField: {
+    hideBtnCancel: Boolean,
+    btnCancelText: {
       type: String,
-      default: 'value'
+      default: 'Cancel'
     },
-    optionsField: {
+    btnOkVariant: {
       type: String,
-      default: 'options'
+      default: 'primary'
+    },
+    hideBtnOk: Boolean,
+    btnOkText: {
+      type: String,
+      default: 'OK'
     }
+  },
+  components: {
+    TWDrawerFooter: DrawerFooter,
+    MountingPortal: portal_vue_common["MountingPortal"],
+    TWDrawerHeader: DrawerHeader
+  },
+  created: function created() {
+    window.addEventListener('keydown', this.onEsc);
+  },
+  beforeDestroy: function beforeDestroy() {
+    window.removeEventListener('keydown', this.onEsc);
+  },
+  mounted: function mounted() {
+    this.isOpen = this.value;
   },
   data: function data() {
     return {
-      localValue: this.value,
-      TWOptions: {}
+      config: this.$TWVue.Drawer,
+      isOpen: false,
+      backdrop: null,
+      panel: null
     };
   },
   watch: {
-    value: function value(_value) {
-      this.localValue = _value;
+    value: function value(vl) {
+      this.isOpen = vl;
+    },
+    isOpen: function isOpen() {
+      this.handleScroll();
     }
   },
   computed: {
-    baseClass: function baseClass() {
-      return [this.TWOptions.base, this.getVariants, this.getSize];
+    backdropClass: function backdropClass() {
+      return ['backdrop absolute inset-0', this.fixedClass.backdrop];
     },
-    getVariants: function getVariants() {
-      if (this.disabled) {
-        return this.TWOptions.disabled;
-      }
-
-      if (this.readonly) {
-        return this.TWOptions.readonly;
-      }
-
-      var variants = this.TWOptions.variants;
-      return variants[this.variant];
+    panelWrapperClass: function panelWrapperClass() {
+      return ['panel flex fixed inset-y-0', this.getDirectionClass];
     },
-    getSize: function getSize() {
-      var sizes = this.TWOptions.sizes;
-      return sizes[this.size];
+    panelClass: function panelClass() {
+      return ['h-full', this.fixedClass.panel, this.sizeClass.panel];
     },
-    formOptions: function formOptions() {
-      return this.normalizeOptions(this.options);
+    headerClass: function headerClass() {
+      return [this.fixedClass.header, this.variantClass.header];
+    },
+    titleClass: function titleClass() {
+      return [this.fixedClass.title, this.variantClass.title];
+    },
+    descriptionWrapperClass: function descriptionWrapperClass() {
+      return [this.fixedClass.descriptionWrapper, this.variantClass.descriptionWrapper];
+    },
+    descriptionClass: function descriptionClass() {
+      return [this.fixedClass.description, this.variantClass.description];
+    },
+    btnCloseClass: function btnCloseClass() {
+      return [this.fixedClass.btnClose, this.variantClass.btnClose];
+    },
+    bodyClass: function bodyClass() {
+      return [this.fixedClass.body, this.variantClass.body];
+    },
+    getDirectionClass: function getDirectionClass() {
+      return this.direction === 'right' ? 'right-0' : 'left-0';
+    },
+    footerClass: function footerClass() {
+      return [this.fixedClass.footer, this.variantClass.footer];
+    },
+    isRight: function isRight() {
+      return this.direction === 'right';
+    },
+    initialXPosition: function initialXPosition() {
+      return "".concat(!this.isRight ? '-' : '', "100%");
     }
   },
-  created: function created() {
-    var _this$$TWVue;
-
-    this.TWOptions = (this === null || this === void 0 ? void 0 : (_this$$TWVue = this.$TWVue) === null || _this$$TWVue === void 0 ? void 0 : _this$$TWVue.TWFormSelect) || {};
-  },
   methods: {
-    normalizeOptions: function normalizeOptions(options) {
-      var _this = this;
+    handleScroll: function handleScroll() {
+      if (typeof window === 'undefined') return;
+      var body = document.body;
 
-      var output = null;
+      if (this.isOpen) {
+        body.classList.add('overflow-hidden');
+      } else {
+        body.classList.remove('overflow-hidden');
+      }
+    },
+    noCloseEffect: function noCloseEffect() {
+      if (this.noAnimation) {
+        return;
+      }
 
-      if (Array.isArray(options)) {
-        output = options.map(function (opt) {
-          var value = opt;
-          var text = opt;
+      gsapWithCSS.fromTo(this.panel, {
+        scale: 1
+      }, {
+        repeat: 1,
+        duration: 0.1,
+        scale: 1.02,
+        yoyo: true
+      });
+    },
+    onBackdropClick: function onBackdropClick() {
+      if (this.noCloseOnBackdrop) {
+        this.noCloseEffect();
+        return;
+      }
 
-          if (_typeof(opt) === 'object') {
-            var _options = opt[_this.optionsField];
+      this.close();
+    },
+    onCancelClick: function onCancelClick() {
+      this.close();
+      this.$emit('cancel');
+    },
+    onOkClick: function onOkClick() {
+      this.close();
+      this.$emit('ok');
+    },
+    onEsc: function onEsc(evt) {
+      if (evt.key === 'Escape') {
+        if (this.noCloseOnEsc) {
+          this.noCloseEffect();
+          return;
+        }
 
-            if (Array.isArray(_options) && _options.length) {
-              _options = _options.map(function (option) {
-                return _this.normalizeOption(option);
-              });
-              return _objectSpread2(_objectSpread2({}, _this.normalizeOption(opt)), {}, {
-                options: _options
-              });
-            }
+        this.close();
+      }
+    },
+    close: function close() {
+      this.$emit('input', false);
+      this.$emit('close');
+    },
+    beforeEnter: function beforeEnter(el) {
+      this.$emit('before-enter');
+      this.backdrop = el.querySelector('.backdrop');
+      this.panel = el.querySelector('.panel');
 
-            return _this.normalizeOption(opt);
-          }
+      if (this.noAnimation) {
+        return;
+      }
 
-          return {
-            value: value,
-            text: text
-          };
+      if (!this.noBackdrop) {
+        gsapWithCSS.set(this.backdrop, {
+          opacity: 0
         });
       }
 
-      return output;
-    },
-    normalizeOption: function normalizeOption(option) {
-      return {
-        value: option[this.valueField],
-        text: option[this.textField]
-      };
-    },
-    onChange: function onChange(evt) {
-      var target = evt.target;
-      var selectedValue = Array.from(target.options).filter(function (o) {
-        return o.selected;
-      }).map(function (o) {
-        return '_value' in o ? o._value : o.value;
+      gsapWithCSS.set(this.panel, {
+        opacity: 0,
+        x: this.initialXPosition
       });
-      this.localValue = this.multiple ? selectedValue : selectedValue[0];
-      this.$emit('input', this.localValue);
-      this.$emit('change', this.localValue);
-    }
-  },
-  render: function render(createElement) {
-    var self = this;
-    var select = {
-      class: this.baseClass,
-      attrs: {
-        autofocus: this.autofocus,
-        disabled: this.disabled,
-        id: this.id,
-        multiple: this.multiple,
-        name: this.name,
-        readonly: this.readonly,
-        required: this.required
-      },
-      domProps: {
-        value: self.value
-      },
-      on: {
-        change: this.onChange
+    },
+    enter: function enter(el, done) {
+      if (this.noAnimation) {
+        done();
+        return;
       }
-    };
-    var options = this.formOptions.map(function (option, index) {
-      var value = option.value,
-          text = option.text,
-          options = option.options;
-      var key = "option_".concat(index);
-      return Array.isArray(options) ? createElement(TWFormSelectOptionGroup, {
-        props: {
-          label: text,
-          options: options
-        },
-        key: key
-      }, text) : createElement(TWFormSelectOption, {
-        props: {
-          value: value
-        },
-        key: key
-      }, text);
-    });
-    return createElement('select', select, [this.$slots.first, options]);
+
+      if (!this.noBackdrop) {
+        gsapWithCSS.to(this.backdrop, {
+          opacity: 1,
+          ease: 'power3.inOut',
+          duration: .6
+        });
+      }
+
+      gsapWithCSS.to(this.panel, {
+        opacity: 1,
+        x: '0px',
+        ease: 'power3.inOut',
+        duration: .6,
+        onComplete: done
+      });
+    },
+    leave: function leave(el, done) {
+      if (this.noAnimation) {
+        done();
+        return;
+      }
+
+      gsapWithCSS.to(this.panel, {
+        opacity: 0,
+        x: this.initialXPosition,
+        ease: 'power3.inOut',
+        duration: .6,
+        onComplete: done
+      });
+
+      if (!this.noBackdrop) {
+        gsapWithCSS.to(this.backdrop, {
+          opacity: 0,
+          ease: 'power3.inOut',
+          duration: .6
+        });
+      }
+    },
+    afterLeave: function afterLeave() {
+      this.$emit('after-leave');
+    }
   }
 });
-// CONCATENATED MODULE: ./src/components/form-select/TWFormSelect.vue?vue&type=script&lang=js&
- /* harmony default export */ var form_select_TWFormSelectvue_type_script_lang_js_ = (TWFormSelectvue_type_script_lang_js_); 
-// CONCATENATED MODULE: ./src/components/form-select/TWFormSelect.vue
-var TWFormSelect_render, TWFormSelect_staticRenderFns
+// CONCATENATED MODULE: ./src/components/drawer/Drawer.vue?vue&type=script&lang=js&
+ /* harmony default export */ var drawer_Drawervue_type_script_lang_js_ = (Drawervue_type_script_lang_js_); 
+// CONCATENATED MODULE: ./src/components/drawer/Drawer.vue
+
 
 
 
 
 /* normalize component */
 
-var TWFormSelect_component = normalizeComponent(
-  form_select_TWFormSelectvue_type_script_lang_js_,
-  TWFormSelect_render,
-  TWFormSelect_staticRenderFns,
+var Drawer_component = normalizeComponent(
+  drawer_Drawervue_type_script_lang_js_,
+  Drawervue_type_template_id_092d9682_render,
+  Drawervue_type_template_id_092d9682_staticRenderFns,
   false,
   null,
   null,
@@ -22972,13 +28078,85 @@ var TWFormSelect_component = normalizeComponent(
   
 )
 
-/* harmony default export */ var TWFormSelect = (TWFormSelect_component.exports);
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"4df010df-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/dropdown/TWDropdown.vue?vue&type=template&id=399b0047&
-var TWDropdownvue_type_template_id_399b0047_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{ref:"component",staticClass:"relative inline-block text-left"},[_c('TWButton',{ref:"button",attrs:{"type":"button","variant":_vm.variant,"size":_vm.size},on:{"click":function($event){$event.stopPropagation();$event.preventDefault();return _vm.toggleDropdown()}}},[_vm._t("button-content",[_vm._v(" "+_vm._s(_vm.text)+" ")]),(!_vm.noCaret)?_vm._t("button-icon",[_c('svg',{class:_vm.iconClassList,attrs:{"xmlns":"http://www.w3.org/2000/svg","viewBox":"0 0 20 20","fill":"currentColor","aria-hidden":"true"}},[_c('path',{attrs:{"fill-rule":"evenodd","d":"M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z","clip-rule":"evenodd"}})])]):_vm._e()],2),_c('div',{ref:"dropdown",staticClass:"absolute dropdown w-56 rounded-md shadow-lg z-10",attrs:{"data-show":_vm.isOpen}},[_c('div',{staticClass:"py-1 rounded-md bg-white shadow-xs"},[_vm._t("default")],2)])],1)}
-var TWDropdownvue_type_template_id_399b0047_staticRenderFns = []
+/* harmony default export */ var Drawer = (Drawer_component.exports);
+// CONCATENATED MODULE: ./src/components/drawer/config.js
+/* harmony default export */ var drawer_config = ({
+  defaultVariant: 'primary',
+  defaultSize: 'sm',
+  fixed: {
+    backdrop: 'bg-gray-900 bg-opacity-40',
+    panel: 'w-screen flex flex-col bg-white shadow-xl',
+    header: 'px-6 py-5',
+    title: 'text-base font-semibold',
+    description: 'text-sm',
+    descriptionWrapper: 'mt-1',
+    btnClose: '',
+    body: 'p-6 relative flex-1 overflow-y-auto',
+    footer: 'px-6 py-5 flex items-center justify-end space-x-3'
+  },
+  variants: {
+    primary: {
+      backdrop: '',
+      panel: '',
+      header: 'bg-blue-700',
+      title: 'text-blue-50',
+      description: 'text-blue-300',
+      descriptionWrapper: '',
+      btnClose: 'text-blue-50',
+      body: '',
+      footer: ''
+    },
+    secondary: {
+      backdrop: '',
+      panel: '',
+      header: 'bg-gray-100 border-b border-gray-200',
+      title: 'text-gray-700',
+      description: 'text-gray-600',
+      descriptionWrapper: '',
+      btnClose: 'text-gray-700',
+      body: '',
+      footer: 'bg-gray-100 border-t border-gray-200'
+    }
+  },
+  sizes: {
+    sm: {
+      panel: 'max-w-md'
+    },
+    md: {
+      panel: 'max-w-lg'
+    },
+    lg: {
+      panel: 'max-w-3xl'
+    },
+    full: {
+      panel: ''
+    }
+  }
+});
+// CONCATENATED MODULE: ./src/components/drawer/index.js
 
 
-// CONCATENATED MODULE: ./src/components/dropdown/TWDropdown.vue?vue&type=template&id=399b0047&
+
+var drawer_Plugin = {
+  install: function install(Vue) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    if (!Vue.prototype.$TWVue) {
+      Vue.prototype.$TWVue = {};
+    }
+
+    Vue.prototype.$TWVue.Drawer = Object(lodash["merge"])(drawer_config, options);
+    Vue.component('TWDrawer', Drawer);
+  }
+};
+/* harmony default export */ var drawer = (drawer_Plugin);
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"3483aeeb-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/dropdown/Dropdown.vue?vue&type=template&id=15de85a6&
+var Dropdownvue_type_template_id_15de85a6_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{ref:"component",class:_vm.rootClass},[_c('TWButton',{ref:"button",attrs:{"type":"button","variant":_vm.variant,"size":_vm.size},on:{"click":function($event){$event.stopPropagation();$event.preventDefault();return _vm.toggleDropdown()}}},[_vm._t("button-content",[_vm._v(" "+_vm._s(_vm.text)+" ")]),(!_vm.noCaret)?_vm._t("button-icon",[_c('svg',{class:_vm.iconClass,attrs:{"xmlns":"http://www.w3.org/2000/svg","viewBox":"0 0 20 20","fill":"currentColor","aria-hidden":"true"}},[_c('path',{attrs:{"fill-rule":"evenodd","d":"M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z","clip-rule":"evenodd"}})])]):_vm._e()],2),_c('MountingPortal',{attrs:{"mount-to":"body","append":""}},[_c('div',{ref:"dropdown",class:_vm.dropdownClass,attrs:{"data-show":_vm.isOpen}},[_c('div',{class:_vm.dropdownContainerClass},[_vm._t("default")],2)])])],1)}
+var Dropdownvue_type_template_id_15de85a6_staticRenderFns = []
+
+
+// CONCATENATED MODULE: ./src/components/dropdown/Dropdown.vue?vue&type=template&id=15de85a6&
 
 // CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/dom-utils/getBoundingClientRect.js
 function getBoundingClientRect(element) {
@@ -23089,14 +28267,14 @@ function getWindowScrollBarX(element) {
 }
 // CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/dom-utils/getComputedStyle.js
 
-function getComputedStyle(element) {
+function getComputedStyle_getComputedStyle(element) {
   return getWindow(element).getComputedStyle(element);
 }
 // CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/dom-utils/isScrollParent.js
 
 function isScrollParent(element) {
   // Firefox wants us to check `-x` and `-y` variations as well
-  var _getComputedStyle = getComputedStyle(element),
+  var _getComputedStyle = getComputedStyle_getComputedStyle(element),
       overflow = _getComputedStyle.overflow,
       overflowX = _getComputedStyle.overflowX,
       overflowY = _getComputedStyle.overflowY;
@@ -23240,7 +28418,7 @@ function isTableElement(element) {
 
 function getTrueOffsetParent(element) {
   if (!isHTMLElement(element) || // https://github.com/popperjs/popper-core/issues/837
-  getComputedStyle(element).position === 'fixed') {
+  getComputedStyle_getComputedStyle(element).position === 'fixed') {
     return null;
   }
 
@@ -23249,7 +28427,7 @@ function getTrueOffsetParent(element) {
   if (offsetParent) {
     var html = getDocumentElement(offsetParent);
 
-    if (getNodeName(offsetParent) === 'body' && getComputedStyle(offsetParent).position === 'static' && getComputedStyle(html).position !== 'static') {
+    if (getNodeName(offsetParent) === 'body' && getComputedStyle_getComputedStyle(offsetParent).position === 'static' && getComputedStyle_getComputedStyle(html).position !== 'static') {
       return html;
     }
   }
@@ -23263,7 +28441,7 @@ function getContainingBlock(element) {
   var currentNode = getParentNode(element);
 
   while (isHTMLElement(currentNode) && ['html', 'body'].indexOf(getNodeName(currentNode)) < 0) {
-    var css = getComputedStyle(currentNode); // This is non-exhaustive but covers the most common CSS properties that
+    var css = getComputedStyle_getComputedStyle(currentNode); // This is non-exhaustive but covers the most common CSS properties that
     // create a containing block.
 
     if (css.transform !== 'none' || css.perspective !== 'none' || css.willChange && css.willChange !== 'auto') {
@@ -23282,11 +28460,11 @@ function getOffsetParent(element) {
   var window = getWindow(element);
   var offsetParent = getTrueOffsetParent(element);
 
-  while (offsetParent && isTableElement(offsetParent) && getComputedStyle(offsetParent).position === 'static') {
+  while (offsetParent && isTableElement(offsetParent) && getComputedStyle_getComputedStyle(offsetParent).position === 'static') {
     offsetParent = getTrueOffsetParent(offsetParent);
   }
 
-  if (offsetParent && getNodeName(offsetParent) === 'body' && getComputedStyle(offsetParent).position === 'static') {
+  if (offsetParent && getNodeName(offsetParent) === 'body' && getComputedStyle_getComputedStyle(offsetParent).position === 'static') {
     return window;
   }
 
@@ -23299,17 +28477,17 @@ var right = 'right';
 var left = 'left';
 var auto = 'auto';
 var basePlacements = [enums_top, bottom, right, left];
-var start = 'start';
-var end = 'end';
-var clippingParents = 'clippingParents';
+var enums_start = 'start';
+var enums_end = 'end';
+var enums_clippingParents = 'clippingParents';
 var viewport = 'viewport';
 var enums_popper = 'popper';
 var enums_reference = 'reference';
 var variationPlacements = /*#__PURE__*/basePlacements.reduce(function (acc, placement) {
-  return acc.concat([placement + "-" + start, placement + "-" + end]);
+  return acc.concat([placement + "-" + enums_start, placement + "-" + enums_end]);
 }, []);
-var placements = /*#__PURE__*/[].concat(basePlacements, [auto]).reduce(function (acc, placement) {
-  return acc.concat([placement, placement + "-" + start, placement + "-" + end]);
+var enums_placements = /*#__PURE__*/[].concat(basePlacements, [auto]).reduce(function (acc, placement) {
+  return acc.concat([placement, placement + "-" + enums_start, placement + "-" + enums_end]);
 }, []); // modifiers that need to read the DOM
 
 var beforeRead = 'beforeRead';
@@ -23737,11 +28915,11 @@ function computeOffsets(_ref) {
     var len = mainAxis === 'y' ? 'height' : 'width';
 
     switch (variation) {
-      case start:
+      case enums_start:
         offsets[mainAxis] = Math.floor(offsets[mainAxis]) - Math.floor(reference[len] / 2 - element[len] / 2);
         break;
 
-      case end:
+      case enums_end:
         offsets[mainAxis] = Math.floor(offsets[mainAxis]) + Math.ceil(reference[len] / 2 - element[len] / 2);
         break;
 
@@ -23754,7 +28932,7 @@ function computeOffsets(_ref) {
 // CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/modifiers/popperOffsets.js
 
 
-function popperOffsets(_ref) {
+function popperOffsets_popperOffsets(_ref) {
   var state = _ref.state,
       name = _ref.name;
   // Offsets are the actual position the popper needs to have to be
@@ -23774,7 +28952,7 @@ function popperOffsets(_ref) {
   name: 'popperOffsets',
   enabled: true,
   phase: 'read',
-  fn: popperOffsets,
+  fn: popperOffsets_popperOffsets,
   data: {}
 });
 // CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/modifiers/computeStyles.js
@@ -23995,99 +29173,918 @@ function applyStyles_effect(_ref2) {
   effect: applyStyles_effect,
   requires: ['computeStyles']
 });
-// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/popper-lite.js
+// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/modifiers/offset.js
+
+
+function distanceAndSkiddingToXY(placement, rects, offset) {
+  var basePlacement = getBasePlacement(placement);
+  var invertDistance = [left, enums_top].indexOf(basePlacement) >= 0 ? -1 : 1;
+
+  var _ref = typeof offset === 'function' ? offset(Object.assign(Object.assign({}, rects), {}, {
+    placement: placement
+  })) : offset,
+      skidding = _ref[0],
+      distance = _ref[1];
+
+  skidding = skidding || 0;
+  distance = (distance || 0) * invertDistance;
+  return [left, right].indexOf(basePlacement) >= 0 ? {
+    x: distance,
+    y: skidding
+  } : {
+    x: skidding,
+    y: distance
+  };
+}
+
+function offset_offset(_ref2) {
+  var state = _ref2.state,
+      options = _ref2.options,
+      name = _ref2.name;
+  var _options$offset = options.offset,
+      offset = _options$offset === void 0 ? [0, 0] : _options$offset;
+  var data = enums_placements.reduce(function (acc, placement) {
+    acc[placement] = distanceAndSkiddingToXY(placement, state.rects, offset);
+    return acc;
+  }, {});
+  var _data$state$placement = data[state.placement],
+      x = _data$state$placement.x,
+      y = _data$state$placement.y;
+
+  if (state.modifiersData.popperOffsets != null) {
+    state.modifiersData.popperOffsets.x += x;
+    state.modifiersData.popperOffsets.y += y;
+  }
+
+  state.modifiersData[name] = data;
+} // eslint-disable-next-line import/no-unused-modules
+
+
+/* harmony default export */ var modifiers_offset = ({
+  name: 'offset',
+  enabled: true,
+  phase: 'main',
+  requires: ['popperOffsets'],
+  fn: offset_offset
+});
+// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/utils/getOppositePlacement.js
+var hash = {
+  left: 'right',
+  right: 'left',
+  bottom: 'top',
+  top: 'bottom'
+};
+function getOppositePlacement(placement) {
+  return placement.replace(/left|right|bottom|top/g, function (matched) {
+    return hash[matched];
+  });
+}
+// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/utils/getOppositeVariationPlacement.js
+var getOppositeVariationPlacement_hash = {
+  start: 'end',
+  end: 'start'
+};
+function getOppositeVariationPlacement(placement) {
+  return placement.replace(/start|end/g, function (matched) {
+    return getOppositeVariationPlacement_hash[matched];
+  });
+}
+// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/dom-utils/getViewportRect.js
+
+
+
+function getViewportRect(element) {
+  var win = getWindow(element);
+  var html = getDocumentElement(element);
+  var visualViewport = win.visualViewport;
+  var width = html.clientWidth;
+  var height = html.clientHeight;
+  var x = 0;
+  var y = 0; // NB: This isn't supported on iOS <= 12. If the keyboard is open, the popper
+  // can be obscured underneath it.
+  // Also, `html.clientHeight` adds the bottom bar height in Safari iOS, even
+  // if it isn't open, so if this isn't available, the popper will be detected
+  // to overflow the bottom of the screen too early.
+
+  if (visualViewport) {
+    width = visualViewport.width;
+    height = visualViewport.height; // Uses Layout Viewport (like Chrome; Safari does not currently)
+    // In Chrome, it returns a value very close to 0 (+/-) but contains rounding
+    // errors due to floating point numbers, so we need to check precision.
+    // Safari returns a number <= 0, usually < -1 when pinch-zoomed
+    // Feature detection fails in mobile emulation mode in Chrome.
+    // Math.abs(win.innerWidth / visualViewport.scale - visualViewport.width) <
+    // 0.001
+    // Fallback here: "Not Safari" userAgent
+
+    if (!/^((?!chrome|android).)*safari/i.test(navigator.userAgent)) {
+      x = visualViewport.offsetLeft;
+      y = visualViewport.offsetTop;
+    }
+  }
+
+  return {
+    width: width,
+    height: height,
+    x: x + getWindowScrollBarX(element),
+    y: y
+  };
+}
+// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/dom-utils/getDocumentRect.js
+
+
+
+ // Gets the entire size of the scrollable document area, even extending outside
+// of the `<html>` and `<body>` rect bounds if horizontally scrollable
+
+function getDocumentRect(element) {
+  var html = getDocumentElement(element);
+  var winScroll = getWindowScroll(element);
+  var body = element.ownerDocument.body;
+  var width = Math.max(html.scrollWidth, html.clientWidth, body ? body.scrollWidth : 0, body ? body.clientWidth : 0);
+  var height = Math.max(html.scrollHeight, html.clientHeight, body ? body.scrollHeight : 0, body ? body.clientHeight : 0);
+  var x = -winScroll.scrollLeft + getWindowScrollBarX(element);
+  var y = -winScroll.scrollTop;
+
+  if (getComputedStyle_getComputedStyle(body || html).direction === 'rtl') {
+    x += Math.max(html.clientWidth, body ? body.clientWidth : 0) - width;
+  }
+
+  return {
+    width: width,
+    height: height,
+    x: x,
+    y: y
+  };
+}
+// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/dom-utils/contains.js
+
+function contains(parent, child) {
+  var rootNode = child.getRootNode && child.getRootNode(); // First, attempt with faster native method
+
+  if (parent.contains(child)) {
+    return true;
+  } // then fallback to custom implementation with Shadow DOM support
+  else if (rootNode && isShadowRoot(rootNode)) {
+      var next = child;
+
+      do {
+        if (next && parent.isSameNode(next)) {
+          return true;
+        } // $FlowFixMe: need a better way to handle this...
+
+
+        next = next.parentNode || next.host;
+      } while (next);
+    } // Give up, the result is false
+
+
+  return false;
+}
+// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/utils/rectToClientRect.js
+function rectToClientRect(rect) {
+  return Object.assign(Object.assign({}, rect), {}, {
+    left: rect.x,
+    top: rect.y,
+    right: rect.x + rect.width,
+    bottom: rect.y + rect.height
+  });
+}
+// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/dom-utils/getClippingRect.js
 
 
 
 
 
-var popper_lite_defaultModifiers = [eventListeners, modifiers_popperOffsets, modifiers_computeStyles, modifiers_applyStyles];
-var popper_lite_createPopper = /*#__PURE__*/popperGenerator({
-  defaultModifiers: popper_lite_defaultModifiers
+
+
+
+
+
+
+
+
+
+function getInnerBoundingClientRect(element) {
+  var rect = getBoundingClientRect(element);
+  rect.top = rect.top + element.clientTop;
+  rect.left = rect.left + element.clientLeft;
+  rect.bottom = rect.top + element.clientHeight;
+  rect.right = rect.left + element.clientWidth;
+  rect.width = element.clientWidth;
+  rect.height = element.clientHeight;
+  rect.x = rect.left;
+  rect.y = rect.top;
+  return rect;
+}
+
+function getClientRectFromMixedType(element, clippingParent) {
+  return clippingParent === viewport ? rectToClientRect(getViewportRect(element)) : isHTMLElement(clippingParent) ? getInnerBoundingClientRect(clippingParent) : rectToClientRect(getDocumentRect(getDocumentElement(element)));
+} // A "clipping parent" is an overflowable container with the characteristic of
+// clipping (or hiding) overflowing elements with a position different from
+// `initial`
+
+
+function getClippingParents(element) {
+  var clippingParents = listScrollParents(getParentNode(element));
+  var canEscapeClipping = ['absolute', 'fixed'].indexOf(getComputedStyle_getComputedStyle(element).position) >= 0;
+  var clipperElement = canEscapeClipping && isHTMLElement(element) ? getOffsetParent(element) : element;
+
+  if (!isElement(clipperElement)) {
+    return [];
+  } // $FlowFixMe: https://github.com/facebook/flow/issues/1414
+
+
+  return clippingParents.filter(function (clippingParent) {
+    return isElement(clippingParent) && contains(clippingParent, clipperElement) && getNodeName(clippingParent) !== 'body';
+  });
+} // Gets the maximum area that the element is visible in due to any number of
+// clipping parents
+
+
+function getClippingRect(element, boundary, rootBoundary) {
+  var mainClippingParents = boundary === 'clippingParents' ? getClippingParents(element) : [].concat(boundary);
+  var clippingParents = [].concat(mainClippingParents, [rootBoundary]);
+  var firstClippingParent = clippingParents[0];
+  var clippingRect = clippingParents.reduce(function (accRect, clippingParent) {
+    var rect = getClientRectFromMixedType(element, clippingParent);
+    accRect.top = Math.max(rect.top, accRect.top);
+    accRect.right = Math.min(rect.right, accRect.right);
+    accRect.bottom = Math.min(rect.bottom, accRect.bottom);
+    accRect.left = Math.max(rect.left, accRect.left);
+    return accRect;
+  }, getClientRectFromMixedType(element, firstClippingParent));
+  clippingRect.width = clippingRect.right - clippingRect.left;
+  clippingRect.height = clippingRect.bottom - clippingRect.top;
+  clippingRect.x = clippingRect.left;
+  clippingRect.y = clippingRect.top;
+  return clippingRect;
+}
+// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/utils/getFreshSideObject.js
+function getFreshSideObject() {
+  return {
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0
+  };
+}
+// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/utils/mergePaddingObject.js
+
+function mergePaddingObject(paddingObject) {
+  return Object.assign(Object.assign({}, getFreshSideObject()), paddingObject);
+}
+// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/utils/expandToHashMap.js
+function expandToHashMap(value, keys) {
+  return keys.reduce(function (hashMap, key) {
+    hashMap[key] = value;
+    return hashMap;
+  }, {});
+}
+// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/utils/detectOverflow.js
+
+
+
+
+
+
+
+
+ // eslint-disable-next-line import/no-unused-modules
+
+function detectOverflow(state, options) {
+  if (options === void 0) {
+    options = {};
+  }
+
+  var _options = options,
+      _options$placement = _options.placement,
+      placement = _options$placement === void 0 ? state.placement : _options$placement,
+      _options$boundary = _options.boundary,
+      boundary = _options$boundary === void 0 ? enums_clippingParents : _options$boundary,
+      _options$rootBoundary = _options.rootBoundary,
+      rootBoundary = _options$rootBoundary === void 0 ? viewport : _options$rootBoundary,
+      _options$elementConte = _options.elementContext,
+      elementContext = _options$elementConte === void 0 ? enums_popper : _options$elementConte,
+      _options$altBoundary = _options.altBoundary,
+      altBoundary = _options$altBoundary === void 0 ? false : _options$altBoundary,
+      _options$padding = _options.padding,
+      padding = _options$padding === void 0 ? 0 : _options$padding;
+  var paddingObject = mergePaddingObject(typeof padding !== 'number' ? padding : expandToHashMap(padding, basePlacements));
+  var altContext = elementContext === enums_popper ? enums_reference : enums_popper;
+  var referenceElement = state.elements.reference;
+  var popperRect = state.rects.popper;
+  var element = state.elements[altBoundary ? altContext : elementContext];
+  var clippingClientRect = getClippingRect(isElement(element) ? element : element.contextElement || getDocumentElement(state.elements.popper), boundary, rootBoundary);
+  var referenceClientRect = getBoundingClientRect(referenceElement);
+  var popperOffsets = computeOffsets({
+    reference: referenceClientRect,
+    element: popperRect,
+    strategy: 'absolute',
+    placement: placement
+  });
+  var popperClientRect = rectToClientRect(Object.assign(Object.assign({}, popperRect), popperOffsets));
+  var elementClientRect = elementContext === enums_popper ? popperClientRect : referenceClientRect; // positive = overflowing the clipping rect
+  // 0 or negative = within the clipping rect
+
+  var overflowOffsets = {
+    top: clippingClientRect.top - elementClientRect.top + paddingObject.top,
+    bottom: elementClientRect.bottom - clippingClientRect.bottom + paddingObject.bottom,
+    left: clippingClientRect.left - elementClientRect.left + paddingObject.left,
+    right: elementClientRect.right - clippingClientRect.right + paddingObject.right
+  };
+  var offsetData = state.modifiersData.offset; // Offsets can be applied only to the popper element
+
+  if (elementContext === enums_popper && offsetData) {
+    var offset = offsetData[placement];
+    Object.keys(overflowOffsets).forEach(function (key) {
+      var multiply = [right, bottom].indexOf(key) >= 0 ? 1 : -1;
+      var axis = [enums_top, bottom].indexOf(key) >= 0 ? 'y' : 'x';
+      overflowOffsets[key] += offset[axis] * multiply;
+    });
+  }
+
+  return overflowOffsets;
+}
+// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/utils/computeAutoPlacement.js
+
+
+
+
+
+/*:: type OverflowsMap = { [ComputedPlacement]: number }; */
+
+/*;; type OverflowsMap = { [key in ComputedPlacement]: number }; */
+function computeAutoPlacement(state, options) {
+  if (options === void 0) {
+    options = {};
+  }
+
+  var _options = options,
+      placement = _options.placement,
+      boundary = _options.boundary,
+      rootBoundary = _options.rootBoundary,
+      padding = _options.padding,
+      flipVariations = _options.flipVariations,
+      _options$allowedAutoP = _options.allowedAutoPlacements,
+      allowedAutoPlacements = _options$allowedAutoP === void 0 ? enums_placements : _options$allowedAutoP;
+  var variation = getVariation(placement);
+  var placements = variation ? flipVariations ? variationPlacements : variationPlacements.filter(function (placement) {
+    return getVariation(placement) === variation;
+  }) : basePlacements; // $FlowFixMe
+
+  var allowedPlacements = placements.filter(function (placement) {
+    return allowedAutoPlacements.indexOf(placement) >= 0;
+  });
+
+  if (allowedPlacements.length === 0) {
+    allowedPlacements = placements;
+
+    if (false) {}
+  } // $FlowFixMe: Flow seems to have problems with two array unions...
+
+
+  var overflows = allowedPlacements.reduce(function (acc, placement) {
+    acc[placement] = detectOverflow(state, {
+      placement: placement,
+      boundary: boundary,
+      rootBoundary: rootBoundary,
+      padding: padding
+    })[getBasePlacement(placement)];
+    return acc;
+  }, {});
+  return Object.keys(overflows).sort(function (a, b) {
+    return overflows[a] - overflows[b];
+  });
+}
+// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/modifiers/flip.js
+
+
+
+
+
+
+ // eslint-disable-next-line import/no-unused-modules
+
+function getExpandedFallbackPlacements(placement) {
+  if (getBasePlacement(placement) === auto) {
+    return [];
+  }
+
+  var oppositePlacement = getOppositePlacement(placement);
+  return [getOppositeVariationPlacement(placement), oppositePlacement, getOppositeVariationPlacement(oppositePlacement)];
+}
+
+function flip(_ref) {
+  var state = _ref.state,
+      options = _ref.options,
+      name = _ref.name;
+
+  if (state.modifiersData[name]._skip) {
+    return;
+  }
+
+  var _options$mainAxis = options.mainAxis,
+      checkMainAxis = _options$mainAxis === void 0 ? true : _options$mainAxis,
+      _options$altAxis = options.altAxis,
+      checkAltAxis = _options$altAxis === void 0 ? true : _options$altAxis,
+      specifiedFallbackPlacements = options.fallbackPlacements,
+      padding = options.padding,
+      boundary = options.boundary,
+      rootBoundary = options.rootBoundary,
+      altBoundary = options.altBoundary,
+      _options$flipVariatio = options.flipVariations,
+      flipVariations = _options$flipVariatio === void 0 ? true : _options$flipVariatio,
+      allowedAutoPlacements = options.allowedAutoPlacements;
+  var preferredPlacement = state.options.placement;
+  var basePlacement = getBasePlacement(preferredPlacement);
+  var isBasePlacement = basePlacement === preferredPlacement;
+  var fallbackPlacements = specifiedFallbackPlacements || (isBasePlacement || !flipVariations ? [getOppositePlacement(preferredPlacement)] : getExpandedFallbackPlacements(preferredPlacement));
+  var placements = [preferredPlacement].concat(fallbackPlacements).reduce(function (acc, placement) {
+    return acc.concat(getBasePlacement(placement) === auto ? computeAutoPlacement(state, {
+      placement: placement,
+      boundary: boundary,
+      rootBoundary: rootBoundary,
+      padding: padding,
+      flipVariations: flipVariations,
+      allowedAutoPlacements: allowedAutoPlacements
+    }) : placement);
+  }, []);
+  var referenceRect = state.rects.reference;
+  var popperRect = state.rects.popper;
+  var checksMap = new Map();
+  var makeFallbackChecks = true;
+  var firstFittingPlacement = placements[0];
+
+  for (var i = 0; i < placements.length; i++) {
+    var placement = placements[i];
+
+    var _basePlacement = getBasePlacement(placement);
+
+    var isStartVariation = getVariation(placement) === enums_start;
+    var isVertical = [enums_top, bottom].indexOf(_basePlacement) >= 0;
+    var len = isVertical ? 'width' : 'height';
+    var overflow = detectOverflow(state, {
+      placement: placement,
+      boundary: boundary,
+      rootBoundary: rootBoundary,
+      altBoundary: altBoundary,
+      padding: padding
+    });
+    var mainVariationSide = isVertical ? isStartVariation ? right : left : isStartVariation ? bottom : enums_top;
+
+    if (referenceRect[len] > popperRect[len]) {
+      mainVariationSide = getOppositePlacement(mainVariationSide);
+    }
+
+    var altVariationSide = getOppositePlacement(mainVariationSide);
+    var checks = [];
+
+    if (checkMainAxis) {
+      checks.push(overflow[_basePlacement] <= 0);
+    }
+
+    if (checkAltAxis) {
+      checks.push(overflow[mainVariationSide] <= 0, overflow[altVariationSide] <= 0);
+    }
+
+    if (checks.every(function (check) {
+      return check;
+    })) {
+      firstFittingPlacement = placement;
+      makeFallbackChecks = false;
+      break;
+    }
+
+    checksMap.set(placement, checks);
+  }
+
+  if (makeFallbackChecks) {
+    // `2` may be desired in some cases – research later
+    var numberOfChecks = flipVariations ? 3 : 1;
+
+    var _loop = function _loop(_i) {
+      var fittingPlacement = placements.find(function (placement) {
+        var checks = checksMap.get(placement);
+
+        if (checks) {
+          return checks.slice(0, _i).every(function (check) {
+            return check;
+          });
+        }
+      });
+
+      if (fittingPlacement) {
+        firstFittingPlacement = fittingPlacement;
+        return "break";
+      }
+    };
+
+    for (var _i = numberOfChecks; _i > 0; _i--) {
+      var _ret = _loop(_i);
+
+      if (_ret === "break") break;
+    }
+  }
+
+  if (state.placement !== firstFittingPlacement) {
+    state.modifiersData[name]._skip = true;
+    state.placement = firstFittingPlacement;
+    state.reset = true;
+  }
+} // eslint-disable-next-line import/no-unused-modules
+
+
+/* harmony default export */ var modifiers_flip = ({
+  name: 'flip',
+  enabled: true,
+  phase: 'main',
+  fn: flip,
+  requiresIfExists: ['offset'],
+  data: {
+    _skip: false
+  }
+});
+// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/utils/getAltAxis.js
+function getAltAxis(axis) {
+  return axis === 'x' ? 'y' : 'x';
+}
+// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/utils/within.js
+function within(min, value, max) {
+  return Math.max(min, Math.min(value, max));
+}
+// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/modifiers/preventOverflow.js
+
+
+
+
+
+
+
+
+
+
+
+function preventOverflow(_ref) {
+  var state = _ref.state,
+      options = _ref.options,
+      name = _ref.name;
+  var _options$mainAxis = options.mainAxis,
+      checkMainAxis = _options$mainAxis === void 0 ? true : _options$mainAxis,
+      _options$altAxis = options.altAxis,
+      checkAltAxis = _options$altAxis === void 0 ? false : _options$altAxis,
+      boundary = options.boundary,
+      rootBoundary = options.rootBoundary,
+      altBoundary = options.altBoundary,
+      padding = options.padding,
+      _options$tether = options.tether,
+      tether = _options$tether === void 0 ? true : _options$tether,
+      _options$tetherOffset = options.tetherOffset,
+      tetherOffset = _options$tetherOffset === void 0 ? 0 : _options$tetherOffset;
+  var overflow = detectOverflow(state, {
+    boundary: boundary,
+    rootBoundary: rootBoundary,
+    padding: padding,
+    altBoundary: altBoundary
+  });
+  var basePlacement = getBasePlacement(state.placement);
+  var variation = getVariation(state.placement);
+  var isBasePlacement = !variation;
+  var mainAxis = getMainAxisFromPlacement(basePlacement);
+  var altAxis = getAltAxis(mainAxis);
+  var popperOffsets = state.modifiersData.popperOffsets;
+  var referenceRect = state.rects.reference;
+  var popperRect = state.rects.popper;
+  var tetherOffsetValue = typeof tetherOffset === 'function' ? tetherOffset(Object.assign(Object.assign({}, state.rects), {}, {
+    placement: state.placement
+  })) : tetherOffset;
+  var data = {
+    x: 0,
+    y: 0
+  };
+
+  if (!popperOffsets) {
+    return;
+  }
+
+  if (checkMainAxis) {
+    var mainSide = mainAxis === 'y' ? enums_top : left;
+    var altSide = mainAxis === 'y' ? bottom : right;
+    var len = mainAxis === 'y' ? 'height' : 'width';
+    var offset = popperOffsets[mainAxis];
+    var min = popperOffsets[mainAxis] + overflow[mainSide];
+    var max = popperOffsets[mainAxis] - overflow[altSide];
+    var additive = tether ? -popperRect[len] / 2 : 0;
+    var minLen = variation === enums_start ? referenceRect[len] : popperRect[len];
+    var maxLen = variation === enums_start ? -popperRect[len] : -referenceRect[len]; // We need to include the arrow in the calculation so the arrow doesn't go
+    // outside the reference bounds
+
+    var arrowElement = state.elements.arrow;
+    var arrowRect = tether && arrowElement ? getLayoutRect(arrowElement) : {
+      width: 0,
+      height: 0
+    };
+    var arrowPaddingObject = state.modifiersData['arrow#persistent'] ? state.modifiersData['arrow#persistent'].padding : getFreshSideObject();
+    var arrowPaddingMin = arrowPaddingObject[mainSide];
+    var arrowPaddingMax = arrowPaddingObject[altSide]; // If the reference length is smaller than the arrow length, we don't want
+    // to include its full size in the calculation. If the reference is small
+    // and near the edge of a boundary, the popper can overflow even if the
+    // reference is not overflowing as well (e.g. virtual elements with no
+    // width or height)
+
+    var arrowLen = within(0, referenceRect[len], arrowRect[len]);
+    var minOffset = isBasePlacement ? referenceRect[len] / 2 - additive - arrowLen - arrowPaddingMin - tetherOffsetValue : minLen - arrowLen - arrowPaddingMin - tetherOffsetValue;
+    var maxOffset = isBasePlacement ? -referenceRect[len] / 2 + additive + arrowLen + arrowPaddingMax + tetherOffsetValue : maxLen + arrowLen + arrowPaddingMax + tetherOffsetValue;
+    var arrowOffsetParent = state.elements.arrow && getOffsetParent(state.elements.arrow);
+    var clientOffset = arrowOffsetParent ? mainAxis === 'y' ? arrowOffsetParent.clientTop || 0 : arrowOffsetParent.clientLeft || 0 : 0;
+    var offsetModifierValue = state.modifiersData.offset ? state.modifiersData.offset[state.placement][mainAxis] : 0;
+    var tetherMin = popperOffsets[mainAxis] + minOffset - offsetModifierValue - clientOffset;
+    var tetherMax = popperOffsets[mainAxis] + maxOffset - offsetModifierValue;
+    var preventedOffset = within(tether ? Math.min(min, tetherMin) : min, offset, tether ? Math.max(max, tetherMax) : max);
+    popperOffsets[mainAxis] = preventedOffset;
+    data[mainAxis] = preventedOffset - offset;
+  }
+
+  if (checkAltAxis) {
+    var _mainSide = mainAxis === 'x' ? enums_top : left;
+
+    var _altSide = mainAxis === 'x' ? bottom : right;
+
+    var _offset = popperOffsets[altAxis];
+
+    var _min = _offset + overflow[_mainSide];
+
+    var _max = _offset - overflow[_altSide];
+
+    var _preventedOffset = within(_min, _offset, _max);
+
+    popperOffsets[altAxis] = _preventedOffset;
+    data[altAxis] = _preventedOffset - _offset;
+  }
+
+  state.modifiersData[name] = data;
+} // eslint-disable-next-line import/no-unused-modules
+
+
+/* harmony default export */ var modifiers_preventOverflow = ({
+  name: 'preventOverflow',
+  enabled: true,
+  phase: 'main',
+  fn: preventOverflow,
+  requiresIfExists: ['offset']
+});
+// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/modifiers/arrow.js
+
+
+
+
+
+
+
+
+
+ // eslint-disable-next-line import/no-unused-modules
+
+function arrow(_ref) {
+  var _state$modifiersData$;
+
+  var state = _ref.state,
+      name = _ref.name;
+  var arrowElement = state.elements.arrow;
+  var popperOffsets = state.modifiersData.popperOffsets;
+  var basePlacement = getBasePlacement(state.placement);
+  var axis = getMainAxisFromPlacement(basePlacement);
+  var isVertical = [left, right].indexOf(basePlacement) >= 0;
+  var len = isVertical ? 'height' : 'width';
+
+  if (!arrowElement || !popperOffsets) {
+    return;
+  }
+
+  var paddingObject = state.modifiersData[name + "#persistent"].padding;
+  var arrowRect = getLayoutRect(arrowElement);
+  var minProp = axis === 'y' ? enums_top : left;
+  var maxProp = axis === 'y' ? bottom : right;
+  var endDiff = state.rects.reference[len] + state.rects.reference[axis] - popperOffsets[axis] - state.rects.popper[len];
+  var startDiff = popperOffsets[axis] - state.rects.reference[axis];
+  var arrowOffsetParent = getOffsetParent(arrowElement);
+  var clientSize = arrowOffsetParent ? axis === 'y' ? arrowOffsetParent.clientHeight || 0 : arrowOffsetParent.clientWidth || 0 : 0;
+  var centerToReference = endDiff / 2 - startDiff / 2; // Make sure the arrow doesn't overflow the popper if the center point is
+  // outside of the popper bounds
+
+  var min = paddingObject[minProp];
+  var max = clientSize - arrowRect[len] - paddingObject[maxProp];
+  var center = clientSize / 2 - arrowRect[len] / 2 + centerToReference;
+  var offset = within(min, center, max); // Prevents breaking syntax highlighting...
+
+  var axisProp = axis;
+  state.modifiersData[name] = (_state$modifiersData$ = {}, _state$modifiersData$[axisProp] = offset, _state$modifiersData$.centerOffset = offset - center, _state$modifiersData$);
+}
+
+function arrow_effect(_ref2) {
+  var state = _ref2.state,
+      options = _ref2.options,
+      name = _ref2.name;
+  var _options$element = options.element,
+      arrowElement = _options$element === void 0 ? '[data-popper-arrow]' : _options$element,
+      _options$padding = options.padding,
+      padding = _options$padding === void 0 ? 0 : _options$padding;
+
+  if (arrowElement == null) {
+    return;
+  } // CSS selector
+
+
+  if (typeof arrowElement === 'string') {
+    arrowElement = state.elements.popper.querySelector(arrowElement);
+
+    if (!arrowElement) {
+      return;
+    }
+  }
+
+  if (false) {}
+
+  if (!contains(state.elements.popper, arrowElement)) {
+    if (false) {}
+
+    return;
+  }
+
+  state.elements.arrow = arrowElement;
+  state.modifiersData[name + "#persistent"] = {
+    padding: mergePaddingObject(typeof padding !== 'number' ? padding : expandToHashMap(padding, basePlacements))
+  };
+} // eslint-disable-next-line import/no-unused-modules
+
+
+/* harmony default export */ var modifiers_arrow = ({
+  name: 'arrow',
+  enabled: true,
+  phase: 'main',
+  fn: arrow,
+  effect: arrow_effect,
+  requires: ['popperOffsets'],
+  requiresIfExists: ['preventOverflow']
+});
+// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/modifiers/hide.js
+
+
+
+function getSideOffsets(overflow, rect, preventedOffsets) {
+  if (preventedOffsets === void 0) {
+    preventedOffsets = {
+      x: 0,
+      y: 0
+    };
+  }
+
+  return {
+    top: overflow.top - rect.height - preventedOffsets.y,
+    right: overflow.right - rect.width + preventedOffsets.x,
+    bottom: overflow.bottom - rect.height + preventedOffsets.y,
+    left: overflow.left - rect.width - preventedOffsets.x
+  };
+}
+
+function isAnySideFullyClipped(overflow) {
+  return [enums_top, right, bottom, left].some(function (side) {
+    return overflow[side] >= 0;
+  });
+}
+
+function hide(_ref) {
+  var state = _ref.state,
+      name = _ref.name;
+  var referenceRect = state.rects.reference;
+  var popperRect = state.rects.popper;
+  var preventedOffsets = state.modifiersData.preventOverflow;
+  var referenceOverflow = detectOverflow(state, {
+    elementContext: 'reference'
+  });
+  var popperAltOverflow = detectOverflow(state, {
+    altBoundary: true
+  });
+  var referenceClippingOffsets = getSideOffsets(referenceOverflow, referenceRect);
+  var popperEscapeOffsets = getSideOffsets(popperAltOverflow, popperRect, preventedOffsets);
+  var isReferenceHidden = isAnySideFullyClipped(referenceClippingOffsets);
+  var hasPopperEscaped = isAnySideFullyClipped(popperEscapeOffsets);
+  state.modifiersData[name] = {
+    referenceClippingOffsets: referenceClippingOffsets,
+    popperEscapeOffsets: popperEscapeOffsets,
+    isReferenceHidden: isReferenceHidden,
+    hasPopperEscaped: hasPopperEscaped
+  };
+  state.attributes.popper = Object.assign(Object.assign({}, state.attributes.popper), {}, {
+    'data-popper-reference-hidden': isReferenceHidden,
+    'data-popper-escaped': hasPopperEscaped
+  });
+} // eslint-disable-next-line import/no-unused-modules
+
+
+/* harmony default export */ var modifiers_hide = ({
+  name: 'hide',
+  enabled: true,
+  phase: 'main',
+  requiresIfExists: ['preventOverflow'],
+  fn: hide
+});
+// CONCATENATED MODULE: ./node_modules/@popperjs/core/lib/popper.js
+
+
+
+
+
+
+
+
+
+
+var popper_defaultModifiers = [eventListeners, modifiers_popperOffsets, modifiers_computeStyles, modifiers_applyStyles, modifiers_offset, modifiers_flip, modifiers_preventOverflow, modifiers_arrow, modifiers_hide];
+var popper_createPopper = /*#__PURE__*/popperGenerator({
+  defaultModifiers: popper_defaultModifiers
 }); // eslint-disable-next-line import/no-unused-modules
 
+ // eslint-disable-next-line import/no-unused-modules
 
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/dropdown/TWDropdown.vue?vue&type=script&lang=js&
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
+ // eslint-disable-next-line import/no-unused-modules
 
 
-/* harmony default export */ var TWDropdownvue_type_script_lang_js_ = ({
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/dropdown/Dropdown.vue?vue&type=script&lang=js&
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+
+
+
+/* harmony default export */ var Dropdownvue_type_script_lang_js_ = ({
   name: 'TWDropdown',
+  mixins: [FixedMixin, VariantMixin, SizeMixin],
   props: {
-    variant: {
-      type: String,
-      default: 'default'
-    },
-    disabled: {
-      type: Boolean,
-      default: false
-    },
-    noCaret: {
-      type: Boolean,
-      default: false
-    },
-    size: {
-      type: String,
-      default: 'md'
-    },
-    text: {
-      type: String,
-      default: undefined
-    },
+    disabled: Boolean,
+    noCaret: Boolean,
+    text: String,
     placement: {
       type: String,
       default: 'bottom-end'
     }
   },
   components: {
-    TWButton: TWButton
+    MountingPortal: portal_vue_common["MountingPortal"],
+    TWButton: Button
   },
   provide: function provide() {
     return {
@@ -24096,16 +30093,23 @@ var popper_lite_createPopper = /*#__PURE__*/popperGenerator({
   },
   data: function data() {
     return {
-      TWOptions: {},
+      config: this.$TWVue.Dropdown,
       isOpen: false,
-      popper: null,
-      id: this._uid
+      popper: null
     };
   },
   computed: {
-    iconClassList: function iconClassList() {
-      var sizes = this.TWOptions.icon.sizes;
-      return sizes[this.size];
+    rootClass: function rootClass() {
+      return [this.fixedClass.root, this.sizeClass.root];
+    },
+    iconClass: function iconClass() {
+      return [this.fixedClass.icon, this.sizeClass.icon];
+    },
+    dropdownClass: function dropdownClass() {
+      return ['twvue-dropdown', this.fixedClass.dropdown, this.variantClass.dropdown, this.sizeClass.dropdown];
+    },
+    dropdownContainerClass: function dropdownContainerClass() {
+      return [this.fixedClass.dropdownContainer, this.sizeClass.dropdownContainer];
     }
   },
   watch: {
@@ -24116,13 +30120,14 @@ var popper_lite_createPopper = /*#__PURE__*/popperGenerator({
     }
   },
   created: function created() {
-    var _this$$TWVue;
-
     this.$root.$on('tw-dropdown-shown', this.rootCloseListener);
-    this.TWOptions = (this === null || this === void 0 ? void 0 : (_this$$TWVue = this.$TWVue) === null || _this$$TWVue === void 0 ? void 0 : _this$$TWVue.TWDropdown) || {};
   },
   mounted: function mounted() {
-    this.initPopper();
+    var _this = this;
+
+    this.$nextTick(function () {
+      _this.initPopper();
+    });
 
     if (typeof document !== 'undefined') {
       document.addEventListener('click', this.clickOutListener);
@@ -24136,7 +30141,9 @@ var popper_lite_createPopper = /*#__PURE__*/popperGenerator({
     }
   },
   destroyed: function destroyed() {
-    this.popper.destroy();
+    if (typeof this.popper.destroy === 'function') {
+      this.popper.destroy();
+    }
   },
   methods: {
     rootCloseListener: function rootCloseListener(vm) {
@@ -24172,18 +30179,18 @@ var popper_lite_createPopper = /*#__PURE__*/popperGenerator({
     initPopper: function initPopper() {
       var button = this.$refs.component;
       var dropdown = this.$refs.dropdown;
-      this.popper = popper_lite_createPopper(button, dropdown, {
+      this.popper = popper_createPopper(button, dropdown, {
         placement: this.placement
       });
     }
   }
 });
-// CONCATENATED MODULE: ./src/components/dropdown/TWDropdown.vue?vue&type=script&lang=js&
- /* harmony default export */ var dropdown_TWDropdownvue_type_script_lang_js_ = (TWDropdownvue_type_script_lang_js_); 
-// EXTERNAL MODULE: ./src/components/dropdown/TWDropdown.vue?vue&type=style&index=0&lang=css&
-var TWDropdownvue_type_style_index_0_lang_css_ = __webpack_require__("9c7c");
+// CONCATENATED MODULE: ./src/components/dropdown/Dropdown.vue?vue&type=script&lang=js&
+ /* harmony default export */ var dropdown_Dropdownvue_type_script_lang_js_ = (Dropdownvue_type_script_lang_js_); 
+// EXTERNAL MODULE: ./src/components/dropdown/Dropdown.vue?vue&type=style&index=0&lang=css&
+var Dropdownvue_type_style_index_0_lang_css_ = __webpack_require__("bded");
 
-// CONCATENATED MODULE: ./src/components/dropdown/TWDropdown.vue
+// CONCATENATED MODULE: ./src/components/dropdown/Dropdown.vue
 
 
 
@@ -24192,10 +30199,10 @@ var TWDropdownvue_type_style_index_0_lang_css_ = __webpack_require__("9c7c");
 
 /* normalize component */
 
-var TWDropdown_component = normalizeComponent(
-  dropdown_TWDropdownvue_type_script_lang_js_,
-  TWDropdownvue_type_template_id_399b0047_render,
-  TWDropdownvue_type_template_id_399b0047_staticRenderFns,
+var Dropdown_component = normalizeComponent(
+  dropdown_Dropdownvue_type_script_lang_js_,
+  Dropdownvue_type_template_id_15de85a6_render,
+  Dropdownvue_type_template_id_15de85a6_staticRenderFns,
   false,
   null,
   null,
@@ -24203,72 +30210,49 @@ var TWDropdown_component = normalizeComponent(
   
 )
 
-/* harmony default export */ var TWDropdown = (TWDropdown_component.exports);
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/dropdown/TWDropdownItem.vue?vue&type=script&lang=js&
+/* harmony default export */ var Dropdown = (Dropdown_component.exports);
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"3483aeeb-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/dropdown/DropdownItem.vue?vue&type=template&id=365cb218&
+var DropdownItemvue_type_template_id_365cb218_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c(_vm.computedTag,_vm._g(_vm._b({tag:"Component",class:_vm.rootClass},'Component',_vm.$attrs,false),_vm.$listeners),[_vm._t("default")],2)}
+var DropdownItemvue_type_template_id_365cb218_staticRenderFns = []
 
 
-/* harmony default export */ var TWDropdownItemvue_type_script_lang_js_ = ({
+// CONCATENATED MODULE: ./src/components/dropdown/DropdownItem.vue?vue&type=template&id=365cb218&
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/dropdown/DropdownItem.vue?vue&type=script&lang=js&
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ var DropdownItemvue_type_script_lang_js_ = ({
   name: 'TWDropdownItem',
-  inject: {
-    'TWDropdown': {
-      default: undefined
-    }
-  },
+  inheritAttrs: false,
+  inject: ['TWDropdown'],
   props: {
-    href: {
+    tag: {
       type: String,
-      default: undefined
-    },
-    to: {
-      type: [String, Object],
-      default: undefined
-    },
-    tagName: {
-      type: String,
-      default: 'button',
-      validator: function validator(value) {
-        return ['button', 'a'].includes(value);
-      }
+      default: 'button'
     }
   },
   computed: {
-    baseClass: function baseClass() {
-      return ['group flex items-center', 'block w-full px-4 py-2 text-sm leading-5 text-gray-700 hover:text-gray-900 hover:bg-gray-100', 'focus:outline-none focus:bg-gray-100 focus:text-gray-900'];
-    },
-    isRouterLinkComponentAvailable: function isRouterLinkComponentAvailable() {
-      return !!(this.$options.components && (this.$options.components.RouterLink || this.$options.components.NuxtLink));
-    },
-    isARouterLink: function isARouterLink() {
-      return this.to !== undefined && this.isRouterLinkComponentAvailable;
-    },
-    toRender: function toRender() {
-      if (this.isARouterLink && this.$options.components) {
-        return this.$options.components.NuxtLink || this.$options.components.RouterLink;
+    computedTag: function computedTag() {
+      if (this.$attrs.disabled !== undefined && this.$attrs.disabled !== false) {
+        return 'button';
       }
 
-      if (this.href) {
-        return 'a';
-      }
-
-      return this.tagName;
+      return this.tag;
+    },
+    rootClass: function rootClass() {
+      return [this.TWDropdown.fixedClass.rootItem];
     }
   },
   methods: {
-    routerLinkAttributes: function routerLinkAttributes() {
-      return {
-        to: this.to,
-        tag: this.tagName
-      };
-    },
-    getAttributes: function getAttributes() {
-      if (this.isARouterLink) {
-        return this.routerLinkAttributes();
-      }
-
-      return {
-        href: this.href
-      };
-    },
     onClick: function onClick($evt) {
       this.closeDropdown();
       this.$emit('click', $evt);
@@ -24280,31 +30264,22 @@ var TWDropdown_component = normalizeComponent(
 
       this.TWDropdown.close();
     }
-  },
-  render: function render(createElement) {
-    return createElement(this.toRender, {
-      class: this.baseClass,
-      attrs: this.getAttributes(),
-      on: _objectSpread2(_objectSpread2({}, this.$listeners), {}, {
-        click: this.onClick
-      })
-    }, this.$slots.default);
   }
 });
-// CONCATENATED MODULE: ./src/components/dropdown/TWDropdownItem.vue?vue&type=script&lang=js&
- /* harmony default export */ var dropdown_TWDropdownItemvue_type_script_lang_js_ = (TWDropdownItemvue_type_script_lang_js_); 
-// CONCATENATED MODULE: ./src/components/dropdown/TWDropdownItem.vue
-var TWDropdownItem_render, TWDropdownItem_staticRenderFns
+// CONCATENATED MODULE: ./src/components/dropdown/DropdownItem.vue?vue&type=script&lang=js&
+ /* harmony default export */ var dropdown_DropdownItemvue_type_script_lang_js_ = (DropdownItemvue_type_script_lang_js_); 
+// CONCATENATED MODULE: ./src/components/dropdown/DropdownItem.vue
+
 
 
 
 
 /* normalize component */
 
-var TWDropdownItem_component = normalizeComponent(
-  dropdown_TWDropdownItemvue_type_script_lang_js_,
-  TWDropdownItem_render,
-  TWDropdownItem_staticRenderFns,
+var DropdownItem_component = normalizeComponent(
+  dropdown_DropdownItemvue_type_script_lang_js_,
+  DropdownItemvue_type_template_id_365cb218_render,
+  DropdownItemvue_type_template_id_365cb218_staticRenderFns,
   false,
   null,
   null,
@@ -24312,127 +30287,31 @@ var TWDropdownItem_component = normalizeComponent(
   
 )
 
-/* harmony default export */ var TWDropdownItem = (TWDropdownItem_component.exports);
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"4df010df-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/dropdown/TWDropdownDivider.vue?vue&type=template&id=022197a2&functional=true&
-var TWDropdownDividervue_type_template_id_022197a2_functional_true_render = function (_h,_vm) {var _c=_vm._c;return _c('div',{staticClass:"border-t my-1 border-gray-100"})}
-var TWDropdownDividervue_type_template_id_022197a2_functional_true_staticRenderFns = []
+/* harmony default export */ var DropdownItem = (DropdownItem_component.exports);
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"3483aeeb-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/dropdown/DropdownDivider.vue?vue&type=template&id=1faab560&
+var DropdownDividervue_type_template_id_1faab560_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{class:_vm.rootClass})}
+var DropdownDividervue_type_template_id_1faab560_staticRenderFns = []
 
 
-// CONCATENATED MODULE: ./src/components/dropdown/TWDropdownDivider.vue?vue&type=template&id=022197a2&functional=true&
+// CONCATENATED MODULE: ./src/components/dropdown/DropdownDivider.vue?vue&type=template&id=1faab560&
 
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/dropdown/TWDropdownDivider.vue?vue&type=script&lang=js&
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/dropdown/DropdownDivider.vue?vue&type=script&lang=js&
 //
 //
 //
 //
-/* harmony default export */ var TWDropdownDividervue_type_script_lang_js_ = ({
-  name: 'TWDropdownDivider'
-});
-// CONCATENATED MODULE: ./src/components/dropdown/TWDropdownDivider.vue?vue&type=script&lang=js&
- /* harmony default export */ var dropdown_TWDropdownDividervue_type_script_lang_js_ = (TWDropdownDividervue_type_script_lang_js_); 
-// CONCATENATED MODULE: ./src/components/dropdown/TWDropdownDivider.vue
-
-
-
-
-
-/* normalize component */
-
-var TWDropdownDivider_component = normalizeComponent(
-  dropdown_TWDropdownDividervue_type_script_lang_js_,
-  TWDropdownDividervue_type_template_id_022197a2_functional_true_render,
-  TWDropdownDividervue_type_template_id_022197a2_functional_true_staticRenderFns,
-  true,
-  null,
-  null,
-  null
-  
-)
-
-/* harmony default export */ var TWDropdownDivider = (TWDropdownDivider_component.exports);
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"4df010df-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/pagination/TWPagination.vue?vue&type=template&id=3754a0e6&scoped=true&
-var TWPaginationvue_type_template_id_3754a0e6_scoped_true_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"flex items-center justify-center my-3"},[_c('div',{staticClass:"flex-1 flex justify-between sm:hidden"},[_c('button',{staticClass:"relative inline-flex items-center px-4 py-2 border border-blue-gray300 text-sm leading-5 font-medium rounded-md text-blue-gray700 bg-white hover:text-blue-gray500 focus:outline-none  focus:border-blue-300 active:bg-blue-gray100 active:text-blue-gray700 transition ease-in-out duration-150",attrs:{"type":"button"},on:{"click":function($event){$event.stopPropagation();$event.preventDefault();return _vm.prev()}}},[_vm._v(" Previous ")]),_c('button',{staticClass:"ml-3 relative inline-flex items-center px-4 py-2 border border-blue-gray300 text-sm leading-5 font-medium rounded-md text-blue-gray700 bg-white hover:text-blue-gray500 focus:outline-none  focus:border-blue-300 active:bg-blue-gray100 active:text-blue-gray700 transition ease-in-out duration-150",attrs:{"type":"button"},on:{"click":function($event){$event.stopPropagation();$event.preventDefault();return _vm.next()}}},[_vm._v(" Next ")])]),_c('div',{staticClass:"hidden sm:inline-flex inline-flex shadow-sm"},[_c('TWPaginatorArrow',{attrs:{"disabled":_vm.currentPage === 1},on:{"click":function($event){$event.stopPropagation();$event.preventDefault();return _vm.prev()}}}),_vm._l((_vm.pagesRage),function(pg,index){return _c('TWPaginatorPage',{key:index,attrs:{"disabled":pg.disabled,"active":_vm.currentPage === pg.value},on:{"click":function($event){$event.stopPropagation();$event.preventDefault();return _vm.changePage(pg.value)}}},[_vm._v(" "+_vm._s(pg.value)+" ")])}),_c('TWPaginatorArrow',{attrs:{"next":"","disabled":_vm.currentPage === _vm.totalPages},on:{"click":function($event){$event.stopPropagation();$event.preventDefault();return _vm.next()}}})],2)])}
-var TWPaginationvue_type_template_id_3754a0e6_scoped_true_staticRenderFns = []
-
-
-// CONCATENATED MODULE: ./src/components/pagination/TWPagination.vue?vue&type=template&id=3754a0e6&scoped=true&
-
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"4df010df-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/pagination/TWPaginatorArrow.vue?vue&type=template&id=3687a264&
-var TWPaginatorArrowvue_type_template_id_3687a264_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('button',_vm._g({class:_vm.classList,attrs:{"type":"button","disabled":_vm.disabled}},_vm.listeners),[_vm._t("default",[_c('svg',{staticClass:"h-5 w-5",attrs:{"fill":"currentColor","viewBox":"0 0 20 20"}},[_c('path',{attrs:{"fill-rule":"evenodd","d":_vm.arrowDirectionSvg,"clip-rule":"evenodd"}})])])],2)}
-var TWPaginatorArrowvue_type_template_id_3687a264_staticRenderFns = []
-
-
-// CONCATENATED MODULE: ./src/components/pagination/TWPaginatorArrow.vue?vue&type=template&id=3687a264&
-
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/pagination/TWPaginatorArrow.vue?vue&type=script&lang=js&
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-/* harmony default export */ var TWPaginatorArrowvue_type_script_lang_js_ = ({
-  name: 'TWPaginatorArrow',
-  props: {
-    next: {
-      type: Boolean,
-      default: false
-    },
-    disabled: {
-      type: Boolean,
-      default: false
-    }
-  },
-  data: function data() {
-    return {};
-  },
+/* harmony default export */ var DropdownDividervue_type_script_lang_js_ = ({
+  name: 'TWDropdownDivider',
+  inject: ['TWDropdown'],
   computed: {
-    classList: function classList() {
-      return ['relative inline-flex items-center px-2 py-2 bg-white border text-sm leading-5 font-medium focus:z-10 hover:z-10 focus:outline-none transition ease-in-out duration-150', this.getTextColorClass, this.getBorderColorClass, this.getBorderRoundClass, this.getBgColorClass, this.getMarginClass];
-    },
-    getTextColorClass: function getTextColorClass() {
-      return this.disabled ? 'text-blue-graygray-300 hover:text-blue-graygray-300' : 'text-blue-graygray-400 hover:text-blue-400 active:text-white';
-    },
-    getBorderColorClass: function getBorderColorClass() {
-      return this.disabled ? 'border-blue-graygray-100' : 'border-blue-graygray-100 hover:border-blue-400';
-    },
-    getBorderRoundClass: function getBorderRoundClass() {
-      return this.next ? 'rounded-r-md' : 'rounded-l-md';
-    },
-    getBgColorClass: function getBgColorClass() {
-      return this.disabled ? 'bg-white' : 'bg-white active:bg-blue-400 ';
-    },
-    getMarginClass: function getMarginClass() {
-      return this.next ? '-ml-px' : '';
-    },
-    arrowDirectionSvg: function arrowDirectionSvg() {
-      return this.next ? 'M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z' : 'M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z';
-    },
-    listeners: function listeners() {
-      return this.$listeners;
+    rootClass: function rootClass() {
+      return [this.TWDropdown.fixedClass.rootDivider, this.TWDropdown.sizeClass.rootDivider];
     }
   }
 });
-// CONCATENATED MODULE: ./src/components/pagination/TWPaginatorArrow.vue?vue&type=script&lang=js&
- /* harmony default export */ var pagination_TWPaginatorArrowvue_type_script_lang_js_ = (TWPaginatorArrowvue_type_script_lang_js_); 
-// CONCATENATED MODULE: ./src/components/pagination/TWPaginatorArrow.vue
+// CONCATENATED MODULE: ./src/components/dropdown/DropdownDivider.vue?vue&type=script&lang=js&
+ /* harmony default export */ var dropdown_DropdownDividervue_type_script_lang_js_ = (DropdownDividervue_type_script_lang_js_); 
+// CONCATENATED MODULE: ./src/components/dropdown/DropdownDivider.vue
 
 
 
@@ -24440,10 +30319,10 @@ var TWPaginatorArrowvue_type_template_id_3687a264_staticRenderFns = []
 
 /* normalize component */
 
-var TWPaginatorArrow_component = normalizeComponent(
-  pagination_TWPaginatorArrowvue_type_script_lang_js_,
-  TWPaginatorArrowvue_type_template_id_3687a264_render,
-  TWPaginatorArrowvue_type_template_id_3687a264_staticRenderFns,
+var DropdownDivider_component = normalizeComponent(
+  dropdown_DropdownDividervue_type_script_lang_js_,
+  DropdownDividervue_type_template_id_1faab560_render,
+  DropdownDividervue_type_template_id_1faab560_staticRenderFns,
   false,
   null,
   null,
@@ -24451,267 +30330,214 @@ var TWPaginatorArrow_component = normalizeComponent(
   
 )
 
-/* harmony default export */ var TWPaginatorArrow = (TWPaginatorArrow_component.exports);
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"4df010df-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/pagination/TWPaginatorPage.vue?vue&type=template&id=5126f08e&
-var TWPaginatorPagevue_type_template_id_5126f08e_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c(_vm.disabled ? 'span' : 'button',_vm._g({tag:"Component",class:_vm.classList,attrs:{"type":_vm.type}},_vm.listeners),[_vm._t("default")],2)}
-var TWPaginatorPagevue_type_template_id_5126f08e_staticRenderFns = []
-
-
-// CONCATENATED MODULE: ./src/components/pagination/TWPaginatorPage.vue?vue&type=template&id=5126f08e&
-
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/pagination/TWPaginatorPage.vue?vue&type=script&lang=js&
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-/* harmony default export */ var TWPaginatorPagevue_type_script_lang_js_ = ({
-  name: 'TWPaginatorPage',
-  props: {
-    disabled: {
-      type: Boolean,
-      default: false
+/* harmony default export */ var DropdownDivider = (DropdownDivider_component.exports);
+// CONCATENATED MODULE: ./src/components/dropdown/config.js
+/* harmony default export */ var dropdown_config = ({
+  defaultVariant: 'primary',
+  defaultSize: 'md',
+  fixed: {
+    root: '',
+    icon: '',
+    rootItem: 'group flex items-center block w-full px-4 py-2 text-sm leading-5 text-gray-700 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-900',
+    rootDivider: 'border-t my-1 border-gray-100',
+    dropdown: 'absolute w-56 bg-white rounded-lg shadow-lg',
+    dropdownContainer: 'py-1'
+  },
+  variants: {
+    primary: {
+      root: '',
+      icon: '',
+      rootItem: '',
+      rootDivider: '',
+      dropdown: '',
+      dropdownContainer: ''
     },
-    active: {
-      type: Boolean,
-      default: false
+    secondary: {
+      root: '',
+      icon: '',
+      rootItem: '',
+      rootDivider: '',
+      dropdown: '',
+      dropdownContainer: ''
+    },
+    success: {
+      root: '',
+      icon: '',
+      rootItem: '',
+      rootDivider: '',
+      dropdown: '',
+      dropdownContainer: ''
+    },
+    danger: {
+      root: '',
+      icon: '',
+      rootItem: '',
+      rootDivider: '',
+      dropdown: '',
+      dropdownContainer: ''
+    },
+    warning: {
+      root: '',
+      icon: '',
+      rootItem: '',
+      rootDivider: '',
+      dropdown: '',
+      dropdownContainer: ''
     }
+  },
+  sizes: {
+    xs: {
+      icon: 'h-3 w-3 -mr-1 ml-1'
+    },
+    sm: {
+      icon: 'h-4 w-4 -mr-1 ml-1'
+    },
+    md: {
+      icon: 'h-5 w-5 -mr-1 ml-1'
+    },
+    lg: {
+      icon: 'h-5 w-5 -mr-2 ml-2'
+    },
+    xl: {
+      icon: 'h-6 w-6 -mr-2 ml-2'
+    }
+  }
+});
+// CONCATENATED MODULE: ./src/components/dropdown/index.js
+
+
+
+
+
+var dropdown_Plugin = {
+  install: function install(Vue) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    if (!Vue.prototype.$TWVue) {
+      Vue.prototype.$TWVue = {};
+    }
+
+    Vue.prototype.$TWVue.Dropdown = Object(lodash["merge"])(dropdown_config, options);
+    Vue.component('TWDropdown', Dropdown);
+    Vue.component('TWDropdownItem', DropdownItem);
+    Vue.component('TWDropdownDivider', DropdownDivider);
+  }
+};
+/* harmony default export */ var components_dropdown = (dropdown_Plugin);
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"3483aeeb-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/form-checkbox/FormCheckbox.vue?vue&type=template&id=47707aae&
+var FormCheckboxvue_type_template_id_47707aae_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('label',_vm._b({class:_vm.rootClass},'label',_vm.$attrs,false),[_c('span',{class:_vm.handlerClass},[(_vm.localValue)?_c('svg',{attrs:{"viewBox":"0 0 20 20","fill":"currentColor"}},[_c('path',{attrs:{"d":"M0 11l2-2 5 5L18 3l2 2L7 18z"}})]):_vm._e()]),(_vm.label)?_c('span',{class:_vm.labelClass},[_vm._v(" "+_vm._s(_vm.label)+" ")]):_vm._e(),_c('input',{staticClass:"absolute opacity-0",attrs:{"type":"checkbox","disabled":_vm.disabled},domProps:{"checked":_vm.localValue},on:{"click":_vm.onClick}})])}
+var FormCheckboxvue_type_template_id_47707aae_staticRenderFns = []
+
+
+// CONCATENATED MODULE: ./src/components/form-checkbox/FormCheckbox.vue?vue&type=template&id=47707aae&
+
+// EXTERNAL MODULE: ./node_modules/core-js/modules/es.number.constructor.js
+var es_number_constructor = __webpack_require__("a9e3");
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/form-checkbox/FormCheckbox.vue?vue&type=script&lang=js&
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+/* harmony default export */ var FormCheckboxvue_type_script_lang_js_ = ({
+  name: 'TWFormCheckbox',
+  mixins: [FixedMixin, VariantMixin, SizeMixin],
+  inheritAttrs: false,
+  props: {
+    value: [Boolean, Number],
+    disabled: [Boolean],
+    label: String
   },
   data: function data() {
-    return {};
+    return {
+      config: this.$TWVue.FormCheckbox,
+      localValue: this.value
+    };
   },
   computed: {
-    classList: function classList() {
-      return ['-ml-px relative inline-flex items-center px-4 py-2 border text-sm focus:outline-none leading-5 font-medium transition ease-in-out duration-150', this.getTextColorClass, this.getBorderColorClass, this.getBgColorClass, this.getZindexClass];
+    rootClass: function rootClass() {
+      return ['relative', this.fixedClass.root];
     },
-    getTextColorClass: function getTextColorClass() {
-      if (this.active) {
-        return "text-white";
+    handlerClass: function handlerClass() {
+      return ['z-10', this.fixedClass.handler, this.getHandlerVariantClass, this.sizeClass.handler];
+    },
+    getHandlerVariantClass: function getHandlerVariantClass() {
+      if (this.disabled) {
+        return this.variantClass.handler.disabled;
       }
 
-      return "text-blue-graygray-400 ".concat(!this.disabled ? 'hover:text-blue-500 active:text-white' : '');
-    },
-    getBorderColorClass: function getBorderColorClass() {
-      if (this.active) {
-        return '';
+      if (this.isChecked) {
+        return this.variantClass.handler.checked;
       }
 
-      return this.disabled ? 'border-blue-graygray-100' : 'border-blue-graygray-100 hover:border-blue-400';
+      return this.variantClass.handler.unchecked;
     },
-    getBgColorClass: function getBgColorClass() {
-      if (this.active) {
-        return "bg-blue-400";
+    labelClass: function labelClass() {
+      return [this.fixedClass.label, this.getLabelVariantClass, this.sizeClass.label];
+    },
+    getLabelVariantClass: function getLabelVariantClass() {
+      if (this.disabled) {
+        return this.variantClass.label.disabled;
       }
 
-      return this.disabled ? 'bg-white' : 'bg-white active:bg-blue-400';
+      if (this.isChecked) {
+        return this.variantClass.label.checked;
+      }
+
+      return this.variantClass.label.unchecked;
     },
-    getZindexClass: function getZindexClass() {
-      return 'focus:z-10 hover:z-10';
-    },
-    type: function type() {
-      return this.disabled ? undefined : 'button';
-    },
-    listeners: function listeners() {
-      return this.$listeners;
+    isChecked: function isChecked() {
+      return !!this.localValue;
     }
   },
-  methods: {}
-});
-// CONCATENATED MODULE: ./src/components/pagination/TWPaginatorPage.vue?vue&type=script&lang=js&
- /* harmony default export */ var pagination_TWPaginatorPagevue_type_script_lang_js_ = (TWPaginatorPagevue_type_script_lang_js_); 
-// CONCATENATED MODULE: ./src/components/pagination/TWPaginatorPage.vue
-
-
-
-
-
-/* normalize component */
-
-var TWPaginatorPage_component = normalizeComponent(
-  pagination_TWPaginatorPagevue_type_script_lang_js_,
-  TWPaginatorPagevue_type_template_id_5126f08e_render,
-  TWPaginatorPagevue_type_template_id_5126f08e_staticRenderFns,
-  false,
-  null,
-  null,
-  null
-  
-)
-
-/* harmony default export */ var TWPaginatorPage = (TWPaginatorPage_component.exports);
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/pagination/TWPagination.vue?vue&type=script&lang=js&
-
-
-
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-
-/* harmony default export */ var TWPaginationvue_type_script_lang_js_ = ({
-  name: 'TWPagination',
-  components: {
-    TWPaginatorArrow: TWPaginatorArrow,
-    TWPaginatorPage: TWPaginatorPage
-  },
-  props: {
-    currentPage: {
-      type: Number,
-      default: 1
-    },
-    perPage: {
-      type: Number,
-      default: 0
-    },
-    total: {
-      type: Number,
-      default: 0
-    },
-    limit: {
-      type: Number,
-      default: 3
-    },
-    pageNumberLimit: {
-      type: Number,
-      default: 0
-    },
-    nextLabel: {
-      type: String,
-      default: undefined
-    },
-    previousLabel: {
-      type: String,
-      default: undefined
-    }
-  },
-  computed: {
-    totalPages: function totalPages() {
-      var total = parseInt(this.total);
-      var perPage = parseInt(this.perPage);
-      var output = Math.ceil(total / perPage); // Fix the number of pages based on props
-
-      if (this.pageNumberLimit && output > this.pageNumberLimit) {
-        return this.pageNumberLimit;
-      }
-
-      return output < 1 ? 1 : output;
-    },
-    pagesRage: function pagesRage() {
-      var total = this.totalPages;
-      var range = [];
-      var gap = this.limit;
-      var before = this.currentPage - gap;
-      var after = this.currentPage + gap;
-      var pages = []; // eslint-disable-next-line
-
-      for (var i = 1; i <= total; i++) {
-        if (i === 1 || i === total || i >= before && i <= after) {
-          range.push({
-            id: i,
-            value: i,
-            disabled: false
-          });
-        }
-      }
-
-      range.forEach(function (item, index) {
-        pages.push(item);
-        var nextIndex = index + 1;
-
-        if (nextIndex <= range.length - 1) {
-          if (item.id + 1 !== range[nextIndex].id) {
-            pages.push({
-              id: "".concat(item.id, "_ellipsis"),
-              value: '...',
-              disabled: true
-            });
-          }
-        }
-      });
-      return pages;
-    },
-    currentPageObject: function currentPageObject() {
-      var _this = this;
-
-      var output = this.pagesRage.filter(function (o) {
-        return o.id === _this.currentPage;
-      });
-      return output.length ? output[0] : {};
+  watch: {
+    value: function value(newValue) {
+      this.localValue = newValue;
     }
   },
   methods: {
-    changePage: function changePage(page) {
-      if (typeof page === 'number') {
-        this.$emit('change', page);
-      }
-    },
-    prev: function prev() {
-      if (this.currentPage !== 1) {
-        this.changePage(this.currentPageObject.id - 1);
-      }
-    },
-    next: function next() {
-      if (this.currentPage < this.totalPages) {
-        this.changePage(this.currentPageObject.id + 1);
-      }
+    onClick: function onClick() {
+      this.localValue = !this.localValue;
+      this.$emit('input', this.localValue);
     }
   }
 });
-// CONCATENATED MODULE: ./src/components/pagination/TWPagination.vue?vue&type=script&lang=js&
- /* harmony default export */ var pagination_TWPaginationvue_type_script_lang_js_ = (TWPaginationvue_type_script_lang_js_); 
-// EXTERNAL MODULE: ./src/components/pagination/TWPagination.vue?vue&type=style&index=0&id=3754a0e6&lang=scss&scoped=true&
-var TWPaginationvue_type_style_index_0_id_3754a0e6_lang_scss_scoped_true_ = __webpack_require__("4557");
-
-// CONCATENATED MODULE: ./src/components/pagination/TWPagination.vue
-
+// CONCATENATED MODULE: ./src/components/form-checkbox/FormCheckbox.vue?vue&type=script&lang=js&
+ /* harmony default export */ var form_checkbox_FormCheckboxvue_type_script_lang_js_ = (FormCheckboxvue_type_script_lang_js_); 
+// CONCATENATED MODULE: ./src/components/form-checkbox/FormCheckbox.vue
 
 
 
@@ -24719,33 +30545,1918 @@ var TWPaginationvue_type_style_index_0_id_3754a0e6_lang_scss_scoped_true_ = __we
 
 /* normalize component */
 
-var TWPagination_component = normalizeComponent(
-  pagination_TWPaginationvue_type_script_lang_js_,
-  TWPaginationvue_type_template_id_3754a0e6_scoped_true_render,
-  TWPaginationvue_type_template_id_3754a0e6_scoped_true_staticRenderFns,
+var FormCheckbox_component = normalizeComponent(
+  form_checkbox_FormCheckboxvue_type_script_lang_js_,
+  FormCheckboxvue_type_template_id_47707aae_render,
+  FormCheckboxvue_type_template_id_47707aae_staticRenderFns,
   false,
   null,
-  "3754a0e6",
+  null,
   null
   
 )
 
-/* harmony default export */ var TWPagination = (TWPagination_component.exports);
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"4df010df-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/tabs/TWTabs.vue?vue&type=template&id=0746bee6&
-var TWTabsvue_type_template_id_0746bee6_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',[_c('div',{staticClass:"border-b border-gray-200"},[_c('nav',{staticClass:"-mb-px flex space-x-8"},_vm._l((_vm.tabs),function(tab,index){return _c('a',{key:tab.id,staticClass:"whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm",class:{ 'border-blue-500 text-blue-600': tab.is_active, 'text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300': !tab.is_active },attrs:{"href":"#"},on:{"click":function($event){$event.stopPropagation();$event.preventDefault();return _vm.activateTabByIndex(index)}}},[_vm._v(" "+_vm._s(tab.header)+" ")])}),0)]),_c('div',{staticClass:"mt-8"},[_vm._t("default")],2)])}
-var TWTabsvue_type_template_id_0746bee6_staticRenderFns = []
+/* harmony default export */ var FormCheckbox = (FormCheckbox_component.exports);
+// CONCATENATED MODULE: ./src/components/form-checkbox/config.js
+/* harmony default export */ var form_checkbox_config = ({
+  defaultVariant: 'primary',
+  defaultSize: 'md',
+  fixed: {
+    root: 'inline-flex justify-start items-center',
+    handler: 'border-2 rounded lex flex-shrink-0 justify-center items-center cursor-pointer',
+    label: 'text-sm ml-2'
+  },
+  variants: {
+    primary: {
+      handler: {
+        checked: 'text-white bg-blue-600 border-blue-600',
+        unchecked: 'bg-white border-gray-300',
+        disabled: 'bg-gray-50 border-gray-200'
+      },
+      label: {
+        checked: 'text-gray-800',
+        unchecked: 'text-gray-800',
+        disabled: 'text-gray-500'
+      }
+    },
+    secondary: {
+      handler: {
+        checked: 'text-white bg-gray-400 border-gray-400',
+        unchecked: 'bg-white border-gray-300',
+        disabled: 'bg-gray-50 border-gray-200'
+      },
+      label: {
+        checked: 'text-gray-800',
+        unchecked: 'text-gray-800',
+        disabled: 'text-gray-500'
+      }
+    },
+    success: {
+      handler: {
+        checked: 'text-white bg-green-500 border-green-500',
+        unchecked: 'bg-white border-gray-300',
+        disabled: 'bg-gray-50 border-gray-200'
+      },
+      label: {
+        checked: '',
+        unchecked: 'text-gray-700',
+        disabled: 'text-gray-500'
+      }
+    },
+    danger: {
+      handler: {
+        checked: 'text-white bg-red-500 border-red-500',
+        unchecked: 'bg-white border-gray-300',
+        disabled: 'bg-gray-50 border-gray-200'
+      },
+      label: {
+        checked: 'text-gray-800',
+        unchecked: 'text-gray-800',
+        disabled: 'text-gray-500'
+      }
+    },
+    warning: {
+      handler: {
+        checked: 'text-white bg-yellow-500 border-yellow-500',
+        unchecked: 'bg-white border-gray-300',
+        disabled: 'bg-gray-50 border-gray-200'
+      },
+      label: {
+        checked: 'text-gray-800',
+        unchecked: 'text-gray-800',
+        disabled: 'text-gray-500'
+      }
+    }
+  },
+  sizes: {
+    sm: {
+      root: '',
+      handler: 'p-0.5 h-5 w-5',
+      label: ''
+    },
+    md: {
+      root: '',
+      handler: 'p-1 w-6 h-6',
+      label: ''
+    },
+    lg: {
+      root: '',
+      handler: 'p-1 h-8 w-8',
+      label: ''
+    }
+  }
+});
+// CONCATENATED MODULE: ./src/components/form-checkbox/index.js
 
 
-// CONCATENATED MODULE: ./src/components/tabs/TWTabs.vue?vue&type=template&id=0746bee6&
+
+var form_checkbox_Plugin = {
+  install: function install(Vue) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    if (!Vue.prototype.$TWVue) {
+      Vue.prototype.$TWVue = {};
+    }
+
+    Vue.prototype.$TWVue.FormCheckbox = Object(lodash["merge"])(form_checkbox_config, options);
+    Vue.component('TWFormCheckbox', FormCheckbox);
+  }
+};
+/* harmony default export */ var form_checkbox = (form_checkbox_Plugin);
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"3483aeeb-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/form-file/FormFile.vue?vue&type=template&id=11d41f33&
+var FormFilevue_type_template_id_11d41f33_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('label',{class:_vm.rootClass},[_c('input',{staticClass:"absolute opacity-0",attrs:{"type":"file","multiple":_vm.multiple,"accept":_vm.accept},on:{"change":_vm.onChange}}),_c('span',{class:_vm.textClass},[_vm._v(_vm._s(_vm.fileName || _vm.placeholder))]),_c('span',{class:_vm.btnClass},[_vm._v(" "+_vm._s(_vm.btnText)+" ")])])}
+var FormFilevue_type_template_id_11d41f33_staticRenderFns = []
+
+
+// CONCATENATED MODULE: ./src/components/form-file/FormFile.vue?vue&type=template&id=11d41f33&
+
+// EXTERNAL MODULE: ./node_modules/core-js/modules/es.function.name.js
+var es_function_name = __webpack_require__("b0c0");
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/form-file/FormFile.vue?vue&type=script&lang=js&
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+/* harmony default export */ var FormFilevue_type_script_lang_js_ = ({
+  name: 'TWFormFile',
+  mixins: [FixedMixin, VariantMixin, SizeMixin],
+  inheritAttrs: false,
+  props: {
+    multiple: Boolean,
+    accept: String,
+    placeholder: {
+      type: String,
+      default: 'Choose a file...'
+    },
+    btnText: {
+      type: String,
+      default: 'Browse'
+    }
+  },
+  data: function data() {
+    return {
+      fileName: null,
+      config: this.$TWVue.FormFile
+    };
+  },
+  computed: {
+    rootClass: function rootClass() {
+      return [this.fixedClass.root, this.variantClass.root, this.sizeClass.root];
+    },
+    textClass: function textClass() {
+      return [this.fixedClass.text, this.variantClass.text, this.sizeClass.text];
+    },
+    btnClass: function btnClass() {
+      return [this.fixedClass.btn, this.variantClass.btn, this.sizeClass.btn];
+    }
+  },
+  methods: {
+    onChange: function onChange($evt) {
+      var files = $evt.target.files;
+
+      if (files.length > 1) {
+        this.fileName = "".concat(files.length, " files");
+      } else if (files.length === 1) {
+        this.fileName = files[0].name;
+      }
+
+      this.$emit('input', $evt.target.files);
+    }
+  }
+});
+// CONCATENATED MODULE: ./src/components/form-file/FormFile.vue?vue&type=script&lang=js&
+ /* harmony default export */ var form_file_FormFilevue_type_script_lang_js_ = (FormFilevue_type_script_lang_js_); 
+// CONCATENATED MODULE: ./src/components/form-file/FormFile.vue
+
+
+
+
+
+/* normalize component */
+
+var FormFile_component = normalizeComponent(
+  form_file_FormFilevue_type_script_lang_js_,
+  FormFilevue_type_template_id_11d41f33_render,
+  FormFilevue_type_template_id_11d41f33_staticRenderFns,
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* harmony default export */ var FormFile = (FormFile_component.exports);
+// CONCATENATED MODULE: ./src/components/form-file/config.js
+/* harmony default export */ var form_file_config = ({
+  defaultVariation: 'primary',
+  defaultSize: 'md',
+  fixed: {
+    root: 'flex items-stretch justify-between relative overflow-hidden w-full shadow-sm disabled:bg-gray-100 rounded-lg',
+    text: 'truncate',
+    btn: 'flex items-center border-l justify-center flex-shrink-0 text-sm px-2.5'
+  },
+  variants: {
+    primary: {
+      root: 'text-gray-800 bg-white placeholder-gray-400 border border-gray-300 focus:border-blue-300 focus:ring focus:ring-opacity-50 focus:ring-blue-200',
+      text: '',
+      btn: 'bg-gray-200 border-gray-300 text-gray-700 font-medium'
+    },
+    success: {
+      root: 'text-gray-800 bg-white placeholder-gray-400 border border-green-500 focus:border-green-500 focus:ring focus:ring-opacity-50 focus:ring-green-200',
+      text: '',
+      btn: 'bg-green-200 border-gray-300 text-green-700 font-medium'
+    },
+    danger: {
+      root: 'text-gray-800 bg-white placeholder-gray-400 border border-red-500 focus:border-red-500 focus:ring focus:ring-opacity-50 focus:ring-red-200',
+      text: '',
+      btn: 'bg-red-200 border-gray-300 text-red-700 font-medium'
+    },
+    warning: {
+      root: 'text-gray-800 bg-white placeholder-gray-400 border border-yellow-500 focus:border-yellow-500 focus:ring focus:ring-opacity-50 focus:ring-yellow-200',
+      text: '',
+      btn: 'bg-yellow-200 border-gray-300 text-yellow-700 font-medium'
+    }
+  },
+  sizes: {
+    sm: {
+      root: '',
+      text: 'text-sm px-3 py-2',
+      btn: ''
+    },
+    md: {
+      root: '',
+      text: 'text-sm px-4 py-2',
+      btn: ''
+    },
+    lg: {
+      root: '',
+      text: 'text-base px-4 py-3',
+      btn: ''
+    }
+  }
+});
+// CONCATENATED MODULE: ./src/components/form-file/index.js
+
+
+
+var form_file_Plugin = {
+  install: function install(Vue) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    if (!Vue.prototype.$TWVue) {
+      Vue.prototype.$TWVue = {};
+    }
+
+    Vue.prototype.$TWVue.FormFile = Object(lodash["merge"])(form_file_config, options);
+    Vue.component('TWFormFile', FormFile);
+  }
+};
+/* harmony default export */ var form_file = (form_file_Plugin);
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"3483aeeb-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/form-group/FormGroup.vue?vue&type=template&id=5c4f7fea&
+var FormGroupvue_type_template_id_5c4f7fea_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',[_vm._t("label",[(_vm.label)?_c('TWFormLabel',{attrs:{"for":_vm.labelFor,"label":_vm.label}}):_vm._e()]),_vm._t("default"),(_vm.helpText)?_c('TWHelpText',{attrs:{"text":_vm.helpText,"variant":_vm.helpTextVariant}}):_vm._e()],2)}
+var FormGroupvue_type_template_id_5c4f7fea_staticRenderFns = []
+
+
+// CONCATENATED MODULE: ./src/components/form-group/FormGroup.vue?vue&type=template&id=5c4f7fea&
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"3483aeeb-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/form-label/FormLabel.vue?vue&type=template&id=436f03c4&
+var FormLabelvue_type_template_id_436f03c4_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('label',_vm._b({class:_vm.rootClass},'label',_vm.$attrs,false),[(_vm.label)?[_vm._v(_vm._s(_vm.label))]:(_vm.$slots.default)?[_vm._t("default")]:_vm._e()],2)}
+var FormLabelvue_type_template_id_436f03c4_staticRenderFns = []
+
+
+// CONCATENATED MODULE: ./src/components/form-label/FormLabel.vue?vue&type=template&id=436f03c4&
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/form-label/FormLabel.vue?vue&type=script&lang=js&
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+/* harmony default export */ var FormLabelvue_type_script_lang_js_ = ({
+  name: 'TWFormLabel',
+  inheritAttrs: false,
+  mixins: [FixedMixin, VariantMixin],
+  props: {
+    label: String
+  },
+  data: function data() {
+    return {
+      config: this.$TWVue.FormLabel
+    };
+  },
+  computed: {
+    rootClass: function rootClass() {
+      return [this.fixedClass.root];
+    }
+  }
+});
+// CONCATENATED MODULE: ./src/components/form-label/FormLabel.vue?vue&type=script&lang=js&
+ /* harmony default export */ var form_label_FormLabelvue_type_script_lang_js_ = (FormLabelvue_type_script_lang_js_); 
+// CONCATENATED MODULE: ./src/components/form-label/FormLabel.vue
+
+
+
+
+
+/* normalize component */
+
+var FormLabel_component = normalizeComponent(
+  form_label_FormLabelvue_type_script_lang_js_,
+  FormLabelvue_type_template_id_436f03c4_render,
+  FormLabelvue_type_template_id_436f03c4_staticRenderFns,
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* harmony default export */ var FormLabel = (FormLabel_component.exports);
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"3483aeeb-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/help-text/HelpText.vue?vue&type=template&id=85561772&
+var HelpTextvue_type_template_id_85561772_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('small',{class:_vm.rootClass},[(_vm.text)?[_vm._v(_vm._s(_vm.text))]:(_vm.$slots.default)?[_vm._t("default")]:_vm._e()],2)}
+var HelpTextvue_type_template_id_85561772_staticRenderFns = []
+
+
+// CONCATENATED MODULE: ./src/components/help-text/HelpText.vue?vue&type=template&id=85561772&
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/help-text/HelpText.vue?vue&type=script&lang=js&
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+/* harmony default export */ var HelpTextvue_type_script_lang_js_ = ({
+  name: 'TWHelpText',
+  mixins: [FixedMixin, VariantMixin],
+  props: {
+    text: String
+  },
+  data: function data() {
+    return {
+      config: this.$TWVue.HelpText
+    };
+  },
+  computed: {
+    rootClass: function rootClass() {
+      return ['relative', this.fixedClass.root, this.variantClass.root];
+    }
+  }
+});
+// CONCATENATED MODULE: ./src/components/help-text/HelpText.vue?vue&type=script&lang=js&
+ /* harmony default export */ var help_text_HelpTextvue_type_script_lang_js_ = (HelpTextvue_type_script_lang_js_); 
+// CONCATENATED MODULE: ./src/components/help-text/HelpText.vue
+
+
+
+
+
+/* normalize component */
+
+var HelpText_component = normalizeComponent(
+  help_text_HelpTextvue_type_script_lang_js_,
+  HelpTextvue_type_template_id_85561772_render,
+  HelpTextvue_type_template_id_85561772_staticRenderFns,
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* harmony default export */ var HelpText = (HelpText_component.exports);
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/form-group/FormGroup.vue?vue&type=script&lang=js&
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+/* harmony default export */ var FormGroupvue_type_script_lang_js_ = ({
+  name: 'TWFormGroup',
+  props: {
+    label: String,
+    labelFor: String,
+    helpText: String,
+    helpTextVariant: String
+  },
+  components: {
+    TWFormLabel: FormLabel,
+    TWHelpText: HelpText
+  }
+});
+// CONCATENATED MODULE: ./src/components/form-group/FormGroup.vue?vue&type=script&lang=js&
+ /* harmony default export */ var form_group_FormGroupvue_type_script_lang_js_ = (FormGroupvue_type_script_lang_js_); 
+// CONCATENATED MODULE: ./src/components/form-group/FormGroup.vue
+
+
+
+
+
+/* normalize component */
+
+var FormGroup_component = normalizeComponent(
+  form_group_FormGroupvue_type_script_lang_js_,
+  FormGroupvue_type_template_id_5c4f7fea_render,
+  FormGroupvue_type_template_id_5c4f7fea_staticRenderFns,
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* harmony default export */ var FormGroup = (FormGroup_component.exports);
+// CONCATENATED MODULE: ./src/components/form-group/index.js
+
+var form_group_Plugin = {
+  install: function install(Vue) {
+    Vue.component('TWFormGroup', FormGroup);
+  }
+};
+/* harmony default export */ var form_group = (form_group_Plugin);
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"3483aeeb-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/form-input/FormInput.vue?vue&type=template&id=69ecee5c&
+var FormInputvue_type_template_id_69ecee5c_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c(_vm.computedTag,_vm._g(_vm._b({tag:"Component",class:_vm.rootClass,attrs:{"value":_vm.localValue}},'Component',_vm.$attrs,false),_vm.inputListeners))}
+var FormInputvue_type_template_id_69ecee5c_staticRenderFns = []
+
+
+// CONCATENATED MODULE: ./src/components/form-input/FormInput.vue?vue&type=template&id=69ecee5c&
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/form-input/FormInput.vue?vue&type=script&lang=js&
+
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+/* harmony default export */ var FormInputvue_type_script_lang_js_ = ({
+  name: 'TWFormInput',
+  mixins: [FixedMixin, VariantMixin, SizeMixin],
+  inheritAttrs: false,
+  props: {
+    value: [String, Number]
+  },
+  data: function data() {
+    return {
+      localValue: this.value,
+      config: this.$TWVue.FormInput
+    };
+  },
+  watch: {
+    value: function value(_value) {
+      this.localValue = _value;
+    }
+  },
+  computed: {
+    rootClass: function rootClass() {
+      return [this.fixedClass.root, this.variantClass.root, this.sizeClass];
+    },
+    inputListeners: function inputListeners() {
+      var vm = this;
+      return _objectSpread2(_objectSpread2({}, this.$listeners), {}, {
+        input: function input(event) {
+          vm.$emit('input', event.target.value);
+        },
+        change: function change(event) {
+          vm.$emit('change', event.target.value);
+        },
+        blur: function blur(event) {
+          vm.$emit('blur', event);
+        }
+      });
+    },
+    computedTag: function computedTag() {
+      return this.$attrs.type && this.$attrs.type === 'textarea' ? 'textarea' : 'input';
+    }
+  }
+});
+// CONCATENATED MODULE: ./src/components/form-input/FormInput.vue?vue&type=script&lang=js&
+ /* harmony default export */ var form_input_FormInputvue_type_script_lang_js_ = (FormInputvue_type_script_lang_js_); 
+// CONCATENATED MODULE: ./src/components/form-input/FormInput.vue
+
+
+
+
+
+/* normalize component */
+
+var FormInput_component = normalizeComponent(
+  form_input_FormInputvue_type_script_lang_js_,
+  FormInputvue_type_template_id_69ecee5c_render,
+  FormInputvue_type_template_id_69ecee5c_staticRenderFns,
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* harmony default export */ var FormInput = (FormInput_component.exports);
+// CONCATENATED MODULE: ./src/components/form-input/config.js
+/* harmony default export */ var form_input_config = ({
+  defaultVariation: 'primary',
+  defaultSize: 'md',
+  fixed: {
+    root: 'block w-full transition ease-in-out focus:outline-none shadow-sm duration-150 disabled:bg-gray-100 rounded-lg'
+  },
+  variants: {
+    primary: {
+      root: 'text-gray-800 bg-white placeholder-gray-400 border border-gray-300 focus:border-blue-300 focus:ring focus:ring-opacity-50 focus:ring-blue-200'
+    },
+    success: {
+      root: 'text-gray-800 bg-white placeholder-gray-400 border border-green-500 focus:border-green-500 focus:ring focus:ring-opacity-50 focus:ring-green-200'
+    },
+    danger: {
+      root: 'text-gray-800 bg-white placeholder-gray-400 border border-red-500 focus:border-red-500 focus:ring focus:ring-opacity-50 focus:ring-red-200'
+    },
+    warning: {
+      root: 'text-gray-800 bg-white placeholder-gray-400 border border-yellow-500 focus:border-yellow-500 focus:ring focus:ring-opacity-50 focus:ring-yellow-200'
+    }
+  },
+  sizes: {
+    sm: 'text-sm px-3 py-2 leading-4',
+    md: 'text-sm px-4 py-2.5',
+    lg: 'text-base px-4 py-3'
+  }
+});
+// CONCATENATED MODULE: ./src/components/form-input/index.js
+
+
+
+var form_input_Plugin = {
+  install: function install(Vue) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    if (!Vue.prototype.$TWVue) {
+      Vue.prototype.$TWVue = {};
+    }
+
+    Vue.prototype.$TWVue.FormInput = Object(lodash["merge"])(form_input_config, options);
+    Vue.component('TWFormInput', FormInput);
+  }
+};
+/* harmony default export */ var form_input = (form_input_Plugin);
+
+// CONCATENATED MODULE: ./src/components/form-label/config.js
+/* harmony default export */ var form_label_config = ({
+  fixed: {
+    root: 'block text-gray-700 text-sm font-medium mb-2 tracking-wide'
+  }
+});
+// CONCATENATED MODULE: ./src/components/form-label/index.js
+
+
+
+var form_label_Plugin = {
+  install: function install(Vue) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    if (!Vue.prototype.$TWVue) {
+      Vue.prototype.$TWVue = {};
+    }
+
+    Vue.prototype.$TWVue.FormLabel = Object(lodash["merge"])(form_label_config, options);
+    Vue.component('TWFormLabel', FormLabel);
+  }
+};
+/* harmony default export */ var form_label = (form_label_Plugin);
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"3483aeeb-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/form-select/FormSelect.vue?vue&type=template&id=504d0de5&
+var FormSelectvue_type_template_id_504d0de5_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('select',_vm._b({directives:[{name:"model",rawName:"v-model",value:(_vm.computedValue),expression:"computedValue"}],class:_vm.rootClass,on:{"blur":function($event){return _vm.$emit('blur', $event)},"focus":function($event){return _vm.$emit('focus', $event)},"change":function($event){var $$selectedVal = Array.prototype.filter.call($event.target.options,function(o){return o.selected}).map(function(o){var val = "_value" in o ? o._value : o.value;return val}); _vm.computedValue=$event.target.multiple ? $$selectedVal : $$selectedVal[0]}}},'select',_vm.$attrs,false),[(_vm.placeholder)?[_c('option',{attrs:{"disabled":_vm.$attrs.multiple},domProps:{"value":null}},[_vm._v(_vm._s(_vm.placeholder))])]:_vm._e(),_vm._l((_vm.formOptions),function(option,index){return _c(_vm.getOptionComponent(option),_vm._b({key:("option_" + index),tag:"Component"},'Component',_vm.getOptionAttributes(option),false),[_vm._v(_vm._s(option.text)+" ")])})],2)}
+var FormSelectvue_type_template_id_504d0de5_staticRenderFns = []
+
+
+// CONCATENATED MODULE: ./src/components/form-select/FormSelect.vue?vue&type=template&id=504d0de5&
+
+// EXTERNAL MODULE: ./node_modules/core-js/modules/es.array.map.js
+var es_array_map = __webpack_require__("d81d");
+
+// EXTERNAL MODULE: ./node_modules/core-js/modules/es.symbol.iterator.js
+var es_symbol_iterator = __webpack_require__("d28b");
+
+// EXTERNAL MODULE: ./node_modules/core-js/modules/es.array.iterator.js
+var es_array_iterator = __webpack_require__("e260");
+
+// EXTERNAL MODULE: ./node_modules/core-js/modules/es.object.to-string.js
+var es_object_to_string = __webpack_require__("d3b7");
+
+// EXTERNAL MODULE: ./node_modules/core-js/modules/es.string.iterator.js
+var es_string_iterator = __webpack_require__("3ca3");
+
+// EXTERNAL MODULE: ./node_modules/core-js/modules/web.dom-collections.iterator.js
+var web_dom_collections_iterator = __webpack_require__("ddb0");
+
+// CONCATENATED MODULE: ./node_modules/@babel/runtime/helpers/esm/typeof.js
+
+
+
+
+
+
+
+function _typeof(obj) {
+  "@babel/helpers - typeof";
+
+  if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
+    _typeof = function _typeof(obj) {
+      return typeof obj;
+    };
+  } else {
+    _typeof = function _typeof(obj) {
+      return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+    };
+  }
+
+  return _typeof(obj);
+}
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"3483aeeb-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/form-select/FormSelectOption.vue?vue&type=template&id=7c9aa0a2&
+var FormSelectOptionvue_type_template_id_7c9aa0a2_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('option',{domProps:{"value":_vm.value}},[_vm._t("default")],2)}
+var FormSelectOptionvue_type_template_id_7c9aa0a2_staticRenderFns = []
+
+
+// CONCATENATED MODULE: ./src/components/form-select/FormSelectOption.vue?vue&type=template&id=7c9aa0a2&
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/form-select/FormSelectOption.vue?vue&type=script&lang=js&
+//
+//
+//
+//
+//
+//
+/* harmony default export */ var FormSelectOptionvue_type_script_lang_js_ = ({
+  name: 'TWFormSelectOption',
+  props: {
+    value: undefined
+  }
+});
+// CONCATENATED MODULE: ./src/components/form-select/FormSelectOption.vue?vue&type=script&lang=js&
+ /* harmony default export */ var form_select_FormSelectOptionvue_type_script_lang_js_ = (FormSelectOptionvue_type_script_lang_js_); 
+// CONCATENATED MODULE: ./src/components/form-select/FormSelectOption.vue
+
+
+
+
+
+/* normalize component */
+
+var FormSelectOption_component = normalizeComponent(
+  form_select_FormSelectOptionvue_type_script_lang_js_,
+  FormSelectOptionvue_type_template_id_7c9aa0a2_render,
+  FormSelectOptionvue_type_template_id_7c9aa0a2_staticRenderFns,
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* harmony default export */ var FormSelectOption = (FormSelectOption_component.exports);
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"3483aeeb-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/form-select/FormSelectOptionGroup.vue?vue&type=template&id=347ba1f0&
+var FormSelectOptionGroupvue_type_template_id_347ba1f0_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('optgroup',{attrs:{"label":_vm.label}},_vm._l((_vm.options),function(option,index){return _c('FormSelectOption',{key:("option_" + index),attrs:{"value":option.value}},[_vm._v(_vm._s(option.text)+" ")])}),1)}
+var FormSelectOptionGroupvue_type_template_id_347ba1f0_staticRenderFns = []
+
+
+// CONCATENATED MODULE: ./src/components/form-select/FormSelectOptionGroup.vue?vue&type=template&id=347ba1f0&
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/form-select/FormSelectOptionGroup.vue?vue&type=script&lang=js&
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ var FormSelectOptionGroupvue_type_script_lang_js_ = ({
+  name: 'TWFormSelectOptionGroup',
+  props: {
+    label: String,
+    options: {
+      type: Array,
+      default: function _default() {
+        return [];
+      }
+    }
+  },
+  components: {
+    FormSelectOption: FormSelectOption
+  }
+});
+// CONCATENATED MODULE: ./src/components/form-select/FormSelectOptionGroup.vue?vue&type=script&lang=js&
+ /* harmony default export */ var form_select_FormSelectOptionGroupvue_type_script_lang_js_ = (FormSelectOptionGroupvue_type_script_lang_js_); 
+// CONCATENATED MODULE: ./src/components/form-select/FormSelectOptionGroup.vue
+
+
+
+
+
+/* normalize component */
+
+var FormSelectOptionGroup_component = normalizeComponent(
+  form_select_FormSelectOptionGroupvue_type_script_lang_js_,
+  FormSelectOptionGroupvue_type_template_id_347ba1f0_render,
+  FormSelectOptionGroupvue_type_template_id_347ba1f0_staticRenderFns,
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* harmony default export */ var FormSelectOptionGroup = (FormSelectOptionGroup_component.exports);
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/form-select/FormSelect.vue?vue&type=script&lang=js&
+
+
+
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+
+
+/* harmony default export */ var FormSelectvue_type_script_lang_js_ = ({
+  name: 'TWFormSelect',
+  mixins: [FixedMixin, VariantMixin, SizeMixin],
+  components: {
+    FormSelectOption: FormSelectOption,
+    FormSelectOptionGroup: FormSelectOptionGroup
+  },
+  props: {
+    value: {
+      type: [String, Number, Boolean, Object, Array, Function, Date],
+      default: null
+    },
+    placeholder: String,
+    options: {
+      type: Array,
+      default: function _default() {
+        return [];
+      }
+    },
+    textField: {
+      type: String,
+      default: 'text'
+    },
+    valueField: {
+      type: String,
+      default: 'value'
+    },
+    optionsField: {
+      type: String,
+      default: 'options'
+    }
+  },
+  data: function data() {
+    return {
+      localValue: this.value,
+      config: this.$TWVue.FormInput
+    };
+  },
+  watch: {
+    value: function value(_value) {
+      this.localValue = _value;
+    }
+  },
+  computed: {
+    computedValue: {
+      get: function get() {
+        return this.localValue;
+      },
+      set: function set(value) {
+        this.localValue = value;
+        this.$emit('input', value);
+      }
+    },
+    rootClass: function rootClass() {
+      return [this.fixedClass.root, this.variantClass.root, this.sizeClass];
+    },
+    formOptions: function formOptions() {
+      return this.normalizeOptions(this.options);
+    }
+  },
+  methods: {
+    getOptionAttributes: function getOptionAttributes(option) {
+      var options = option.options;
+
+      if (Array.isArray(options) && options.length) {
+        return {
+          label: option.text,
+          options: option.options
+        };
+      } else {
+        return {
+          value: option.value
+        };
+      }
+    },
+    getOptionComponent: function getOptionComponent(option) {
+      var options = option.options;
+      return Array.isArray(options) ? 'FormSelectOptionGroup' : 'FormSelectOption';
+    },
+    normalizeOptions: function normalizeOptions(options) {
+      var _this = this;
+
+      var output = null;
+
+      if (Array.isArray(options)) {
+        output = options.map(function (opt) {
+          var value = opt;
+          var text = opt;
+
+          if (_typeof(opt) === 'object') {
+            var _options = opt[_this.optionsField];
+
+            if (Array.isArray(_options) && _options.length) {
+              _options = _options.map(function (option) {
+                return _this.normalizeOption(option);
+              });
+              return _objectSpread2(_objectSpread2({}, _this.normalizeOption(opt)), {}, {
+                options: _options
+              });
+            }
+
+            return _this.normalizeOption(opt);
+          }
+
+          return {
+            value: value,
+            text: text
+          };
+        });
+      }
+
+      return output;
+    },
+    normalizeOption: function normalizeOption(option) {
+      return {
+        value: option[this.valueField],
+        text: option[this.textField]
+      };
+    }
+  }
+});
+// CONCATENATED MODULE: ./src/components/form-select/FormSelect.vue?vue&type=script&lang=js&
+ /* harmony default export */ var form_select_FormSelectvue_type_script_lang_js_ = (FormSelectvue_type_script_lang_js_); 
+// CONCATENATED MODULE: ./src/components/form-select/FormSelect.vue
+
+
+
+
+
+/* normalize component */
+
+var FormSelect_component = normalizeComponent(
+  form_select_FormSelectvue_type_script_lang_js_,
+  FormSelectvue_type_template_id_504d0de5_render,
+  FormSelectvue_type_template_id_504d0de5_staticRenderFns,
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* harmony default export */ var FormSelect = (FormSelect_component.exports);
+// CONCATENATED MODULE: ./src/components/form-select/index.js
+
+var form_select_Plugin = {
+  install: function install(Vue) {
+    Vue.component('TWFormSelect', FormSelect);
+  }
+};
+/* harmony default export */ var form_select = (form_select_Plugin);
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"3483aeeb-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/form-switch/FormSwitch.vue?vue&type=template&id=60ce6f62&
+var FormSwitchvue_type_template_id_60ce6f62_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('button',{class:_vm.rootClass,attrs:{"type":"button"},on:{"click":_vm.onClick}},[_c('span',{class:_vm.handlerClass})])}
+var FormSwitchvue_type_template_id_60ce6f62_staticRenderFns = []
+
+
+// CONCATENATED MODULE: ./src/components/form-switch/FormSwitch.vue?vue&type=template&id=60ce6f62&
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/form-switch/FormSwitch.vue?vue&type=script&lang=js&
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+/* harmony default export */ var FormSwitchvue_type_script_lang_js_ = ({
+  name: 'TWFormSwitch',
+  mixins: [FixedMixin, VariantMixin, SizeMixin],
+  props: {
+    value: [Boolean, Number]
+  },
+  data: function data() {
+    return {
+      config: this.$TWVue.FormSwitch,
+      localValue: this.value
+    };
+  },
+  computed: {
+    rootClass: function rootClass() {
+      return [this.fixedClass.root, this.isEnabled ? this.variantClass.root.enabled : this.variantClass.root.disabled, this.sizeClass.root];
+    },
+    handlerClass: function handlerClass() {
+      return [this.fixedClass.handler, this.isEnabled ? 'translate-x-full' : 'translate-x-0', this.isEnabled ? this.variantClass.handler.enabled : this.variantClass.handler.disabled, this.sizeClass.handler];
+    },
+    isEnabled: function isEnabled() {
+      return !!this.localValue;
+    }
+  },
+  watch: {
+    value: function value(newValue) {
+      this.localValue = newValue;
+    }
+  },
+  methods: {
+    onClick: function onClick() {
+      this.localValue = !this.localValue;
+      this.$emit('input', this.localValue);
+    }
+  }
+});
+// CONCATENATED MODULE: ./src/components/form-switch/FormSwitch.vue?vue&type=script&lang=js&
+ /* harmony default export */ var form_switch_FormSwitchvue_type_script_lang_js_ = (FormSwitchvue_type_script_lang_js_); 
+// CONCATENATED MODULE: ./src/components/form-switch/FormSwitch.vue
+
+
+
+
+
+/* normalize component */
+
+var FormSwitch_component = normalizeComponent(
+  form_switch_FormSwitchvue_type_script_lang_js_,
+  FormSwitchvue_type_template_id_60ce6f62_render,
+  FormSwitchvue_type_template_id_60ce6f62_staticRenderFns,
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* harmony default export */ var FormSwitch = (FormSwitch_component.exports);
+// CONCATENATED MODULE: ./src/components/form-switch/config.js
+/* harmony default export */ var form_switch_config = ({
+  defaultVariant: 'primary',
+  defaultSize: 'md',
+  fixed: {
+    root: 'relative inline-flex flex-shrink-0 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none',
+    handler: 'pointer-events-none inline-block rounded-full shadow transform ring-0 transition ease-in-out duration-200'
+  },
+  variants: {
+    primary: {
+      root: {
+        enabled: 'bg-blue-600',
+        disabled: 'bg-gray-200'
+      },
+      handler: {
+        enabled: 'bg-white',
+        disabled: 'bg-white'
+      }
+    },
+    secondary: {
+      root: {
+        enabled: 'bg-gray-400',
+        disabled: 'bg-gray-200'
+      },
+      handler: {
+        enabled: 'bg-white',
+        disabled: 'bg-white'
+      }
+    },
+    success: {
+      root: {
+        enabled: 'bg-green-500',
+        disabled: 'bg-gray-200'
+      },
+      handler: {
+        enabled: 'bg-white',
+        disabled: 'bg-white'
+      }
+    },
+    danger: {
+      root: {
+        enabled: 'bg-red-500',
+        disabled: 'bg-gray-200'
+      },
+      handler: {
+        enabled: 'bg-white',
+        disabled: 'bg-white'
+      }
+    },
+    warning: {
+      root: {
+        enabled: 'bg-yellow-500',
+        disabled: 'bg-gray-200'
+      },
+      handler: {
+        enabled: 'bg-white',
+        disabled: 'bg-white'
+      }
+    }
+  },
+  sizes: {
+    sm: {
+      root: 'h-5 w-9',
+      handler: 'h-4 w-4'
+    },
+    md: {
+      root: 'h-6 w-11',
+      handler: 'h-5 w-5'
+    },
+    lg: {
+      root: 'h-8 w-15',
+      handler: 'h-7 w-7'
+    }
+  }
+});
+// CONCATENATED MODULE: ./src/components/form-switch/index.js
+
+
+
+var form_switch_Plugin = {
+  install: function install(Vue) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    if (!Vue.prototype.$TWVue) {
+      Vue.prototype.$TWVue = {};
+    }
+
+    Vue.prototype.$TWVue.FormSwitch = Object(lodash["merge"])(form_switch_config, options);
+    Vue.component('TWFormSwitch', FormSwitch);
+  }
+};
+/* harmony default export */ var form_switch = (form_switch_Plugin);
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"3483aeeb-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/form-textarea/FormTextarea.vue?vue&type=template&id=2cbe72b0&
+var FormTextareavue_type_template_id_2cbe72b0_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('textarea',_vm._g(_vm._b({class:_vm.rootClass,domProps:{"value":_vm.value}},'textarea',_vm.$attrs,false),_vm.inputListeners))}
+var FormTextareavue_type_template_id_2cbe72b0_staticRenderFns = []
+
+
+// CONCATENATED MODULE: ./src/components/form-textarea/FormTextarea.vue?vue&type=template&id=2cbe72b0&
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/form-textarea/FormTextarea.vue?vue&type=script&lang=js&
+
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+/* harmony default export */ var FormTextareavue_type_script_lang_js_ = ({
+  name: 'TWFormTextarea',
+  mixins: [VariantMixin, SizeMixin],
+  inheritAttrs: false,
+  props: {
+    value: [String, Number]
+  },
+  data: function data() {
+    return {
+      localValue: this.value,
+      config: this.$TWVue.FormTextarea
+    };
+  },
+  watch: {
+    value: function value(_value) {
+      this.localValue = _value;
+    }
+  },
+  computed: {
+    rootClass: function rootClass() {
+      return [this.fixedClass.root, this.variantClass.root, this.sizeClass];
+    },
+    inputListeners: function inputListeners() {
+      var vm = this;
+      return _objectSpread2(_objectSpread2({}, this.$listeners), {}, {
+        input: function input(event) {
+          vm.$emit('input', event.target.value);
+        },
+        change: function change(event) {
+          vm.$emit('change', event.target.value);
+        },
+        blur: function blur(event) {
+          vm.$emit('blur', event);
+        }
+      });
+    }
+  }
+});
+// CONCATENATED MODULE: ./src/components/form-textarea/FormTextarea.vue?vue&type=script&lang=js&
+ /* harmony default export */ var form_textarea_FormTextareavue_type_script_lang_js_ = (FormTextareavue_type_script_lang_js_); 
+// CONCATENATED MODULE: ./src/components/form-textarea/FormTextarea.vue
+
+
+
+
+
+/* normalize component */
+
+var FormTextarea_component = normalizeComponent(
+  form_textarea_FormTextareavue_type_script_lang_js_,
+  FormTextareavue_type_template_id_2cbe72b0_render,
+  FormTextareavue_type_template_id_2cbe72b0_staticRenderFns,
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* harmony default export */ var FormTextarea = (FormTextarea_component.exports);
+// CONCATENATED MODULE: ./src/components/form-textarea/index.js
+
+
+
+var form_textarea_Plugin = {
+  install: function install(Vue) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    if (!Vue.prototype.$TWVue) {
+      Vue.prototype.$TWVue = {};
+    }
+
+    Vue.prototype.$TWVue.FormTextarea = Object(lodash["merge"])(form_input_config, options);
+    Vue.component('TWFormTextarea', FormTextarea);
+  }
+};
+/* harmony default export */ var form_textarea = (form_textarea_Plugin);
+
+// CONCATENATED MODULE: ./src/components/help-text/config.js
+/* harmony default export */ var help_text_config = ({
+  defaultVariant: 'primary',
+  fixed: {
+    root: 'block text-sm m-0 py-1'
+  },
+  variants: {
+    primary: {
+      root: 'text-blue-400'
+    },
+    secondary: {
+      root: 'text-gray-500'
+    },
+    success: {
+      root: 'text-green-400'
+    },
+    danger: {
+      root: 'text-red-400'
+    },
+    warning: {
+      root: 'text-yellow-400'
+    }
+  }
+});
+// CONCATENATED MODULE: ./src/components/help-text/index.js
+
+
+
+var help_text_Plugin = {
+  install: function install(Vue) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    if (!Vue.prototype.$TWVue) {
+      Vue.prototype.$TWVue = {};
+    }
+
+    Vue.prototype.$TWVue.HelpText = Object(lodash["merge"])(help_text_config, options);
+    Vue.component('TWHelpText', HelpText);
+  }
+};
+/* harmony default export */ var help_text = (help_text_Plugin);
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"3483aeeb-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/modal/Modal.vue?vue&type=template&id=6b40161d&
+var Modalvue_type_template_id_6b40161d_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('MountingPortal',{attrs:{"mount-to":"body","append":""}},[_c('Transition',{attrs:{"css":false},on:{"before-enter":_vm.beforeEnter,"enter":_vm.enter,"leave":_vm.leave,"after-leave":_vm.afterLeave}},[(_vm.isOpen)?_c('div',{staticClass:"fixed inset-0 overflow-hidden"},[_c('div',{staticClass:"absolute flex items-center justify-center inset-0 overflow-hidden"},[(!_vm.noBackdrop)?_c('div',{class:_vm.backdropClass,on:{"click":function($event){return _vm.onBackdropClick()}}}):_vm._e(),_c('div',{class:_vm.panelWrapperClass},[(!_vm.hideHeader)?_c('div',{class:_vm.headerClass},[_vm._t("header",[_vm._t("header-title",[_c(_vm.titleTag,{tag:"Component",class:_vm.titleClass},[_vm._v(" "+_vm._s(_vm.title)+" ")])]),(!_vm.hideHeaderClose)?_c('div',{staticClass:"-mr-2"},[_c('TWButtonClose',{class:_vm.buttonCloseClass,attrs:{"size":"sm"},on:{"click":function($event){return _vm.close()}}})],1):_vm._e()])],2):_vm._e(),_c('div',{class:_vm.bodyClass},[_vm._t("default")],2),(!_vm.hideFooter)?_c('div',{class:_vm.footerClass},[(!_vm.hideBtnCancel)?_c('TWButton',{attrs:{"variant":_vm.btnCancelVariant},on:{"click":function($event){return _vm.onCancelClick()}}},[_vm._v(" "+_vm._s(_vm.btnCancelText)+" ")]):_vm._e(),(!_vm.hideBtnOk)?_c('TWButton',{attrs:{"variant":_vm.btnOkVariant},on:{"click":function($event){return _vm.onOkClick()}}},[_vm._v(" "+_vm._s(_vm.btnOkText)+" ")]):_vm._e()],1):_vm._e()])])]):_vm._e()])],1)}
+var Modalvue_type_template_id_6b40161d_staticRenderFns = []
+
+
+// CONCATENATED MODULE: ./src/components/modal/Modal.vue?vue&type=template&id=6b40161d&
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/modal/Modal.vue?vue&type=script&lang=js&
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+
+
+
+/* harmony default export */ var Modalvue_type_script_lang_js_ = ({
+  name: 'TWModal',
+  mixins: [FixedMixin, SizeMixin],
+  props: {
+    value: Boolean,
+    size: String,
+    title: String,
+    titleTag: {
+      type: String,
+      default: 'h5'
+    },
+    hideHeader: Boolean,
+    hideHeaderClose: Boolean,
+    hideFooter: Boolean,
+    noCloseOnBackdrop: Boolean,
+    noCloseOnEsc: Boolean,
+    btnCancelVariant: {
+      type: String,
+      default: 'danger'
+    },
+    noAnimation: Boolean,
+    hideBtnCancel: Boolean,
+    btnCancelText: {
+      type: String,
+      default: 'Cancel'
+    },
+    btnOkVariant: {
+      type: String,
+      default: 'primary'
+    },
+    hideBtnOk: Boolean,
+    btnOkText: {
+      type: String,
+      default: 'OK'
+    },
+    noBackdrop: Boolean
+  },
+  components: {
+    MountingPortal: portal_vue_common["MountingPortal"],
+    TWButtonClose: ButtonClose,
+    TWButton: Button
+  },
+  data: function data() {
+    return {
+      config: this.$TWVue.Modal,
+      isOpen: this.value
+    };
+  },
+  computed: {
+    backdropClass: function backdropClass() {
+      return ['backdrop absolute inset-0', this.fixedClass.backdrop];
+    },
+    panelWrapperClass: function panelWrapperClass() {
+      return ['panel fixed', this.fixedClass.panel, this.sizeClass.panel];
+    },
+    titleClass: function titleClass() {
+      return [this.fixedClass.title];
+    },
+    headerClass: function headerClass() {
+      return [this.fixedClass.header];
+    },
+    bodyClass: function bodyClass() {
+      return [this.fixedClass.body];
+    },
+    footerClass: function footerClass() {
+      return [this.fixedClass.footer];
+    },
+    buttonCloseClass: function buttonCloseClass() {
+      return [this.fixedClass.btnClose];
+    }
+  },
+  watch: {
+    value: function value(vl) {
+      this.isOpen = vl;
+    },
+    isOpen: function isOpen() {
+      this.handleScroll();
+    }
+  },
+  created: function created() {
+    window.addEventListener('keydown', this.onEsc);
+  },
+  beforeDestroy: function beforeDestroy() {
+    window.removeEventListener('keydown', this.onEsc);
+  },
+  mounted: function mounted() {
+    this.isOpen = this.value;
+  },
+  methods: {
+    handleScroll: function handleScroll() {
+      if (typeof window === 'undefined') return;
+      var body = document.body;
+
+      if (this.isOpen) {
+        body.classList.add('overflow-hidden');
+      } else {
+        body.classList.remove('overflow-hidden');
+      }
+    },
+    noCloseEffect: function noCloseEffect() {
+      if (this.noAnimation) {
+        return;
+      }
+
+      gsapWithCSS.fromTo(this.panel, {
+        scale: 1
+      }, {
+        repeat: 1,
+        duration: 0.1,
+        scale: 1.02,
+        yoyo: true
+      });
+    },
+    onBackdropClick: function onBackdropClick() {
+      if (this.noCloseOnBackdrop) {
+        this.noCloseEffect();
+        return;
+      }
+
+      this.close();
+    },
+    onCancelClick: function onCancelClick() {
+      this.close();
+      this.$emit('cancel');
+    },
+    onOkClick: function onOkClick() {
+      this.close();
+      this.$emit('ok');
+    },
+    close: function close() {
+      this.$emit('input', false);
+      this.$emit('close');
+    },
+    onEsc: function onEsc(evt) {
+      if (evt.key === 'Escape') {
+        if (this.noCloseOnEsc) {
+          this.noCloseEffect();
+          return;
+        }
+
+        this.close();
+      }
+    },
+    beforeEnter: function beforeEnter(el) {
+      this.$emit('before-enter');
+      this.backdrop = el.querySelector('.backdrop');
+      this.panel = el.querySelector('.panel');
+
+      if (this.noAnimation) {
+        return;
+      }
+
+      if (!this.noBackdrop) {
+        gsapWithCSS.set(this.backdrop, {
+          opacity: 0
+        });
+      }
+
+      gsapWithCSS.set(this.panel, {
+        opacity: 0,
+        y: '-20px'
+      });
+    },
+    enter: function enter(el, done) {
+      if (this.noAnimation) {
+        done();
+        return;
+      }
+
+      if (!this.noBackdrop) {
+        gsapWithCSS.to(this.backdrop, {
+          opacity: 1,
+          duration: 0.5,
+          ease: 'power3.inOut'
+        });
+      }
+
+      gsapWithCSS.to(this.panel, {
+        opacity: 1,
+        y: '0px',
+        ease: 'power3.inOut',
+        duration: 0.5,
+        onComplete: done
+      });
+    },
+    leave: function leave(el, done) {
+      if (this.noAnimation) {
+        done();
+        return;
+      }
+
+      if (!this.noBackdrop) {
+        gsapWithCSS.to(this.backdrop, {
+          opacity: 0,
+          duration: 0.5,
+          ease: 'power3.inOut'
+        });
+      }
+
+      gsapWithCSS.to(this.panel, {
+        opacity: 0,
+        y: '-20px',
+        ease: 'power3.inOut',
+        duration: 0.5,
+        onComplete: done
+      });
+    },
+    afterLeave: function afterLeave() {
+      this.$emit('after-leave');
+    }
+  }
+});
+// CONCATENATED MODULE: ./src/components/modal/Modal.vue?vue&type=script&lang=js&
+ /* harmony default export */ var modal_Modalvue_type_script_lang_js_ = (Modalvue_type_script_lang_js_); 
+// CONCATENATED MODULE: ./src/components/modal/Modal.vue
+
+
+
+
+
+/* normalize component */
+
+var Modal_component = normalizeComponent(
+  modal_Modalvue_type_script_lang_js_,
+  Modalvue_type_template_id_6b40161d_render,
+  Modalvue_type_template_id_6b40161d_staticRenderFns,
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* harmony default export */ var Modal = (Modal_component.exports);
+// CONCATENATED MODULE: ./src/components/modal/config.js
+/* harmony default export */ var modal_config = ({
+  defaultSize: 'md',
+  fixed: {
+    backdrop: 'bg-gray-900 bg-opacity-40',
+    panel: 'flex flex-col bg-white text-left overflow-hidden shadow-xl',
+    header: 'bg-gray-50 px-6 py-5 flex items-center justify-between',
+    title: 'text-lg leading-6 font-medium text-gray-900',
+    body: 'flex-1 h-full px-6 py-5',
+    footer: 'bg-gray-50 px-6 py-5 flex flex-col sm:flex-row sm:space-x-3 sm:justify-end',
+    btnClose: 'text-gray-600 hover:text-gray-800 hover:bg-gray-200 rounded-lg'
+  },
+  sizes: {
+    sm: {
+      panel: 'sm:w-full sm:max-w-sm'
+    },
+    md: {
+      panel: 'sm:w-full sm:max-w-xl'
+    },
+    lg: {
+      panel: 'sm:w-full sm:max-w-6xl'
+    },
+    full: {
+      panel: 'sm:w-full'
+    }
+  }
+});
+// CONCATENATED MODULE: ./src/components/modal/index.js
+
+
+
+var modal_Plugin = {
+  install: function install(Vue) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    if (!Vue.prototype.$TWVue) {
+      Vue.prototype.$TWVue = {};
+    }
+
+    Vue.prototype.$TWVue.Modal = Object(lodash["merge"])(modal_config, options);
+    Vue.component('TWModal', Modal);
+  }
+};
+/* harmony default export */ var modal = (modal_Plugin);
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"3483aeeb-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/progressbar/ProgressBar.vue?vue&type=template&id=a65b879a&
+var ProgressBarvue_type_template_id_a65b879a_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{class:_vm.rootClass,on:{"mouseover":function($event){_vm.activeToolTip = true},"mouseleave":function($event){_vm.activeToolTip = false}}},[_c('div',{class:[_vm.percentageClass, _vm.percentageBarClass],style:(("width: " + _vm.percentage + "%"))},[_c('div',{class:_vm.toolTipContainerClass},[_c('span',{directives:[{name:"show",rawName:"v-show",value:(_vm.activeToolTip & _vm.directionData == 'mt'),expression:"activeToolTip & directionData == 'mt'"}],class:_vm.getToolTipClass},[_vm._v(" "+_vm._s(_vm.tooltip)+" ")]),_c('p',{class:_vm.percentageTextClass},[_vm._v(_vm._s(_vm.percentage)+"% ")]),_c('span',{directives:[{name:"show",rawName:"v-show",value:(_vm.activeToolTip & _vm.directionData == 'mb'),expression:"activeToolTip & directionData == 'mb'"}],class:_vm.getToolTipClass},[_vm._v(" "+_vm._s(_vm.tooltip)+" ")])])])])}
+var ProgressBarvue_type_template_id_a65b879a_staticRenderFns = []
+
+
+// CONCATENATED MODULE: ./src/components/progressbar/ProgressBar.vue?vue&type=template&id=a65b879a&
+
+// EXTERNAL MODULE: ./node_modules/core-js/modules/es.array.concat.js
+var es_array_concat = __webpack_require__("99af");
+
+// EXTERNAL MODULE: ./node_modules/core-js/modules/es.array.index-of.js
+var es_array_index_of = __webpack_require__("c975");
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/progressbar/ProgressBar.vue?vue&type=script&lang=js&
+
+
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+/* harmony default export */ var ProgressBarvue_type_script_lang_js_ = ({
+  name: "ProgressBar",
+  mixins: [FixedMixin, VariantMixin, SizeMixin],
+  data: function data() {
+    return {
+      config: this.$TWVue.Progressbar,
+      activeToolTip: false,
+      directionData: 'mt'
+    };
+  },
+  props: {
+    percentage: {
+      type: [String, Number],
+      require: true
+    },
+    direction: {
+      type: String,
+      default: function _default() {
+        return "top";
+      },
+      validator: function validator(value) {
+        return ["bottom", "top"].indexOf(value) !== -1;
+      }
+    },
+    tooltip: {
+      type: [String, Number],
+      default: function _default() {
+        return "".concat(this.percentage, "%");
+      }
+    }
+  },
+  methods: {
+    checkDirection: function checkDirection() {
+      if (this.direction == 'top') {
+        this.directionData = 'mt';
+      } else {
+        this.directionData = 'mb';
+      }
+    }
+  },
+  computed: {
+    rootClass: function rootClass() {
+      return [this.fixedClass.root];
+    },
+    percentageClass: function percentageClass() {
+      return [this.fixedClass.percentage, this.variantClass.root];
+    },
+    getToolTipClass: function getToolTipClass() {
+      return ["-".concat(this.directionData, "-").concat(this.sizeClass.tooltip), this.sizeClass.text, this.fixedClass.tooltip, this.variantClass.tooltip];
+    },
+    percentageBarClass: function percentageBarClass() {
+      return [this.sizeClass.bar];
+    },
+    percentageTextClass: function percentageTextClass() {
+      return [this.sizeClass.text, this.fixedClass.percentageText];
+    },
+    toolTipContainerClass: function toolTipContainerClass() {
+      return this.fixedClass.tooltipContainer;
+    }
+  },
+  created: function created() {
+    this.checkDirection();
+  }
+});
+// CONCATENATED MODULE: ./src/components/progressbar/ProgressBar.vue?vue&type=script&lang=js&
+ /* harmony default export */ var progressbar_ProgressBarvue_type_script_lang_js_ = (ProgressBarvue_type_script_lang_js_); 
+// CONCATENATED MODULE: ./src/components/progressbar/ProgressBar.vue
+
+
+
+
+
+/* normalize component */
+
+var ProgressBar_component = normalizeComponent(
+  progressbar_ProgressBarvue_type_script_lang_js_,
+  ProgressBarvue_type_template_id_a65b879a_render,
+  ProgressBarvue_type_template_id_a65b879a_staticRenderFns,
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* harmony default export */ var ProgressBar = (ProgressBar_component.exports);
+// CONCATENATED MODULE: ./src/components/progressbar/config.js
+/* harmony default export */ var progressbar_config = ({
+  defaultVariant: "primary",
+  defaultSize: "md",
+  fixed: {
+    root: "shadow bg-gray-200 mt-2 rounded-full",
+    percentage: "leading-none py-1 flex justify-center items-center rounded-full relative",
+    tooltipContainer: "w-max flex flex-col justify-center align-center",
+    percentageText: "text-white font-semibold text-center",
+    tooltip: "my-2 p-2 shadow text-center text-black rounded-full font-bold "
+  },
+  variants: {
+    primary: {
+      root: "bg-blue-500 ",
+      tooltip: 'text-blue-700  bg-blue-200'
+    },
+    secondary: {
+      root: "bg-gray-500 ",
+      tooltip: 'text-gray-700 bg-gray-200'
+    },
+    success: {
+      root: "bg-green-500 ",
+      tooltip: 'text-green-700 bg-green-200'
+    },
+    danger: {
+      root: "bg-red-500 ",
+      tooltip: 'text-red-700 bg-red-200'
+    },
+    warning: {
+      root: "bg-yellow-500 ",
+      tooltip: 'text-yellow-700 bg-yellow-200'
+    }
+  },
+  sizes: {
+    sm: {
+      text: "text-xs",
+      bar: "h-4",
+      tooltip: "10"
+    },
+    md: {
+      text: "text-sm",
+      bar: "h-5",
+      tooltip: "11"
+    },
+    lg: {
+      text: "text-2xl",
+      bar: "h-7",
+      tooltip: "14"
+    }
+  }
+});
+// CONCATENATED MODULE: ./src/components/progressbar/index.js
+
+
+
+var progressbar_Plugin = {
+  install: function install(Vue) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    if (!Vue.prototype.$TWVue) {
+      Vue.prototype.$TWVue = {};
+    }
+
+    Vue.prototype.$TWVue.Progressbar = Object(lodash["merge"])(progressbar_config, options);
+    Vue.component("TWProgressBar", ProgressBar);
+  }
+};
+/* harmony default export */ var progressbar = (progressbar_Plugin);
+
+// CONCATENATED MODULE: ./src/components/spinner/config.js
+/* harmony default export */ var spinner_config = ({
+  defaultSize: 'sm',
+  fixed: {
+    root: 'inline-block'
+  },
+  sizes: {
+    xxs: 'h-4 w-4',
+    xs: 'h-6 w-6',
+    sm: 'h-8 w-8',
+    md: 'h-10 w-10',
+    lg: 'h-12 w-12',
+    xl: 'h-14 w-14'
+  }
+});
+// CONCATENATED MODULE: ./src/components/spinner/index.js
+
+
+
+var spinner_Plugin = {
+  install: function install(Vue) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    if (!Vue.prototype.$TWVue) {
+      Vue.prototype.$TWVue = {};
+    }
+
+    Vue.prototype.$TWVue.Spinner = Object(lodash["merge"])(spinner_config, options);
+    Vue.component('TWSpinner', Spinner);
+  }
+};
+/* harmony default export */ var spinner = (spinner_Plugin);
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"3483aeeb-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/tabs/Tabs.vue?vue&type=template&id=027de1d6&
+var Tabsvue_type_template_id_027de1d6_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{class:_vm.rootClass},[_c('div',{class:_vm.navWrapClass},[_c('nav',{class:_vm.navClass},_vm._l((_vm.tabs),function(tab,index){return _c('a',{key:tab.id,class:[
+                    _vm.linkClass,
+                    tab.is_active ? _vm.activeLinkClass : _vm.inactiveLinkClass
+                ],attrs:{"href":"#"},on:{"click":function($event){$event.stopPropagation();$event.preventDefault();return _vm.activateTabByIndex(index)}}},[_vm._v(_vm._s(tab.header)+" ")])}),0)]),_c('div',{class:_vm.contentClass},[_vm._t("default")],2)])}
+var Tabsvue_type_template_id_027de1d6_staticRenderFns = []
+
+
+// CONCATENATED MODULE: ./src/components/tabs/Tabs.vue?vue&type=template&id=027de1d6&
 
 // EXTERNAL MODULE: ./node_modules/core-js/modules/es.array.find.js
 var es_array_find = __webpack_require__("7db0");
 
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/tabs/TWTabs.vue?vue&type=script&lang=js&
+// EXTERNAL MODULE: ./node_modules/core-js/modules/es.string.link.js
+var es_string_link = __webpack_require__("9911");
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/tabs/Tabs.vue?vue&type=script&lang=js&
 
 
 
 
+
 //
 //
 //
@@ -24769,18 +32480,51 @@ var es_array_find = __webpack_require__("7db0");
 //
 //
 //
-/* harmony default export */ var TWTabsvue_type_script_lang_js_ = ({
+//
+
+
+/* harmony default export */ var Tabsvue_type_script_lang_js_ = ({
   name: 'TWTabs',
+  mixins: [FixedMixin, VariantMixin],
   props: {
     defaultTab: {
       type: Number,
       default: 0
     }
   },
+  provide: function provide() {
+    return {
+      Tabs: this
+    };
+  },
   data: function data() {
     return {
-      tabs: []
+      tabs: [],
+      config: this.$TWVue.Tab
     };
+  },
+  computed: {
+    rootClass: function rootClass() {
+      return [this.fixedClass.root, this.variantClass.root];
+    },
+    navWrapClass: function navWrapClass() {
+      return [this.fixedClass.navWrap, this.variantClass.navWrap];
+    },
+    navClass: function navClass() {
+      return [this.fixedClass.nav, this.variantClass.nav];
+    },
+    linkClass: function linkClass() {
+      return [this.fixedClass.link, this.variantClass.link];
+    },
+    activeLinkClass: function activeLinkClass() {
+      return [this.fixedClass.linkActive, this.variantClass.linkActive];
+    },
+    inactiveLinkClass: function inactiveLinkClass() {
+      return [this.fixedClass.linkInactive, this.variantClass.linkInactive];
+    },
+    contentClass: function contentClass() {
+      return [this.fixedClass.content, this.variantClass.content];
+    }
   },
   methods: {
     createTab: function createTab(tab) {
@@ -24809,9 +32553,9 @@ var es_array_find = __webpack_require__("7db0");
     }
   }
 });
-// CONCATENATED MODULE: ./src/components/tabs/TWTabs.vue?vue&type=script&lang=js&
- /* harmony default export */ var tabs_TWTabsvue_type_script_lang_js_ = (TWTabsvue_type_script_lang_js_); 
-// CONCATENATED MODULE: ./src/components/tabs/TWTabs.vue
+// CONCATENATED MODULE: ./src/components/tabs/Tabs.vue?vue&type=script&lang=js&
+ /* harmony default export */ var tabs_Tabsvue_type_script_lang_js_ = (Tabsvue_type_script_lang_js_); 
+// CONCATENATED MODULE: ./src/components/tabs/Tabs.vue
 
 
 
@@ -24819,10 +32563,10 @@ var es_array_find = __webpack_require__("7db0");
 
 /* normalize component */
 
-var TWTabs_component = normalizeComponent(
-  tabs_TWTabsvue_type_script_lang_js_,
-  TWTabsvue_type_template_id_0746bee6_render,
-  TWTabsvue_type_template_id_0746bee6_staticRenderFns,
+var Tabs_component = normalizeComponent(
+  tabs_Tabsvue_type_script_lang_js_,
+  Tabsvue_type_template_id_027de1d6_render,
+  Tabsvue_type_template_id_027de1d6_staticRenderFns,
   false,
   null,
   null,
@@ -24830,31 +32574,42 @@ var TWTabs_component = normalizeComponent(
   
 )
 
-/* harmony default export */ var TWTabs = (TWTabs_component.exports);
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"4df010df-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/tabs/TWTab.vue?vue&type=template&id=7e0b251a&
-var TWTabvue_type_template_id_7e0b251a_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{directives:[{name:"show",rawName:"v-show",value:(_vm.is_active),expression:"is_active"}]},[_vm._t("default")],2)}
-var TWTabvue_type_template_id_7e0b251a_staticRenderFns = []
+/* harmony default export */ var Tabs = (Tabs_component.exports);
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"3483aeeb-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/tabs/TabItem.vue?vue&type=template&id=7e5cd576&
+var TabItemvue_type_template_id_7e5cd576_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{directives:[{name:"show",rawName:"v-show",value:(_vm.is_active),expression:"is_active"}],class:_vm.itemClass},[_vm._t("default")],2)}
+var TabItemvue_type_template_id_7e5cd576_staticRenderFns = []
 
 
-// CONCATENATED MODULE: ./src/components/tabs/TWTab.vue?vue&type=template&id=7e0b251a&
+// CONCATENATED MODULE: ./src/components/tabs/TabItem.vue?vue&type=template&id=7e5cd576&
 
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/tabs/TWTab.vue?vue&type=script&lang=js&
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/tabs/TabItem.vue?vue&type=script&lang=js&
 //
 //
 //
 //
 //
 //
-/* harmony default export */ var TWTabvue_type_script_lang_js_ = ({
-  name: 'TWTab',
+//
+/* harmony default export */ var TabItemvue_type_script_lang_js_ = ({
+  name: 'TWTabItem',
   props: {
     header: {
       type: String,
       required: true
     }
   },
-  mounted: function mounted() {
-    this.$parent.createTab(this);
+  inject: {
+    'Tabs': {
+      default: undefined
+    }
+  },
+  created: function created() {
+    this.Tabs.createTab(this);
+  },
+  computed: {
+    itemClass: function itemClass() {
+      return [this.Tabs.fixedClass.tabItem, this.Tabs.variantClass.tabItem];
+    }
   },
   data: function data() {
     return {
@@ -24862,9 +32617,9 @@ var TWTabvue_type_template_id_7e0b251a_staticRenderFns = []
     };
   }
 });
-// CONCATENATED MODULE: ./src/components/tabs/TWTab.vue?vue&type=script&lang=js&
- /* harmony default export */ var tabs_TWTabvue_type_script_lang_js_ = (TWTabvue_type_script_lang_js_); 
-// CONCATENATED MODULE: ./src/components/tabs/TWTab.vue
+// CONCATENATED MODULE: ./src/components/tabs/TabItem.vue?vue&type=script&lang=js&
+ /* harmony default export */ var tabs_TabItemvue_type_script_lang_js_ = (TabItemvue_type_script_lang_js_); 
+// CONCATENATED MODULE: ./src/components/tabs/TabItem.vue
 
 
 
@@ -24872,10 +32627,10 @@ var TWTabvue_type_template_id_7e0b251a_staticRenderFns = []
 
 /* normalize component */
 
-var TWTab_component = normalizeComponent(
-  tabs_TWTabvue_type_script_lang_js_,
-  TWTabvue_type_template_id_7e0b251a_render,
-  TWTabvue_type_template_id_7e0b251a_staticRenderFns,
+var TabItem_component = normalizeComponent(
+  tabs_TabItemvue_type_script_lang_js_,
+  TabItemvue_type_template_id_7e5cd576_render,
+  TabItemvue_type_template_id_7e5cd576_staticRenderFns,
   false,
   null,
   null,
@@ -24883,841 +32638,249 @@ var TWTab_component = normalizeComponent(
   
 )
 
-/* harmony default export */ var TWTab = (TWTab_component.exports);
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"4df010df-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/badge/TWBadge.vue?vue&type=template&id=4fa50e2a&
-var TWBadgevue_type_template_id_4fa50e2a_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('span',{class:_vm.classList},[_vm._t("default")],2)}
-var TWBadgevue_type_template_id_4fa50e2a_staticRenderFns = []
-
-
-// CONCATENATED MODULE: ./src/components/badge/TWBadge.vue?vue&type=template&id=4fa50e2a&
-
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/badge/TWBadge.vue?vue&type=script&lang=js&
-//
-//
-//
-//
-//
-//
-/* harmony default export */ var TWBadgevue_type_script_lang_js_ = ({
-  name: 'TWBadge',
-  props: {
-    variant: {
-      type: String,
-      default: 'default'
-    },
-    size: {
-      type: String,
-      default: 'md'
-    }
+/* harmony default export */ var TabItem = (TabItem_component.exports);
+// CONCATENATED MODULE: ./src/components/tabs/config.js
+/* harmony default export */ var tabs_config = ({
+  defaultVariant: 'primary',
+  fixed: {
+    root: '',
+    navWrap: '',
+    nav: '',
+    link: '',
+    linkActive: '',
+    linkInactive: '',
+    content: 'mt-8',
+    tabItem: ''
   },
-  computed: {
-    classList: function classList() {
-      return [this.TWOptions.base, this.getVariant, this.getSize];
-    },
-    getVariant: function getVariant() {
-      var variants = this.TWOptions.variants;
-      return variants[this.variant];
-    },
-    getSize: function getSize() {
-      var sizes = this.TWOptions.sizes;
-      return sizes[this.size];
-    }
-  },
-  created: function created() {
-    var _this$$TWVue;
-
-    this.TWOptions = (this === null || this === void 0 ? void 0 : (_this$$TWVue = this.$TWVue) === null || _this$$TWVue === void 0 ? void 0 : _this$$TWVue.TWBadge) || {};
-  }
-});
-// CONCATENATED MODULE: ./src/components/badge/TWBadge.vue?vue&type=script&lang=js&
- /* harmony default export */ var badge_TWBadgevue_type_script_lang_js_ = (TWBadgevue_type_script_lang_js_); 
-// CONCATENATED MODULE: ./src/components/badge/TWBadge.vue
-
-
-
-
-
-/* normalize component */
-
-var TWBadge_component = normalizeComponent(
-  badge_TWBadgevue_type_script_lang_js_,
-  TWBadgevue_type_template_id_4fa50e2a_render,
-  TWBadgevue_type_template_id_4fa50e2a_staticRenderFns,
-  false,
-  null,
-  null,
-  null
-  
-)
-
-/* harmony default export */ var TWBadge = (TWBadge_component.exports);
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"4df010df-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/modal/TWModal.vue?vue&type=template&id=7f925f70&
-var TWModalvue_type_template_id_7f925f70_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return (_vm.isInDOM)?_c('MountingPortal',{attrs:{"mount-to":"body","append":""}},[_c('div',{directives:[{name:"show",rawName:"v-show",value:(_vm.isOpen),expression:"isOpen"}],staticClass:"fixed z-50 inset-0 overflow-y-auto"},[_c('div',{staticClass:"flex items-center justify-center min-h-screen p-4 sm:p-0 text-center"},[(!_vm.hideBackdrop)?_c('div',{staticClass:"fixed inset-0 transition-opacity",on:{"click":function($event){return _vm.onBackdropClick()}}},[_c('div',{class:_vm.backdropClassList})]):_vm._e(),_c('span',{staticClass:"hidden sm:inline-block sm:align-middle sm:h-screen"},[_vm._v("​")]),_c('div',{class:_vm.wrapClassList},[(!_vm.hideHeader)?_c('div',{class:_vm.headerClassList},[_vm._t("header",[_vm._t("header-title",[_c(_vm.titleTag,{tag:"Component",class:_vm.titleClassList},[_vm._v(" "+_vm._s(_vm.title)+" ")])]),(!_vm.hideHeaderClose)?_c('div',{staticClass:"-mr-2"},[_c('TWButtonClose',{attrs:{"size":"sm"},on:{"click":function($event){return _vm.close()}}})],1):_vm._e()])],2):_vm._e(),_c('div',{class:_vm.bodyClassList},[_vm._t("default")],2),(!_vm.hideFooter)?_c('div',{class:_vm.footerClassList},[(!_vm.hideCancel)?_c('TWButton',{attrs:{"variant":_vm.cancelVariant},on:{"click":function($event){return _vm.onCancelClick()}}},[_vm._v(" "+_vm._s(_vm.cancelTitle)+" ")]):_vm._e(),(!_vm.hideOk)?_c('TWButton',{attrs:{"variant":_vm.okVariant},on:{"click":function($event){return _vm.onOkClick()}}},[_vm._v(" "+_vm._s(_vm.okTitle)+" ")]):_vm._e()],1):_vm._e()])])])]):_vm._e()}
-var TWModalvue_type_template_id_7f925f70_staticRenderFns = []
-
-
-// CONCATENATED MODULE: ./src/components/modal/TWModal.vue?vue&type=template&id=7f925f70&
-
-// EXTERNAL MODULE: ./node_modules/portal-vue/dist/portal-vue.common.js
-var portal_vue_common = __webpack_require__("2b88");
-
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/modal/TWModal.vue?vue&type=script&lang=js&
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-
-
-/* harmony default export */ var TWModalvue_type_script_lang_js_ = ({
-  name: 'TWModal',
-  props: {
-    value: {
-      type: Boolean,
-      default: false
-    },
-    size: {
-      type: String,
-      default: 'md'
-    },
-    title: {
-      type: String,
-      default: 'Modal title'
-    },
-    titleTag: {
-      type: String,
-      default: 'h5'
-    },
-    hideHeader: {
-      type: Boolean,
-      default: false
-    },
-    hideHeaderClose: {
-      type: Boolean,
-      default: false
-    },
-    hideFooter: {
-      type: Boolean,
-      default: false
-    },
-    hideBackdrop: {
-      type: Boolean,
-      default: false
-    },
-    noCloseOnBackdrop: {
-      type: Boolean,
-      default: false
-    },
-    noCloseOnEsc: {
-      type: Boolean,
-      default: false
-    },
-    cancelVariant: {
-      type: String,
-      default: 'danger'
-    },
-    hideCancel: {
-      type: Boolean,
-      default: false
-    },
-    cancelTitle: {
-      type: String,
-      default: 'Cancel'
-    },
-    okVariant: {
-      type: String,
-      default: 'primary'
-    },
-    hideOk: {
-      type: Boolean,
-      default: false
-    },
-    okTitle: {
-      type: String,
-      default: 'OK'
-    }
-  },
-  components: {
-    MountingPortal: portal_vue_common["MountingPortal"],
-    TWButtonClose: TWButtonClose,
-    TWButton: TWButton
-  },
-  data: function data() {
-    return {
-      TWOptions: {},
-      isOpen: this.value,
-      isInDOM: this.value,
-      // TODO: this is required for transition to be added later on.
-      wrapClassList: [],
-      titleClassList: [],
-      headerClassList: [],
-      bodyClassList: [],
-      footerClassList: []
-    };
-  },
-  computed: {
-    backdropClassList: function backdropClassList() {
-      return ['absolute inset-0', this.TWOptions.backdropBackground, this.TWOptions.backdropOpacity];
-    },
-    getSize: function getSize() {
-      var sizes = this.TWOptions.sizes;
-      return sizes[this.size];
-    }
-  },
-  watch: {
-    value: function value(vl) {
-      this.isInDOM = vl;
-      this.isOpen = vl;
-    },
-    isOpen: function isOpen(vl) {
-      var body = document.body;
-
-      if (vl) {
-        body.classList.add('overflow-hidden');
-      } else {
-        body.classList.remove('overflow-hidden');
-      }
-    }
-  },
-  created: function created() {
-    var _this$$TWVue;
-
-    this.TWOptions = (this === null || this === void 0 ? void 0 : (_this$$TWVue = this.$TWVue) === null || _this$$TWVue === void 0 ? void 0 : _this$$TWVue.TWModal) || {};
-    this.initClasses();
-    window.addEventListener('keydown', this.onEsc);
-  },
-  beforeDestroy: function beforeDestroy() {
-    window.removeEventListener('keydown', this.onEsc);
-  },
-  methods: {
-    initClasses: function initClasses() {
-      this.wrapClassList = [this.TWOptions.wrap, this.getSize];
-      this.titleClassList = this.TWOptions.title;
-      this.headerClassList = this.TWOptions.header;
-      this.bodyClassList = this.TWOptions.body;
-      this.footerClassList = this.TWOptions.footer;
-    },
-    onBackdropClick: function onBackdropClick() {
-      if (!this.noCloseOnBackdrop) {
-        this.close();
-      }
-    },
-    onCancelClick: function onCancelClick() {
-      this.close();
-      this.$emit('cancel');
-    },
-    onOkClick: function onOkClick() {
-      this.close();
-      this.$emit('ok');
-    },
-    close: function close() {
-      this.$emit('input', false);
-      this.$emit('close');
-    },
-    onEsc: function onEsc(evt) {
-      console.log('aqui');
-
-      if (evt.key === 'Escape' && !this.noCloseOnEsc) {
-        this.close();
-      }
-    }
-  }
-});
-// CONCATENATED MODULE: ./src/components/modal/TWModal.vue?vue&type=script&lang=js&
- /* harmony default export */ var modal_TWModalvue_type_script_lang_js_ = (TWModalvue_type_script_lang_js_); 
-// CONCATENATED MODULE: ./src/components/modal/TWModal.vue
-
-
-
-
-
-/* normalize component */
-
-var TWModal_component = normalizeComponent(
-  modal_TWModalvue_type_script_lang_js_,
-  TWModalvue_type_template_id_7f925f70_render,
-  TWModalvue_type_template_id_7f925f70_staticRenderFns,
-  false,
-  null,
-  null,
-  null
-  
-)
-
-/* harmony default export */ var TWModal = (TWModal_component.exports);
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"4df010df-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/toggle/TWToggle.vue?vue&type=template&id=628b2ed7&
-var TWTogglevue_type_template_id_628b2ed7_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('button',{class:_vm.baseClass,attrs:{"type":"button"},on:{"click":_vm.onClick}},[_c('span',{class:_vm.handlerClass})])}
-var TWTogglevue_type_template_id_628b2ed7_staticRenderFns = []
-
-
-// CONCATENATED MODULE: ./src/components/toggle/TWToggle.vue?vue&type=template&id=628b2ed7&
-
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/toggle/TWToggle.vue?vue&type=script&lang=js&
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-/* harmony default export */ var TWTogglevue_type_script_lang_js_ = ({
-  name: 'TWToggle',
-  props: {
-    value: {
-      type: Boolean,
-      default: false
-    },
-    variant: {
-      type: String,
-      default: 'default'
-    }
-  },
-  data: function data() {
-    return {
-      localValue: this.value
-    };
-  },
-  computed: {
-    config: function config() {
-      var _this$$TWVue;
-
-      return (this === null || this === void 0 ? void 0 : (_this$$TWVue = this.$TWVue) === null || _this$$TWVue === void 0 ? void 0 : _this$$TWVue.TWToggle) || {};
-    },
-    baseClass: function baseClass() {
-      var isEnabled = this.isEnabled;
-      var variant = this.getVariant;
-      return [this.config.base, isEnabled ? variant.enabled : variant.disabled];
-    },
-    handlerClass: function handlerClass() {
-      var isEnabled = this.isEnabled;
-      return [this.config.handlerBase, isEnabled ? 'translate-x-5' : 'translate-x-0'];
-    },
-    isEnabled: function isEnabled() {
-      return this.localValue;
-    },
-    getVariant: function getVariant() {
-      return this.config.variants[this.variant];
-    },
-    inputListeners: function inputListeners() {
-      return this.$listeners;
-    }
-  },
-  watch: {
-    value: function value(newValue) {
-      this.localValue = newValue;
-    }
-  },
-  methods: {
-    onClick: function onClick() {
-      this.localValue = !this.localValue;
-      this.$emit('input', this.localValue);
-    }
-  }
-});
-// CONCATENATED MODULE: ./src/components/toggle/TWToggle.vue?vue&type=script&lang=js&
- /* harmony default export */ var toggle_TWTogglevue_type_script_lang_js_ = (TWTogglevue_type_script_lang_js_); 
-// CONCATENATED MODULE: ./src/components/toggle/TWToggle.vue
-
-
-
-
-
-/* normalize component */
-
-var TWToggle_component = normalizeComponent(
-  toggle_TWTogglevue_type_script_lang_js_,
-  TWTogglevue_type_template_id_628b2ed7_render,
-  TWTogglevue_type_template_id_628b2ed7_staticRenderFns,
-  false,
-  null,
-  null,
-  null
-  
-)
-
-/* harmony default export */ var TWToggle = (TWToggle_component.exports);
-// CONCATENATED MODULE: ./src/components/button/config.js
-/* harmony default export */ var config = ({
-  base: 'inline-flex items-center justify-center border focus:outline-none transition ease-in-out duration-150',
   variants: {
-    default: 'text-gray-700 bg-white hover:bg-gray-50 border border-gray-300',
-    naked: 'text-gray-700 border-transparent',
-    primary: 'text-white bg-blue-500 hover:bg-blue-600 border-blue-500 hover:border-blue-600',
-    'primary-outline': 'text-blue-500 hover:text-blue-600 border-blue-500 hover:border-blue-600',
-    secondary: 'text-white bg-gray-500 hover:bg-gray-600 border-gray-500 hover:border-gray-600',
-    'secondary-outline': 'text-gray-500 hover:text-gray-600 border-gray-500 hover:border-gray-600',
-    success: 'text-white bg-green-600 hover:bg-green-700 border-green-500 hover:border-green-600',
-    'success-outline': 'text-green-600 hover:text-green-700 border-green-500 hover:border-green-600',
-    danger: 'text-white bg-red-500 hover:bg-red-600 border-red-500 hover:border-red-600',
-    'danger-outline': 'text-red-500 hover:text-red-600 border-red-500 hover:border-red-600',
-    warning: 'text-yellow-900 bg-yellow-400 hover:bg-yellow-500 border-yellow-400 hover:border-yellow-500',
-    'warning-outline': 'text-yellow-500 hover:text-yellow-600 border-yellow-400 hover:border-yellow-500',
-    info: 'text-white bg-cyan-500 hover:bg-cyan-600 border-cyan-500 hover:border-cyan-600',
-    'info-outline': 'text-cyan-500 hover:text-cyan-600 border-cyan-500 hover:border-cyan-600',
-    light: 'text-gray-700 bg-gray-100 hover:bg-gray-200 border-gray-100 hover:border-gray-200',
-    dark: 'text-white bg-gray-700 hover:bg-gray-900',
-    'dark-outline': 'text-gray-700 hover:text-gray-900 border-gray-700 hover:border-gray-900'
-  },
-  rounded: {
-    sm: 'rounded-sm',
-    default: 'rounded',
-    md: 'rounded-md',
-    lg: 'rounded-lg',
-    xl: 'rounded-xl',
-    '2xl': 'rounded-2xl',
-    '3xl': 'rounded-3xl',
-    full: 'rounded-full'
-  },
-  circle: {
-    xs: 30,
-    sm: 34,
-    md: 38,
-    lg: 42,
-    xl: 50,
-    '2xl': 54
-  },
-  sizes: {
-    xs: 'text-xs px-2.5 py-1.5',
-    sm: 'text-sm px-3 py-2 leading-4',
-    md: 'text-sm px-4 py-2',
-    lg: 'text-base px-4 py-2',
-    xl: 'text-base px-6 py-3',
-    '2xl': 'text-xl px-8 py-3'
-  }
-});
-// CONCATENATED MODULE: ./src/components/button-close/config.js
-/* harmony default export */ var button_close_config = ({
-  base: 'inline-flex items-center justify-center p-1.5 focus:outline-none transition ease-in-out duration-150',
-  variants: {
-    default: 'text-gray-400 hover:text-gray-500',
-    'default-rounded': 'text-gray-400 hover:text-gray-500 border border-gray-200 rounded-full bg-white',
-    primary: 'text-blue-400 hover:text-blue-500',
-    'primary-rounded': 'text-blue-400 hover:text-blue-500 border border-blue-200 rounded-full bg-white',
-    danger: 'text-red-400 hover:text-red-500',
-    'danger-rounded': 'text-red-400 hover:text-red-500 border border-red-200 rounded-full bg-white',
-    success: 'text-green-400 hover:text-green-500',
-    'success-rounded': 'text-green-400 hover:text-green-500 border border-green-200 rounded-full bg-white'
-  },
-  sizes: {
-    xxs: 'w-3 h-3',
-    xs: 'w-4 h-4',
-    sm: 'w-5 h-5',
-    md: 'w-6 h-6',
-    lg: 'w-7 h-7'
-  }
-});
-// CONCATENATED MODULE: ./src/components/form-input/config.js
-/* harmony default export */ var form_input_config = ({
-  base: 'block w-full transition ease-in-out duration-150',
-  variants: {
-    default: 'text-gray-800 bg-white placeholder-gray-300 border border-gray-300 focus:border-blue-300 focus:ring focus:ring-opacity-50 focus:ring-blue-200 shadow-sm ',
-    naked: 'text-gray-800  bg-white placeholder-gray-300 border border-transparent bg-transparent focus:outline-none focus:border-transparent focus:ring-0',
-    success: 'text-gray-800 bg-white placeholder-gray-300 border border-green-500 focus:border-green-500 focus:ring focus:ring-opacity-50 focus:ring-green-200 shadow-sm ',
-    danger: 'text-gray-800 bg-white placeholder-gray-300 border border-red-500 focus:border-red-500 focus:ring focus:ring-opacity-50 focus:ring-red-200 shadow-sm ',
-    warning: 'text-gray-800 bg-white placeholder-gray-300 border border-yellow-500 focus:border-yellow-500 focus:ring focus:ring-opacity-50 focus:ring-yellow-200 shadow-sm ',
-    info: 'text-gray-800 bg-white placeholder-gray-300 border border-cyan-500 focus:border-cyan-500 focus:ring focus:ring-opacity-50 focus:ring-cyan-200 shadow-sm '
-  },
-  disabled: 'text-gray-400 border border-gray-200 focus:border-gray-200 bg-gray-100 shadow-sm ',
-  readonly: 'text-gray-800 border border-gray-300 focus:border-gray-300 shadow-sm ',
-  sizes: {
-    xs: 'text-xs px-2.5 py-1.5 text-xs rounded',
-    sm: 'text-sm px-3 py-2 leading-4 rounded',
-    md: 'text-sm px-4 py-2 rounded',
-    lg: 'text-base px-4 py-2 rounded',
-    xl: 'text-base px-4 py-3 rounded',
-    '2xl': 'text-2xl px-4 py-3 rounded'
-  }
-});
-// CONCATENATED MODULE: ./src/components/form-select/config.js
-/* harmony default export */ var form_select_config = ({
-  sizes: {
-    xs: 'text-xs px-2.5 pr-5 py-1.5 text-xs rounded',
-    sm: 'text-sm px-3 pr-6 py-2 leading-4 rounded',
-    md: 'text-sm px-4 pr-8 py-2 rounded',
-    lg: 'text-base px-4 pr-8 py-2 rounded',
-    xl: 'text-base px-4 pr-8 py-3 rounded',
-    '2xl': 'text-2xl px-4 pr-8 py-3 rounded'
-  }
-});
-// CONCATENATED MODULE: ./src/components/alert/config.js
-/* harmony default export */ var alert_config = ({
-  base: 'rounded-md p-4 text-sm font-medium',
-  baseButtonClose: 'inline-flex rounded-md p-1.5 focus:outline-none focus:ring-2 focus:ring-offset-2',
-  variants: {
-    default: {
-      base: 'bg-gray-50',
-      text: 'text-gray-700',
-      buttonClose: 'bg-gray-50 text-gray-500 hover:bg-gray-100 focus:ring-offset-gray-50 focus:ring-gray-600'
-    },
     primary: {
-      base: 'bg-blue-50',
-      text: 'text-blue-800',
-      buttonClose: 'bg-blue-50 text-blue-500 hover:bg-blue-100 focus:ring-offset-blue-50 focus:ring-blue-600'
+      root: '',
+      navWrap: 'border-b border-gray-200',
+      nav: '-mb-px flex space-x-8',
+      link: 'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm',
+      linkActive: 'border-blue-500 text-blue-600',
+      linkInactive: 'text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300',
+      content: '',
+      tabItem: ''
     },
     secondary: {
-      base: 'bg-gray-500',
-      text: 'text-white',
-      buttonClose: 'bg-gray-500 text-white hover:bg-gray-400 focus:ring-offset-gray-500 focus:ring-white'
+      root: '',
+      navWrap: 'bg-gray-300 rounded-lg p-2',
+      nav: 'flex space-x-3',
+      link: 'whitespace-nowrap py-1 px-2 font-medium text-sm rounded-md',
+      linkActive: 'border-gray-500 text-gray-600 bg-white',
+      linkInactive: 'text-gray-400 border-transparent hover:text-gray-700 hover:border-gray-300',
+      content: '',
+      tabItem: ''
+    }
+  }
+});
+// CONCATENATED MODULE: ./src/components/tabs/index.js
+
+
+
+
+var tabs_Plugin = {
+  install: function install(Vue) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    if (!Vue.prototype.$TWVue) {
+      Vue.prototype.$TWVue = {};
+    }
+
+    Vue.prototype.$TWVue.Tab = Object(lodash["merge"])(tabs_config, options);
+    Vue.component('TWTabs', Tabs);
+    Vue.component('TWTabItem', TabItem);
+  }
+};
+/* harmony default export */ var tabs = (tabs_Plugin);
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"node_modules/.cache/vue-loader","cacheIdentifier":"3483aeeb-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/tag/Tag.vue?vue&type=template&id=188b088c&
+var Tagvue_type_template_id_188b088c_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('span',{class:_vm.rootClass},[_vm._t("default"),(_vm.closable)?_c('button',{class:_vm.btnCloseClass,attrs:{"type":"button"}},[_c('svg',{staticClass:"h-2 w-2",attrs:{"stroke":"currentColor","fill":"none","viewBox":"0 0 8 8"}},[_c('path',{attrs:{"stroke-linecap":"round","stroke-width":"1.5","d":"M1 1l6 6m0-6L1 7"}})])]):_vm._e()],2)}
+var Tagvue_type_template_id_188b088c_staticRenderFns = []
+
+
+// CONCATENATED MODULE: ./src/components/tag/Tag.vue?vue&type=template&id=188b088c&
+
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./src/components/tag/Tag.vue?vue&type=script&lang=js&
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+/* harmony default export */ var Tagvue_type_script_lang_js_ = ({
+  name: 'TWTag',
+  mixins: [FixedMixin, VariantMixin, SizeMixin],
+  props: {
+    closable: Boolean
+  },
+  data: function data() {
+    return {
+      config: this.$TWVue.Tag
+    };
+  },
+  computed: {
+    rootClass: function rootClass() {
+      return [this.fixedClass.root, this.variantClass.root, this.sizeClass];
+    },
+    btnCloseClass: function btnCloseClass() {
+      return ['h-4 w-4 ml-1 -mr-2', this.fixedClass.btnClose, this.variantClass.buttonClose];
+    }
+  }
+});
+// CONCATENATED MODULE: ./src/components/tag/Tag.vue?vue&type=script&lang=js&
+ /* harmony default export */ var tag_Tagvue_type_script_lang_js_ = (Tagvue_type_script_lang_js_); 
+// CONCATENATED MODULE: ./src/components/tag/Tag.vue
+
+
+
+
+
+/* normalize component */
+
+var Tag_component = normalizeComponent(
+  tag_Tagvue_type_script_lang_js_,
+  Tagvue_type_template_id_188b088c_render,
+  Tagvue_type_template_id_188b088c_staticRenderFns,
+  false,
+  null,
+  null,
+  null
+  
+)
+
+/* harmony default export */ var Tag = (Tag_component.exports);
+// CONCATENATED MODULE: ./src/components/tag/config.js
+/* harmony default export */ var tag_config = ({
+  defaultVariant: 'primary',
+  defaultSize: 'sm',
+  fixed: {
+    root: 'inline-flex items-center font-medium rounded-full px-2.5 py-0.5',
+    btnClose: 'rounded-full inline-flex items-center justify-center focus:outline-none'
+  },
+  variants: {
+    primary: {
+      root: 'bg-blue-100 text-blue-700',
+      btnClose: 'text-blue-400 hover:bg-blue-200 hover:text-blue-500 focus:bg-blue-500 focus:text-white'
+    },
+    secondary: {
+      root: 'bg-gray-100 text-gray-700',
+      btnClose: 'text-gray-400 hover:bg-gray-200 hover:text-gray-500 focus:bg-gray-500 focus:text-white'
     },
     success: {
-      base: 'bg-green-50',
-      text: 'text-green-800',
-      buttonClose: 'bg-green-50 text-green-500 hover:bg-green-100 focus:ring-offset-green-50 focus:ring-green-600'
+      root: 'bg-green-100 text-green-700',
+      btnClose: 'text-green-400 hover:bg-green-200 hover:text-green-500 focus:bg-green-500 focus:text-white'
     },
     danger: {
-      base: 'bg-red-50',
-      text: 'text-red-800',
-      buttonClose: 'bg-red-50 text-red-500 hover:bg-red-100 focus:ring-offset-red-50 focus:ring-red-600'
+      root: 'bg-red-100 text-red-700',
+      btnClose: 'text-red-400 hover:bg-red-200 hover:text-red-500 focus:bg-red-500 focus:text-white'
     },
     warning: {
-      base: 'bg-yellow-50',
-      text: 'text-yellow-800',
-      buttonClose: 'bg-yellow-50 text-yellow-500 hover:bg-yellow-100 focus:ring-offset-yellow-50 focus:ring-yellow-600'
-    },
-    info: {
-      base: 'bg-cyan-50',
-      text: 'text-cyan-800',
-      buttonClose: 'bg-cyan-50 text-cyan-500 hover:bg-cyan-100 focus:ring-offset-cyan-50 focus:ring-cyan-600'
-    },
-    light: {
-      base: 'bg-gray-50',
-      text: 'text-gray-400',
-      buttonClose: 'bg-gray-50 text-gray-400 hover:bg-gray-100 focus:ring-offset-gray-50 focus:ring-gray-400'
-    },
-    dark: {
-      base: 'bg-gray-700',
-      text: 'text-white',
-      buttonClose: 'bg-gray-700 text-white hover:bg-gray-800 focus:ring-offset-gray-700 focus:ring-white'
+      root: 'bg-yellow-100 text-yellow-700',
+      btnClose: 'text-yellow-400 hover:bg-yellow-200 hover:text-yellow-500 focus:bg-yellow-500 focus:text-white'
     }
-  }
-});
-// CONCATENATED MODULE: ./src/components/form-label/config.js
-/* harmony default export */ var form_label_config = ({
-  base: 'block text-gray-700 text-sm font-medium mb-2 tracking-wide'
-});
-// CONCATENATED MODULE: ./src/components/help-text/config.js
-/* harmony default export */ var help_text_config = ({
-  base: 'block text-xs m-0 py-1',
-  variants: {
-    default: 'text-gray-400',
-    primary: 'text-blue-400',
-    secondary: 'text-gray-500',
-    success: 'text-green-400',
-    danger: 'text-red-400',
-    warning: 'text-yellow-400',
-    info: 'text-cyan-400',
-    light: 'text-gray-300',
-    dark: 'text-gray-800'
-  }
-});
-// CONCATENATED MODULE: ./src/components/avatar/config.js
-/* harmony default export */ var avatar_config = ({
-  sizes: {
-    xs: 'h-6 w-6',
-    sm: 'h-8 w-8',
-    md: 'h-10 w-10',
-    lg: 'h-12 w-12',
-    xl: 'h-14 w-14'
-  }
-});
-// CONCATENATED MODULE: ./src/components/spinner/config.js
-/* harmony default export */ var spinner_config = ({
-  base: 'inline-block',
-  variants: {
-    white: 'text-white',
-    primary: 'text-blue-500',
-    secondary: 'text-gray-500',
-    success: 'text-green-600',
-    danger: 'text-red-500',
-    warning: 'text-yellow-500',
-    info: 'text-cyan-500',
-    dark: 'text-gray-800'
   },
   sizes: {
-    xxs: 'h-4 w-4',
-    xs: 'h-6 w-6',
-    sm: 'h-8 w-8',
-    md: 'h-10 w-10',
-    lg: 'h-12 w-12',
-    xl: 'h-14 w-14'
+    sm: 'text-xs',
+    lg: 'text-sm'
   }
 });
-// CONCATENATED MODULE: ./src/components/dropdown/config.js
-/* harmony default export */ var dropdown_config = ({
-  // button: {
-  //     base: 'inline-flex items-center border focus:outline-none transition ease-in-out duration-150',
-  //     variants: {
-  //         default: 'text-gray-600 hover:text-gray-700 bg-white hover:bg-gray-50 border-gray-300',
-  //         naked: 'text-gray-700',
-  //         primary: 'text-white border-transparent bg-blue-500 hover:bg-blue-600',
-  //         secondary: 'text-white border-transparent bg-gray-500 hover:bg-gray-600',
-  //         success: 'text-white border-transparent bg-green-600 hover:bg-green-700',
-  //         danger: 'text-white border-transparent bg-red-500 hover:bg-red-600',
-  //         warning: 'text-yellow-900 border-transparent bg-yellow-400 hover:bg-yellow-500',
-  //         info: 'text-white border-transparent bg-cyan-500 hover:bg-cyan-600',
-  //         light: 'text-gray-400 border-transparent bg-gray-50 hover:bg-gray-100 border-gray-300',
-  //         dark: 'text-white border-transparent bg-gray-700 hover:bg-gray-900',
-  //     },
-  //     disabled: 'text-gray-400 border-gray-200 focus:border-gray-200 bg-gray-100',
-  //     readonly: 'text-gray-800 border-gray-300 focus:border-gray-300',
-  //     sizes: {
-  //         xs: 'text-xs px-2.5 py-1.5 text-xs rounded',
-  //         sm: 'text-sm px-3 py-2 leading-4 rounded-md',
-  //         md: 'text-sm px-4 py-2 rounded-md',
-  //         lg: 'text-base px-4 py-2 rounded-md',
-  //         xl: 'text-base px-4 py-3 rounded-md',
-  //         '2xl': 'text-2xl px-4 py-3 rounded-md',
-  //     },
-  // },
-  icon: {
-    sizes: {
-      xs: 'h-3 w-3 -mr-1 ml-1',
-      sm: 'h-4 w-4 -mr-1 ml-1',
-      md: 'h-5 w-5 -mr-1 ml-2',
-      lg: 'h-5 w-5 -mr-2 ml-2',
-      xl: 'h-6 w-6 -mr-2 ml-2',
-      '2xl': 'h-6 w-6 -mr-2 ml-2'
+// CONCATENATED MODULE: ./src/components/tag/index.js
+
+
+
+var tag_Plugin = {
+  install: function install(Vue) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    if (!Vue.prototype.$TWVue) {
+      Vue.prototype.$TWVue = {};
     }
+
+    Vue.prototype.$TWVue.Tag = Object(lodash["merge"])(tag_config, options);
+    Vue.component('TWTag', Tag);
   }
-});
-// CONCATENATED MODULE: ./src/components/card/config.js
-/* harmony default export */ var card_config = ({
-  base: 'w-full shadow rounded',
-  body: 'p-6',
-  variants: {
-    default: 'bg-white border border-gray-50',
-    naked: 'text-gray-700',
-    primary: 'text-white bg-blue-500',
-    secondary: 'text-white bg-gray-500',
-    success: 'text-white bg-green-600',
-    danger: 'text-white bg-red-500',
-    warning: 'text-yellow-900 bg-yellow-400',
-    info: 'text-white bg-cyan-500',
-    light: 'text-gray-400 bg-gray-50 border-gray-300',
-    dark: 'text-white bg-gray-700'
-  }
-});
-// CONCATENATED MODULE: ./src/components/badge/config.js
-/* harmony default export */ var badge_config = ({
-  base: 'inline-flex items-center font-medium',
-  variants: {
-    default: 'rounded-full bg-gray-100 text-gray-800',
-    primary: 'rounded-full bg-blue-100 text-blue-800',
-    secondary: 'rounded-full bg-gray-500 text-white',
-    success: 'rounded-full bg-green-100 text-green-800',
-    danger: 'rounded-full bg-red-100 text-red-800',
-    warning: 'rounded-full bg-yellow-100 text-yellow-800',
-    info: 'rounded-full bg-cyan-100 text-cyan-800',
-    // light: 'rounded-full bg-gray-100 text-gray-800',
-    dark: 'rounded-full bg-gray-700 text-white'
-  },
-  sizes: {
-    xs: 'text-xs px-2.5 py-1.5 rounded',
-    sm: 'text-sm px-3 py-2 leading-4 rounded',
-    md: 'px-2.5 py-0.5 text-xs',
-    lg: 'text-base px-4 py-2 rounded',
-    xl: 'text-base px-6 py-3 rounded',
-    '2xl': 'text-xl px-8 py-3 rounded'
-  }
-});
-// CONCATENATED MODULE: ./src/components/modal/config.js
-/* harmony default export */ var modal_config = ({
-  zIndex: 'z-50',
-  backdropBackground: 'bg-gray-900',
-  backdropOpacity: 'opacity-75',
-  wrap: 'inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle',
-  title: 'text-lg leading-6 font-medium text-gray-900',
-  header: 'bg-gray-50 py-3 px-6 flex items-center justify-between',
-  body: 'bg-white p-6',
-  footer: 'bg-gray-50 py-3 px-6 flex flex-col sm:flex-row sm:space-x-3 sm:justify-end',
-  sizes: {
-    xs: 'sm:w-full sm:max-w-xs',
-    sm: 'sm:w-full sm:max-w-md',
-    md: 'sm:w-full sm:max-w-lg',
-    lg: 'sm:w-full sm:max-w-3xl',
-    xl: 'sm:w-full sm:max-w-6xl',
-    full: 'sm:w-full'
-  }
-});
-// CONCATENATED MODULE: ./src/components/toggle/config.js
-/* harmony default export */ var toggle_config = ({
-  base: 'relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500',
-  handlerBase: 'pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200',
-  variants: {
-    default: {
-      enabled: 'bg-blue-600',
-      disabled: 'bg-gray-200'
-    }
-  }
-});
+};
+/* harmony default export */ var tag = (tag_Plugin);
+
+// CONCATENATED MODULE: ./src/components/index.js
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // CONCATENATED MODULE: ./src/index.js
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// import { merge } from 'lodash';
+ // import Alert from './components/alert/Alert';
+// import alertConfig from './components/alert/config';
+// import avatarConfig from './components/avatar/config';
+// import buttonConfig from './components/button/config';
+// import buttonCloseConfig from './components/button-close/config';
+// import formSwitch from './components/form-switch/config';
+// import helpTextConfig from './components/help-text/config';
+// import spinnerConfig from './components/spinner/config';
+// import tagConfig from './components/tag/config';
 
 /* harmony default export */ var src_0 = ({
-  install: function install(Vue, options) {
-    var _options$TWButton, _options$TWButtonClos, _options$TWFormInput, _options$TWFormSelect, _options$TWAlert, _options$TWFormLabel, _options$TWHelpText, _options$TWAvatar, _options$TWSpinner, _options$TWDropdown, _options$TWCard, _options$TWBadge, _options$TWModal, _options$TWToggle;
-
+  install: function install(Vue) {
     if (this.installed) {
       return;
     }
 
     this.installed = true;
-    Vue.prototype.$TWVue = {
-      TWButton: Object(lodash["merge"])(config, options === null || options === void 0 ? void 0 : (_options$TWButton = options.TWButton) === null || _options$TWButton === void 0 ? void 0 : _options$TWButton.extend),
-      TWButtonClose: Object(lodash["merge"])(button_close_config, options === null || options === void 0 ? void 0 : (_options$TWButtonClos = options.TWButtonClose) === null || _options$TWButtonClos === void 0 ? void 0 : _options$TWButtonClos.extend),
-      TWFormInput: Object(lodash["merge"])(form_input_config, options === null || options === void 0 ? void 0 : (_options$TWFormInput = options.TWFormInput) === null || _options$TWFormInput === void 0 ? void 0 : _options$TWFormInput.extend),
-      TWFormSelect: Object(lodash["merge"])(_objectSpread2(_objectSpread2({}, form_input_config), form_select_config), options === null || options === void 0 ? void 0 : (_options$TWFormSelect = options.TWFormSelect) === null || _options$TWFormSelect === void 0 ? void 0 : _options$TWFormSelect.extend),
-      TWAlert: Object(lodash["merge"])(alert_config, options === null || options === void 0 ? void 0 : (_options$TWAlert = options.TWAlert) === null || _options$TWAlert === void 0 ? void 0 : _options$TWAlert.extend),
-      TWFormLabel: Object(lodash["merge"])(form_label_config, options === null || options === void 0 ? void 0 : (_options$TWFormLabel = options.TWFormLabel) === null || _options$TWFormLabel === void 0 ? void 0 : _options$TWFormLabel.extend),
-      TWHelpText: Object(lodash["merge"])(help_text_config, options === null || options === void 0 ? void 0 : (_options$TWHelpText = options.TWHelpText) === null || _options$TWHelpText === void 0 ? void 0 : _options$TWHelpText.extend),
-      TWAvatar: Object(lodash["merge"])(avatar_config, options === null || options === void 0 ? void 0 : (_options$TWAvatar = options.TWAvatar) === null || _options$TWAvatar === void 0 ? void 0 : _options$TWAvatar.extend),
-      TWSpinner: Object(lodash["merge"])(spinner_config, options === null || options === void 0 ? void 0 : (_options$TWSpinner = options.TWSpinner) === null || _options$TWSpinner === void 0 ? void 0 : _options$TWSpinner.extend),
-      TWDropdown: Object(lodash["merge"])(dropdown_config, options === null || options === void 0 ? void 0 : (_options$TWDropdown = options.TWDropdown) === null || _options$TWDropdown === void 0 ? void 0 : _options$TWDropdown.extend),
-      TWCard: Object(lodash["merge"])(card_config, options === null || options === void 0 ? void 0 : (_options$TWCard = options.TWCard) === null || _options$TWCard === void 0 ? void 0 : _options$TWCard.extend),
-      TWBadge: Object(lodash["merge"])(badge_config, options === null || options === void 0 ? void 0 : (_options$TWBadge = options.TWBadge) === null || _options$TWBadge === void 0 ? void 0 : _options$TWBadge.extend),
-      TWModal: Object(lodash["merge"])(modal_config, options === null || options === void 0 ? void 0 : (_options$TWModal = options.TWModal) === null || _options$TWModal === void 0 ? void 0 : _options$TWModal.extend),
-      TWToggle: Object(lodash["merge"])(toggle_config, options === null || options === void 0 ? void 0 : (_options$TWToggle = options.TWToggle) === null || _options$TWToggle === void 0 ? void 0 : _options$TWToggle.extend)
-    };
-    Vue.component('TWButton', TWButton);
-    Vue.component('TWButtonClose', TWButtonClose);
-    Vue.component('TWButton', TWButton);
-    Vue.component('TWFormGroup', TWFormGroup);
-    Vue.component('TWFormInput', TWFormInput);
-    Vue.component('TWFormFile', TWFormFile);
-    Vue.component('TWFormTextarea', TWFormTextarea);
-    Vue.component('TWFormSelect', TWFormSelect);
-    Vue.component('TWFormSelectOption', TWFormSelectOption);
-    Vue.component('TWAlert', TWAlert);
-    Vue.component('TWFormLabel', TWFormLabel);
-    Vue.component('TWSpinner', TWSpinner);
-    Vue.component('TWHelpText', TWHelpText);
-    Vue.component('TWAvatar', TWAvatar);
-    Vue.component('TWDropdown', TWDropdown);
-    Vue.component('TWDropdownItem', TWDropdownItem);
-    Vue.component('TWDropdownDivider', TWDropdownDivider);
-    Vue.component('TWCard', TWCard);
-    Vue.component('TWCardBody', TWCardBody);
-    Vue.component('TWPagination', TWPagination);
-    Vue.component('TWTabs', TWTabs);
-    Vue.component('TWTab', TWTab);
-    Vue.component('TWBadge', TWBadge);
-    Vue.component('TWModal', TWModal);
-    Vue.component('TWToggle', TWToggle);
+    Vue.prototype.$TWVue = {// Alert: merge(alertConfig, options?.Alert?.extend),
+      // Avatar: merge(avatarConfig, options?.Avatar?.extend),
+      // Button: merge(buttonConfig, options?.Button?.extend),
+      // ButtonClose: merge(buttonCloseConfig, options?.ButtonClose?.extend),
+      // FormSwitch: merge(formSwitch, options?.FormSwitch?.extend),
+      // Spinner: merge(spinnerConfig, options?.Spinner?.extend),
+      // Tag: merge(tagConfig, options?.Tag?.extend),
+      // HelpText: merge(helpTextConfig, options?.HelpText?.extend),
+    }; // Vue.component(Alert.name, Alert);
+
+    for (var componentKey in components_namespaceObject) {
+      Vue.use(components_namespaceObject[componentKey]);
+    }
   }
 });
 // CONCATENATED MODULE: ./node_modules/@vue/cli-service/lib/commands/build/entry-lib.js
