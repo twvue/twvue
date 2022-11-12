@@ -3,12 +3,12 @@ export default {
     defaultSize: "md",
     fixed: {
         root: "bg-white rounded-lg border-2 overflow-hidden",
-        header: "p-2 flex justify-between items-center cursor-pointer",
+        header: "p-2 flex justify-between items-center cursor-pointer ",
         tittle: 'text-xl',
         icon: 'w-6 h-6',
         content: {
-            fixed: 'transition-all duration-200 px-2',
-            actived: 'h-max p-2',
+            fixed: 'transition-all duration-200 px-2 ',
+            actived: 'h-max p-2 border-t border-gray-200',
             noActived: 'max-h-0'
         }
     },
@@ -45,7 +45,7 @@ export default {
         },
         ghost:{
             root: "border-gray-200 text-black",
-            header: 'bg-transparent text-black',
+            header: 'bg-transparent',
             tittle: 'text-black',
             icon: "text-black"
         }
