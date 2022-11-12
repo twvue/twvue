@@ -1,6 +1,6 @@
 <template>
-    <div>
-        <div class="space-x-4 text-sm">
+    <div class="">
+        <div class="space-x-4 text-sm pb-1">
             <RouterLink
                 v-for="nav in menu"
                 :key="nav.label"
@@ -14,10 +14,11 @@
                 {{ nav.label }}
             </RouterLink>
         </div>
-
-        <br /><br />
-
-        <RouterView />
+        <div>
+            <div class="flex-1 pt-2">
+                <RouterView />
+            </div>
+        </div>
     </div>
 </template>
 
@@ -27,6 +28,7 @@ export default {
     data() {
         return {
             menu: [
+                { label: "Accordion", to: "/documentation/accordion" },
                 { label: "Alert", to: "/documentation/alert" },
                 { label: "Avatar", to: "/documentation/avatar" },
                 { label: "Button", to: "/documentation/button" },
@@ -40,7 +42,9 @@ export default {
                 { label: "Step Bar", to: "/documentation/stepBar" },
                 { label: "Tab", to: "/documentation/tab" },
                 { label: "Tag", to: "/documentation/tag" },
-            ]
+                
+            ],
+            selected: false
         };
     }
 };

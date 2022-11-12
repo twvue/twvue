@@ -32,6 +32,7 @@ const router = new VueRouter({
                 buildRoute("stepBar", "documentation/StepBar.vue"),
                 buildRoute("tab", "documentation/Tab"),
                 buildRoute("tag", "documentation/Tag"),
+                buildRoute("accordion", "documentation/Accordion"),
             ]
         }
     ]
