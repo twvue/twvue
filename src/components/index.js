@@ -17,6 +17,7 @@ import Spinner from './spinner';
 import StepBar from './stepBar'
 import Tabs from './tabs';
 import Tag from './tag';
+import Accordion from './accordion';
 
 export {
     Alert,
@@ -37,5 +38,6 @@ export {
     Spinner,
     StepBar,
     Tabs,
-    Tag
+    Tag,
+    Accordion
 };
