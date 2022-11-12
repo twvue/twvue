@@ -29,6 +29,12 @@
             <TWAccordionTittle slot="tittle">Title</TWAccordionTittle>
             <TWAccordionContent slot="content">Content</TWAccordionContent>
         </TWAccordion>
+        
+        <h1 class="text-bold font-mono text-3xl">Ghost</h1>
+        <TWAccordion variant="ghost">
+            <TWAccordionTittle slot="tittle">Title</TWAccordionTittle>
+            <TWAccordionContent slot="content">Content</TWAccordionContent>
+        </TWAccordion>
 
         <br>
         <h1>Sm</h1>
