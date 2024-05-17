@@ -1,5 +1,5 @@
 export default {
     fixed: {
-        root: 'block text-gray-700 text-sm font-medium mb-2 tracking-wide',
+        root: 'block text-gray-700 dark:text-gray-300 text-sm font-semibold dark:font-medium mb-2',
     },
 };
