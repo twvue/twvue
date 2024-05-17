@@ -1,14 +1,9 @@
-import Dropdown from './Dropdown';
-import DropdownItem from './DropdownItem';
-import DropdownDivider from './DropdownDivider';
-import { merge } from 'lodash';
-import config from './config';
+import Dropdown from './Dropdown.vue';
+import DropdownItem from './DropdownItem.vue';
+import DropdownDivider from './DropdownDivider.vue';
 
 const Plugin = {
-    install(Vue, options = {}) {
-        if (!Vue.prototype.$TWVue) { Vue.prototype.$TWVue = {}; }
-        Vue.prototype.$TWVue.Dropdown = merge(config, options);
-
+    install(Vue) {
         Vue.component('TWDropdown', Dropdown);
         Vue.component('TWDropdownItem', DropdownItem);
         Vue.component('TWDropdownDivider', DropdownDivider);

@@ -2,8 +2,8 @@
     <Component
         :is="computedTag"
         :class="rootClass"
+        type="button"
         v-bind="$attrs"
-        v-on="$listeners"
     >
         <slot />
     </Component>
@@ -32,19 +32,6 @@ export default {
                 this.TWDropdown.fixedClass.rootItem,
             ];
         },
-    },
-    methods: {
-        onClick($evt) {
-            this.closeDropdown();
-            this.$emit('click', $evt);
-        },
-        closeDropdown() {
-            if (!this.TWDropdown) {
-                return;
-            }
-
-            this.TWDropdown.close();
-        },
-    },
+    }
 };
 </script>

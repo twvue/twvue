@@ -1,67 +1,76 @@
 <template>
-    <div
-        ref="component"
-        :class="rootClass"
-    >
-        <TWButton
+    <div :class="rootClass">
+        <div
             ref="button"
-            type="button"
-            :variant="variant"
-            :size="size"
-            @click.stop.prevent="toggleDropdown()"
+            class="cursor-pointer"
+            @click="toggleDropdown()"
         >
             <slot name="button-content">
-                {{ text }}
-            </slot>
-
-            <slot
-                v-if="!noCaret"
-                name="button-icon"
-            >
-                <svg
-                    :class="iconClass"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    aria-hidden="true"
+                <TWButton
+                    type="button"
+                    :variant="variant"
+                    :size="size"
                 >
-                    <path
-                        fill-rule="evenodd"
-                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                        clip-rule="evenodd"
-                    />
-                </svg>
-            </slot>
-        </TWButton>
+                    {{ text }}
 
-        <MountingPortal
-            mount-to="body"
-            append
+                    <slot
+                        v-if="!noCaret"
+                        name="button-icon"
+                    >
+                        <svg
+                            :class="iconClass"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                            aria-hidden="true"
+                        >
+                            <path
+                                fill-rule="evenodd"
+                                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                clip-rule="evenodd"
+                            />
+                        </svg>
+                    </slot>
+                </TWButton>
+            </slot>
+        </div>
+
+        <Transition
+            :css="false"
+            @before-enter="beforeEnter"
+            @enter="enter"
+            @leave="leave"
         >
             <div
-                ref="dropdown"
-                :data-show="isOpen"
-                :class="dropdownClass"
+                ref="dropdownPopper"
+                v-show="isOpen"
             >
-                <div :class="dropdownContainerClass">
-                    <slot />
+                <div
+                    ref="dropdown"
+                    :class="dropdownClass"
+                >
+                    <div :class="dropdownContainerClass">
+                        <slot />
+                    </div>
                 </div>
             </div>
-        </MountingPortal>
+        </Transition>
     </div>
 </template>
 
 <script>
-import { MountingPortal } from 'portal-vue';
-import TWButton from '../button/Button';
+import TWButton from '../button/Button.vue';
 import { createPopper } from '@popperjs/core';
-import FixedMixin from '../../utils/FixedMixin';
-import VariantMixin from '../../utils/VariantMixin';
-import SizeMixin from '../../utils/SizeMixin';
+import FixedMixin from '../FixedMixin';
+import VariantMixin from '../VariantMixin';
+import SizeMixin from '../SizeMixin';
+import config from './config';
+import { gsap } from 'gsap';
 
 export default {
     name: 'TWDropdown',
     mixins: [FixedMixin, VariantMixin, SizeMixin],
+    emits: ['open', 'close', 'select'],
     props: {
         disabled: Boolean,
         noCaret: Boolean,
@@ -72,7 +81,6 @@ export default {
         },
     },
     components: {
-        MountingPortal,
         TWButton,
     },
     provide() {
@@ -82,9 +90,10 @@ export default {
     },
     data() {
         return {
-            config: this.$TWVue.Dropdown,
+            config,
             isOpen: false,
             popper: null,
+            dropdown: null
         };
     },
     computed: {
@@ -102,7 +111,6 @@ export default {
         },
         dropdownClass() {
             return [
-                'twvue-dropdown',
                 this.fixedClass.dropdown,
                 this.variantClass.dropdown,
                 this.sizeClass.dropdown,
@@ -118,40 +126,26 @@ export default {
     watch: {
         isOpen(value) {
             if (value) {
-                this.$root.$emit('tw-dropdown-shown', this);
+                this.initPopper()
             }
         },
     },
-    created() {
-        this.$root.$on('tw-dropdown-shown', this.rootCloseListener);
-    },
     mounted() {
-        this.$nextTick(() => {
-            this.initPopper();
-        })
+        this.dropdown = this.$refs.dropdown;
 
         if (typeof document !== 'undefined') {
             document.addEventListener('click', this.clickOutListener);
         }
     },
-    beforeDestroy() {
-        this.close();
-
+    beforeUnmount() {
         if (typeof document !== 'undefined') {
             document.removeEventListener('click', this.clickOutListener);
         }
     },
-    destroyed() {
-        if (typeof this.popper.destroy === 'function') {
-            this.popper.destroy();
-        }
+    unmounted() {
+        this.close()
     },
     methods: {
-        rootCloseListener(vm) {
-            if (vm !== this) {
-                this.close();
-            }
-        },
         clickOutListener(e) {
             // TODO Refactor as it should close only the current scope
             if (!this.$el.contains(e.target)) {
@@ -178,25 +172,38 @@ export default {
             this.$emit('select', opt);
         },
         initPopper() {
-            const button = this.$refs.component;
-            const dropdown = this.$refs.dropdown;
+            this.$nextTick(() => {
+                const button = this.$refs.button;
+                const dropdown = this.$refs.dropdownPopper;
 
-            this.popper = createPopper(button, dropdown, {
-                placement: this.placement,
-            });
+                this.popper = createPopper(button, dropdown, {
+                    placement: this.placement,
+                    removeOnDestroy: true,
+                    modifiers: [
+                        {
+                            name: 'offset',
+                            options: {
+                                offset: [0, 5],
+                            },
+                        },
+                    ],
+                });
+
+                this.popper.update();
+            })
+        },
+        beforeEnter() {
+            gsap.set(this.dropdown, { opacity: 0, scale: 0.95 });
+        },
+        enter(el, done) {
+            gsap.to(this.dropdown, { opacity: 1, scale: 1, ease: 'elastic.out(1.5, 0.75)', duration: .7, onComplete: done })
+        },
+        leave(el, done) {
+            gsap.to(this.dropdown, { opacity: 0, scale: 0.95, ease: 'power3.inOut', duration: .5, onComplete: () => {
+                this.popper?.destroy();
+                done();
+            }, })
         },
     },
 };
 </script>
-
-<style>
-.twvue-dropdown {
-    pointer-events: none;
-    visibility: hidden;
-}
-
-.twvue-dropdown[data-show] {
-    pointer-events: auto;
-    visibility: visible;
-}
-</style>
